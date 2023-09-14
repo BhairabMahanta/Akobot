@@ -45,7 +45,7 @@ module.exports = {
 
       data.push(newQuestion);
 
-   fs.writeFileSync('./commands/fun/questions.json', JSON.stringify(data));
+   fs.writeFileSync('./commands/fun/questions.json', JSON.stringify(data), 2);
 
       message.channel.send('Question added successfully!');
     } catch (error) {
