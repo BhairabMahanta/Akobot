@@ -1,4 +1,4 @@
-  const config = require('./jsons/config.json');
+  const config = require('./config.json');
 const { Client, IntentsBitField, EmbedBuilder, ButtonBuilder, ActionRowBuilder, SlashCommandBuilder, Events, ModalBuilder, Collection } = require('discord.js');
 const path = require('path');
 const fs = require('fs');

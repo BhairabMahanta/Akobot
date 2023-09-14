@@ -1,4 +1,4 @@
-const { Schema } = require("mongoose");
+/*const { Schema } = require("mongoose");
 
 const { heroExpToNextLevel, heroStatIncreaseOnLevel } = require("./game/_CONSTS/heroexp");
 const { army, statistics, cooldowns, resources, inventory } = require("./userValues");
@@ -291,3 +291,4 @@ User.methods = {
 };
 
 module.exports = User;
+*/
