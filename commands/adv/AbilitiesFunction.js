@@ -163,7 +163,7 @@ class MirrorImage extends Ability {
     console.log(`${user} creates multiple illusory copies to confuse opponents.`);
     // Implement illusion logic here
   }
-}
+} 
 
 class MindTrick extends Ability {
   constructor() {
@@ -420,6 +420,7 @@ class InventiveMind extends Ability {
 module.exports = {
   ShieldBash,
   Defend,
+  Bloodlust, RagingStrike, ArenaSpin, CrowdControl, PrecisionStrike, HonorsResolve, Fireball, ArcaneShield, FrostNova, Thunderstorm, RaiseDead, DrainLife, MirrorImage, MindTrick, Backstab, ShadowStep,
     DualWield,
     Evasion,
     SmokeBomb,

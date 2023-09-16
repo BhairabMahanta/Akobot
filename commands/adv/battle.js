@@ -96,9 +96,10 @@ for (const familiarName of this.playerFamiliar) {
  }} else if (i.customId === 'starter') {
 const selectedClassValue = i.values[0]; // Get the selected value // gae shit
     console.log('selectedValues', selectedClassValue)
-     if (selectedClassValue.startsWith('player_ability_')) {
+      if (selectedClassValue.startsWith('player_ability_')) {
    try{
-message.channel.send('AbilityUsed');
+       const abilityName = selectedClassValue.replace('player_ability_', '');
+message.channel.send(`AbilityUsed:  ${abilityName}`);
        // this.printBattleResult();
    if (this.boss.physicalStats.hp < 0) {
       message.channel.send("You won the battle against the Monster, you can continue the journey where you left off (I lied  you can't)")
@@ -109,6 +110,14 @@ message.channel.send('AbilityUsed');
    } catch (error) {
     console.error('Error on hit:', error);
  }}
+      else if (selectedClassValue.startsWith('fam-')) {
+        try{
+      const abilityName = selectedClassValue.replace('fam-', '');   
+      message.channel.send(`You're Gay if you used ${abilityName}`)
+      } catch (error) {
+          console.log('ErrorFamiliar:', error)
+        }
+      }
     }
 
   });
@@ -130,7 +139,7 @@ const moveFinder = familiarArray.map(cardName => getCardMoves(cardName));
         return {
           label: ability.name,
           description: ability.description,
-          value: ability.id.toString(),
+          value: `fam-${ability.name}`,
         };
       }
     });

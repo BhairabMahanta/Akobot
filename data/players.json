@@ -49,10 +49,10 @@
         },
         "playerpos": {
             "x": 300,
-            "y": 300
+            "y": 250
         },
-        "atkBar": 98.00000000000001,
-        "attackBarEmoji": "[■■■■■■■■■ ]"
+        "atkBar": 0,
+        "attackBarEmoji": "[■■■■■■■■■■]"
     },
     "266939098017562625": {
         "name": "scammedsirol",
