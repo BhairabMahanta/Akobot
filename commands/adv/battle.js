@@ -5,6 +5,7 @@ const { checkResults, updateMovesOnCd, calculateAbilityDamage, getCardStats, get
   calculateDamage, getPlayerMoves } = require('../util/glogic.js');
 const classes = require('../../data/classes/allclasses');
 const abilities = require('../../data/abilities.js');
+const {Ability} = require('./AbilitiesFunction.js');
 let initialMessage = null;
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, StringSelectMenuBuilder } = require('discord.js');
   const buttonRow = new ActionRowBuilder()
@@ -23,6 +24,7 @@ class Battle {
  constructor(player, bossName) {
     this.player = player;
       this.abilityOptions = [];
+   this.ability = new Ability();
    try{
     this.playerFamiliar = player.selectedFamiliars.name;
     console.log('selectedplayerFamiliar:', this.playerFamiliar)
@@ -57,6 +59,19 @@ for (const familiarName of this.playerFamiliar) {
     this.initialMessage = initialMessage;
     
   }
+
+  
+  async toCamelCase(str) {
+     const words = str.split(' ');
+  if (words.length === 2) {
+    return words[0].toLowerCase() + words[1];
+  }
+  return str.replace(/\s(.)/g, function(match, group1) {
+    console.log('group1:', group1);
+      console.log('match:', match);
+    return group1.toUpperCase();
+  }).replace(/\s/g, ''); // Remove any remaining spaces
+}
 
  async startBattle(message) {
 
@@ -99,6 +114,15 @@ const selectedClassValue = i.values[0]; // Get the selected value // gae shit
       if (selectedClassValue.startsWith('player_ability_')) {
    try{
        const abilityName = selectedClassValue.replace('player_ability_', '');
+     console.log('abilityName:a', abilityName)
+           const abilityNameCamel = await this.toCamelCase(abilityName);
+          console.log('abilityName:a', abilityNameCamel)
+            // Check if the abilityName exists as a method in the Ability class
+ if (typeof this.ability[abilityNameCamel] === 'function') {
+        this.ability[abilityNameCamel](this.playerName, this.boss.name);
+ } else {
+     console.log(`Ability ${abilityName} not found.`);
+ }
 message.channel.send(`AbilityUsed:  ${abilityName}`);
        // this.printBattleResult();
    if (this.boss.physicalStats.hp < 0) {
@@ -113,11 +137,19 @@ message.channel.send(`AbilityUsed:  ${abilityName}`);
       else if (selectedClassValue.startsWith('fam-')) {
         try{
       const abilityName = selectedClassValue.replace('fam-', '');   
+         // Check if the abilityName exists as a method in the Ability class
+if (typeof this.ability[abilityName] === 'function') {
+    // Execute the ability by calling it using square brackets
+    this.ability[abilityName](user, target);
+} else {
+    console.log(`Ability ${abilityName} not found.`);
+}
       message.channel.send(`You're Gay if you used ${abilityName}`)
       } catch (error) {
           console.log('ErrorFamiliar:', error)
         }
       }
+      
     }
 
   });
@@ -131,7 +163,7 @@ message.channel.send(`AbilityUsed:  ${abilityName}`);
    let familiarArray = [];
       familiarArray.push(this.currentTurn);
 const moveFinder = familiarArray.map(cardName => getCardMoves(cardName));
-   console.log('moveFinderWhattf it is:', moveFinder)
+
     
      try { 
        this.abilityOptions = moveFinder[0].map((ability) => {
@@ -144,7 +176,7 @@ const moveFinder = familiarArray.map(cardName => getCardMoves(cardName));
       }
     });
        familiarArray = [];
-       console.log('abilityOptions:', this.abilityOptions)
+       // console.log('abilityOptions:', this.abilityOptions)
      } catch (error) {
        console.log('moveOptionsError:', error)
      }
@@ -154,11 +186,11 @@ const moveFinder = familiarArray.map(cardName => getCardMoves(cardName));
     console.log('stuffimportant:', playerAbility)
       try { 
         const moveFinder = playerAbility.map(cardName => getPlayerMoves(cardName));
-        console.log('moveFinder:', moveFinder)
+        // console.log('moveFinder:', moveFinder)
         this.abilityOptions = moveFinder.map((ability, index) => {
       if (ability && ability.description) {
-        ability.execute(this.currentTurn, this.boss.name)
-      console.log('execuTE:', ability.execute); 
+        // ability.execute(this.currentTurn, this.boss.name)
+      // console.log('execuTE:', ability.execute); 
         return {
           label: ability.name,
           description: ability.description,
@@ -166,7 +198,7 @@ const moveFinder = familiarArray.map(cardName => getCardMoves(cardName));
         };
       }
     });
-       console.log('abilityOptions:', this.abilityOptions)
+       // console.log('abilityOptions:', this.abilityOptions)
      } catch (error) {
        console.log('moveOptionsError:', error)
      }
@@ -220,7 +252,7 @@ const moveFinder = familiarArray.map(cardName => getCardMoves(cardName));
       const speedMultiplier = character.speedBuff ? 1.3 : 1; // Apply Speed Buff if active
       character.atkBar += speed * 0.07 * speedMultiplier;
       character.attackBarEmoji = await this.generateAttackBarEmoji(character.atkBar);
-      console.log(character.name, '-', character.attackBarEmoji);
+      // console.log(character.name, '-', character.attackBarEmoji);
     }
     } catch (error) {
       console.log('fillBarError:', error);

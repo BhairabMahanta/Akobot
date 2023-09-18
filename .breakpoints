@@ -1,0 +1,20 @@
+{
+  "files": {
+    "commands/adv/sofimoves.js": [
+      {
+        "id": "7ec3d1b2-fca9-496f-b119-127498af912d",
+        "line": 1,
+        "version": 1,
+        "index": 0
+      }
+    ],
+    "commands/fun/elixir.js": [
+      {
+        "id": "5229f2f3-67fa-4cb5-b1af-67330370ce13",
+        "line": 30,
+        "version": 846,
+        "index": 1034
+      }
+    ]
+  }
+}
