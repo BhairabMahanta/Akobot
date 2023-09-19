@@ -26,6 +26,7 @@ const { GameImage, Player, Element } = require('./sumfunctions');
     async execute(client, message, args, interaction) {
   
       let player = players[message.author.id];
+
       const playerName = player.name; const playerFloorIndex = 0; // Replace with the actual floor index for the player 
       const playerLocationIndex = 0; // Replace with the actual location index for the player
       const selectedFloor = allFloors[playerFloorIndex]; const selectedLocation = selectedFloor.locations[playerLocationIndex];
@@ -38,7 +39,7 @@ const { GameImage, Player, Element } = require('./sumfunctions');
    const adventureLoading = new EmbedBuilder()
         .setTitle(selectedLocation.name)
         .setImage('attachment://area2.png')
-        .setDescription('Loading please wait!')
+        .setDescription('Loading please wait! <a:Green:874929269741072414>')
       // Create the embed for the adventure command
       const adventureIntoEmbedConfirmation = new EmbedBuilder()
         .setTitle(selectedLocation.name)

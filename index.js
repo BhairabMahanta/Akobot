@@ -14,6 +14,7 @@ const mongoClient = new MongoClient(uri, {
   }
 });
 
+
 async function connectToDB() {
   try {
     await mongoClient.connect();

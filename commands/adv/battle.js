@@ -19,17 +19,16 @@ const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, StringSelectMenuBuilder }
         .setLabel('Dodge')
         .setStyle('Danger')
     );
-   
+
 class Battle {
  constructor(player, bossName) {
     this.player = player;
-      this.abilityOptions = [];
-   this.ability = new Ability();
-   try{
+    this.abilityOptions = [];
+    try{
     this.playerFamiliar = player.selectedFamiliars.name;
     console.log('selectedplayerFamiliar:', this.playerFamiliar)
    } catch (error) {
-     console.log('No selected Familiars!', error);
+      console.log('No selected Familiars!', error);
    }
      this.familiarInfo = [];
 
@@ -56,13 +55,18 @@ for (const familiarName of this.playerFamiliar) {
     this.currentTurnIndex = 0; // Index of the character whose turn it is
     this.turnCounter = 0; // Counter to track overall turns
     this.battleLogs = [];
+    this.ability = new Ability(this);
     this.initialMessage = initialMessage;
     
   }
 
   
   async toCamelCase(str) {
+   
      const words = str.split(' ');
+     if (words.length === 1) {
+      return words[0].toLowerCase();
+    }
   if (words.length === 2) {
     return words[0].toLowerCase() + words[1];
   }
@@ -119,11 +123,14 @@ const selectedClassValue = i.values[0]; // Get the selected value // gae shit
           console.log('abilityName:a', abilityNameCamel)
             // Check if the abilityName exists as a method in the Ability class
  if (typeof this.ability[abilityNameCamel] === 'function') {
-        this.ability[abilityNameCamel](this.playerName, this.boss.name);
+        this.ability[abilityNameCamel](this.player, this.boss);
+    await this.getNextTurn()
+     console.log('currentTurn:', this.currentTurn);
+     const updatedEmbed = await this.sendInitialEmbed(message);
+     this.initialMessage.edit({ embeds: [updatedEmbed], components: await this.getDuelActionRow() });
  } else {
      console.log(`Ability ${abilityName} not found.`);
  }
-message.channel.send(`AbilityUsed:  ${abilityName}`);
        // this.printBattleResult();
    if (this.boss.physicalStats.hp < 0) {
       message.channel.send("You won the battle against the Monster, you can continue the journey where you left off (I lied  you can't)")
@@ -137,14 +144,22 @@ message.channel.send(`AbilityUsed:  ${abilityName}`);
       else if (selectedClassValue.startsWith('fam-')) {
         try{
       const abilityName = selectedClassValue.replace('fam-', '');   
-         // Check if the abilityName exists as a method in the Ability class
-if (typeof this.ability[abilityName] === 'function') {
+     console.log('abilityName:a', abilityName)
+           const abilityNameCamel = await this.toCamelCase(abilityName);
+          console.log('abilityName:a', abilityNameCamel)
+if (typeof this.ability[abilityNameCamel] === 'function') {
     // Execute the ability by calling it using square brackets
-    this.ability[abilityName](user, target);
-} else {
+   for (const familiar of this.familiarInfo) {
+    if (familiar.name === this.currentTurn) {
+    this.ability[abilityNameCamel](familiar, this.boss);
+   await this.getNextTurn()
+     console.log('currentTurn:', this.currentTurn);
+     const updatedEmbed = await this.sendInitialEmbed(message);
+     this.initialMessage.edit({ embeds: [updatedEmbed], components: await this.getDuelActionRow() });
+} }
+}else {
     console.log(`Ability ${abilityName} not found.`);
 }
-      message.channel.send(`You're Gay if you used ${abilityName}`)
       } catch (error) {
           console.log('ErrorFamiliar:', error)
         }

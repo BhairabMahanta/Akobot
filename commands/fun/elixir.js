@@ -11,7 +11,8 @@ function calculateTotal(data) {
   console.log('lines:', lines)
   let totalEasy = 0;
   let totalMedium = 0;
-  let totalHard = 0;
+  let totalHard = 0; 
+
 
    for (const line of lines) {
      console.log('lines:', line)
