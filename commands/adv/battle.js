@@ -39,7 +39,7 @@ for (const familiarName of this.playerFamiliar) {
     this.familiarInfo.push(familiarData);
   }
 }
-    this.playerName = this.player.name;
+    this.playerName = this.player.name.toUpperCase();
     this.playerClass = this.player.class
     this.playerRace = this.player.race
     this.boss = bosses[bossName];
@@ -98,6 +98,7 @@ for (const familiarName of this.playerFamiliar) {
    try{
      this.performTurn(message);
      await this.getNextTurn()
+     await this.performEnemyTurn(message);
      console.log('currentTurn:', this.currentTurn);
      const updatedEmbed = await this.sendInitialEmbed(message);
      this.initialMessage.edit({ embeds: [updatedEmbed], components: await this.getDuelActionRow() });
@@ -124,7 +125,8 @@ const selectedClassValue = i.values[0]; // Get the selected value // gae shit
             // Check if the abilityName exists as a method in the Ability class
  if (typeof this.ability[abilityNameCamel] === 'function') {
         this.ability[abilityNameCamel](this.player, this.boss);
-    await this.getNextTurn()
+        await this.getNextTurn()
+   await this.performEnemyTurn(message);
      console.log('currentTurn:', this.currentTurn);
      const updatedEmbed = await this.sendInitialEmbed(message);
      this.initialMessage.edit({ embeds: [updatedEmbed], components: await this.getDuelActionRow() });
@@ -152,6 +154,7 @@ if (typeof this.ability[abilityNameCamel] === 'function') {
    for (const familiar of this.familiarInfo) {
     if (familiar.name === this.currentTurn) {
     this.ability[abilityNameCamel](familiar, this.boss);
+      await this.performEnemyTurn(message);
    await this.getNextTurn()
      console.log('currentTurn:', this.currentTurn);
      const updatedEmbed = await this.sendInitialEmbed(message);
@@ -274,6 +277,22 @@ const moveFinder = familiarArray.map(cardName => getCardMoves(cardName));
     }
   }
   
+ async generateAttackBarEmoji(atkBar) {
+  const emoji = '■';
+  const filledBars = Math.floor(atkBar / 8);
+  const emptyBars = 12.5 - filledBars;
+    // Set an if case, so that filledBars and emptyBars cant reach negative values
+  if (filledBars < 0) {
+    filledBars = 0;
+  }
+  if (emptyBars < 0) {
+    emptyBars = 0;
+  }
+  
+  const attackBarString = `${emoji.repeat(filledBars)}${' '.repeat(emptyBars)}`;
+  return `[${attackBarString}]`;
+}
+
  async getNextTurn() {
     let nextTurn = null;
    while (true) {
@@ -294,14 +313,6 @@ const moveFinder = familiarArray.map(cardName => getCardMoves(cardName));
 
     return nextTurn;
   }
-  
- async generateAttackBarEmoji(atkBar) {
-  const emoji = '■';
-  const filledBars = Math.floor(atkBar / 10);
-  const emptyBars = 10 - filledBars;
-  const attackBarString = `${emoji.repeat(filledBars)}${' '.repeat(emptyBars)}`;
-  return `[${attackBarString}]`;
-}
 
  async sendInitialEmbed() {
   try{   
@@ -334,20 +345,9 @@ const moveFinder = familiarArray.map(cardName => getCardMoves(cardName));
 
     initialEmbed.addFields({ name: 'Your Team Info:', value: `\`\`\`ini\n${playerAndFamiliarsInfo}\`\`\``, inline: false });
 }
-
-    //    if(this.player) { for (const familiar of this.familiarInfo) {
-    //     const familiarHP = familiar.stats.hp;
-    //     initialEmbed.addFields( { name: `${familiar.name} HP: ${familiarHP}:`,
-    //     value: `\`\`\`ini\nAttackBar: ${familiar.attackBarEmoji}\`\`\``,
-    //     inline: false});
-    // }  initialEmbed.addFields({ name: `Player HP: ${this.player.stats.hitpoints}`,
-    //     value: `\`\`\`ini\nAttackBar: ${this.player.attackBarEmoji}\`\`\``,
-    //     inline: false});
-    //               }
-                   
    if (this.battleLogs.length > 0) {
       console.log('isitanArray???:', this.battleLogs.join('\n'))
-      initialEmbed.addFields({ name: 'Battle Logs', value: '```' + this.battleLogs.join('\n') + '```',            inline: false });
+      initialEmbed.addFields({ name: 'Battle Logs', value: '```diff\n' + this.battleLogs.join('\n') + '```',            inline: false });
       } else {
       initialEmbed.addFields({ name: 'Battle Logs', value: 'No battle logs yet.', inline: false });
       } 
@@ -371,28 +371,12 @@ const moveFinder = familiarArray.map(cardName => getCardMoves(cardName));
       // Update HP and battle logs
       this.boss.physicalStats.hp -= damage;
       console.log('playerHp:', this.boss.physicalStats.hp);
-      this.battleLogs.push(`${this.currentTurn} attacks ${target} for ${damage} damage using gayness`);
+      this.battleLogs.push(`+ ${this.currentTurn} attacks ${target} for ${damage} damage using gayness`);
       console.log('loglength:', this.battleLogs.length)
       console.log(`${this.currentTurn} attacks ${target} for ${damage} damage using gayness`)
       // this.getNextTurn()
       // console.log('currentTurn:', this.currentTurn);
-    } else if (this.currentTurn === this.boss.name) {
-      // If the current turn is the environment, let it make a move
-      // const move = this.environment.makeMove();
-      const target = this.playerName;
-      const damage = calculateDamage(this.boss.physicalStats.attack, this.player.stats.defense);
-
-      // Update HP and battle logs
-      this.player.stats.hitpoints -= damage;
-      console.log('playerHp:', this.player.stats.hitpoints);
-      this.battleLogs.push(`${this.currentTurn} attacks ${target} for ${damage} damage using cum!`);
-            // message.channel.send(`\`\`\`${logsString}\`\`\``);
-      console.log('loglength:', this.battleLogs.length)
-      console.log(`${this.currentTurn} attacks ${target} for ${damage} damage using cum!`)
-      // this.getNextTurn()
-      // console.log('currentTurn:', this.currentTurn);
-    } else // Check if the current turn is a familiar's turn
-if (this.playerFamiliar.includes(this.currentTurn)) {
+    } else if (this.playerFamiliar.includes(this.currentTurn)) {
   const target = this.boss.name; // Implement target selection logic
   let damage = 0;
   console.log('True');
@@ -406,7 +390,7 @@ if (this.playerFamiliar.includes(this.currentTurn)) {
 
       // Update HP and battle logs
       this.boss.physicalStats.hp -= damage;
-      this.battleLogs.push(`${this.currentTurn} attacks ${target} for ${damage} damage using an attack`);
+      this.battleLogs.push(`+ ${this.currentTurn} attacks ${target} for ${damage} damage using an attack`);
       console.log(`${this.currentTurn} attacks ${target} for ${damage} damage using an attack`);
       break; // Exit the loop once the attacking familiar is found
     }
@@ -419,6 +403,32 @@ if (this.playerFamiliar.includes(this.currentTurn)) {
   
   }
 
+ async performEnemyTurn(message) {
+   if (this.currentTurn != this.boss.name) {
+     console.log('notmy turn bitches')
+     return
+   }
+    else if (this.currentTurn === this.boss.name) {
+      // If the current turn is the environment, let it make a move
+      // const move = this.environment.makeMove();
+      const target = this.playerName;
+      const damage = calculateDamage(this.boss.physicalStats.attack, this.player.stats.defense);
+
+      // Update HP and battle logs
+      this.player.stats.hitpoints -= damage;
+     console.log('My turn now bitches')
+      this.battleLogs.push(`- ${this.currentTurn} attacks ${target} for ${damage} damage using cum!\n ============================================`);
+            // message.channel.send(`\`\`\`${logsString}\`\`\``);
+      console.log('loglength:', this.battleLogs.length)
+      console.log(`${this.currentTurn} attacks ${target} for ${damage} damage using cum!`)
+      await this.getNextTurn()
+      console.log('currentTurnForDragonafter;', this.currentTurn)
+     //  const updatedEmbed = await this.sendInitialEmbed(message);
+     // this.initialMessage.edit({ embeds: [updatedEmbed], components: await this.getDuelActionRow() });
+  
+      // console.log('currentTurn:', this.currentTurn);
+    }
+ }
 
 
 

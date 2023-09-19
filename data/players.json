@@ -1,562 +1,607 @@
 {
-  "537619455409127442": {
-    "name": "akai",
-    "location": "Krizzland",
-    "inventory": {
-      "active": [],
-      "backpack": []
+    "537619455409127442": {
+        "name": "akai",
+        "location": "Krizzland",
+        "inventory": {
+            "active": [],
+            "backpack": []
+        },
+        "stats": {
+            "attack": 100,
+            "tactics": 0,
+            "magic": 1,
+            "training": 0,
+            "defense": 150,
+            "speed": 100,
+            "hitpoints": 1000,
+            "intelligence": 1,
+            "wise": 1,
+            "luck": 1,
+            "devotion": 0,
+            "potential": 1,
+            "hp": null
+        },
+        "balance": {
+            "coins": 0,
+            "gems": 0
+        },
+        "selectedFamiliars": {
+            "name": [
+                "Fire Dragon",
+                "Water Nymph",
+                "cumpokemon"
+            ]
+        },
+        "exp": {
+            "xp": 0,
+            "level": 0
+        },
+        "cards": {
+            "name": [
+                "Fire Dragon"
+            ]
+        },
+        "class": "Knight",
+        "race": null,
+        "stuff": {
+            "generatedRandomElements": false,
+            "generatedRandomElements2": false
+        },
+        "playerpos": {
+            "x": 300,
+            "y": 250
+        },
+        "atkBar": 0,
+        "attackBarEmoji": "[■■■■■■■■■■]"
     },
-    "stats": {
-      "attack": 100,
-      "tactics": 0,
-      "magic": 1,
-      "training": 0,
-      "defense": 150,
-      "speed": 100,
-      "hitpoints": 1000,
-      "intelligence": 1,
-      "wise": 1,
-      "luck": 1,
-      "devotion": 0,
-      "potential": 1,
-      "hp": null
+    "266939098017562625": {
+        "name": "scammedsirol",
+        "location": "Krizzland",
+        "inventory": {
+            "active": [],
+            "backpack": []
+        },
+        "stats": {
+            "attack": 1,
+            "tactics": 0,
+            "magic": 1,
+            "training": 0,
+            "defense": 1,
+            "speed": 1,
+            "hitpoints": 10,
+            "intelligence": 1,
+            "wise": 1,
+            "luck": 1,
+            "devotion": 0,
+            "potential": 1,
+            "hp": null
+        },
+        "balance": {
+            "coins": 0,
+            "gems": 0
+        },
+        "exp": {
+            "xp": 0,
+            "level": 0
+        },
+        "cards": {
+            "name": [
+                "Fire Dragon"
+            ]
+        },
+        "class": null,
+        "race": null,
+        "stuff": {
+            "generatedRandomElements": "true",
+            "generatedRandomElements2": false
+        },
+        "playerpos": {
+            "x": 500,
+            "y": 350
+        }
     },
-    "balance": {
-      "coins": 0,
-      "gems": 0
+    "169160763091451904": {
+        "name": "crowdslay",
+        "location": "Krizzland",
+        "inventory": {
+            "active": [],
+            "backpack": []
+        },
+        "stats": {
+            "attack": 1,
+            "tactics": 0,
+            "magic": 1,
+            "training": 0,
+            "defense": 1,
+            "speed": 1,
+            "hitpoints": 10,
+            "intelligence": 1,
+            "wise": 1,
+            "luck": 1,
+            "devotion": 0,
+            "potential": 1
+        },
+        "balance": {
+            "coins": 0,
+            "gems": 0
+        },
+        "exp": {
+            "xp": 0,
+            "level": 0
+        },
+        "cards": {
+            "name": [
+                "Water Nymph"
+            ]
+        },
+        "class": null,
+        "race": "Orc",
+        "stuff": {
+            "generatedRandomElements": false,
+            "generatedRandomElements2": false
+        },
+        "playerpos": {
+            "x": 100,
+            "y": 50
+        }
     },
-    "selectedFamiliars": {
-      "name": [
-        "Fire Dragon",
-        "Water Nymph",
-        "cumpokemon"
-      ]
+    "430236084744749058": {
+        "name": "hound",
+        "location": "Krizzland",
+        "inventory": {
+            "active": [],
+            "backpack": []
+        },
+        "stats": {
+            "attack": 1,
+            "tactics": 0,
+            "magic": 1,
+            "training": 0,
+            "defense": 1,
+            "speed": 1,
+            "hitpoints": 10,
+            "intelligence": 1,
+            "wise": 1,
+            "luck": 1,
+            "devotion": 0,
+            "potential": 1
+        },
+        "balance": {
+            "coins": 0,
+            "gems": 0
+        },
+        "exp": {
+            "xp": 0,
+            "level": 0
+        },
+        "cards": {
+            "name": [
+                "Fire Dragon"
+            ]
+        },
+        "class": null,
+        "race": null,
+        "playerpos": {
+            "x": 100,
+            "y": 50
+        }
     },
-    "exp": {
-      "xp": 0,
-      "level": 0
+    "738949480111407164": {
+        "name": "muspy",
+        "location": "Krizzland",
+        "inventory": {
+            "active": [],
+            "backpack": []
+        },
+        "stats": {
+            "attack": 1,
+            "tactics": 0,
+            "magic": 1,
+            "training": 0,
+            "defense": 1,
+            "speed": 1,
+            "hitpoints": 10,
+            "intelligence": 1,
+            "wise": 1,
+            "luck": 1,
+            "devotion": 0,
+            "potential": 1
+        },
+        "balance": {
+            "coins": 0,
+            "gems": 0
+        },
+        "exp": {
+            "xp": 0,
+            "level": 0
+        },
+        "cards": {
+            "name": [
+                "Water Nymph"
+            ]
+        },
+        "class": null,
+        "race": null
     },
-    "cards": {
-      "name": [
-        "Fire Dragon"
-      ]
+    "532798408340144148": {
+        "name": "rei",
+        "location": "Krizzland",
+        "inventory": {
+            "active": [],
+            "backpack": []
+        },
+        "stats": {
+            "attack": 1,
+            "tactics": 0,
+            "magic": 1,
+            "training": 0,
+            "defense": 1,
+            "speed": 1,
+            "hitpoints": 10,
+            "intelligence": 1,
+            "wise": 1,
+            "luck": 1,
+            "devotion": 0,
+            "potential": 1
+        },
+        "balance": {
+            "coins": 0,
+            "gems": 0
+        },
+        "exp": {
+            "xp": 0,
+            "level": 0
+        },
+        "cards": {
+            "name": [
+                "Fire Dragon"
+            ]
+        },
+        "class": null,
+        "race": null
     },
-    "class": "Knight",
-    "race": null,
-    "stuff": {
-      "generatedRandomElements": false,
-      "generatedRandomElements2": false
+    "269039696242278401": {
+        "name": "krizzler",
+        "location": "Krizzland",
+        "inventory": {
+            "active": [],
+            "backpack": []
+        },
+        "stats": {
+            "attack": 1,
+            "tactics": 0,
+            "magic": 1,
+            "training": 0,
+            "defense": 1,
+            "speed": 1,
+            "hitpoints": 10,
+            "intelligence": 1,
+            "wise": 1,
+            "luck": 1,
+            "devotion": 0,
+            "potential": 1
+        },
+        "balance": {
+            "coins": 0,
+            "gems": 0
+        },
+        "exp": {
+            "xp": 0,
+            "level": 0
+        },
+        "cards": {
+            "name": [
+                "Fire Dragon"
+            ]
+        },
+        "class": null,
+        "race": null,
+        "stuff": {
+            "generatedRandomElements": false,
+            "generatedRandomElements2": false
+        },
+        "playerpos": {
+            "x": 100,
+            "y": 50
+        }
     },
-    "playerpos": {
-      "x": 300,
-      "y": 200
+    "562668850097946694": {
+        "name": "hvcker",
+        "location": "Krizzland",
+        "inventory": {
+            "active": [],
+            "backpack": []
+        },
+        "stats": {
+            "attack": 1,
+            "tactics": 0,
+            "magic": 1,
+            "training": 0,
+            "defense": 1,
+            "speed": 1,
+            "hitpoints": 10,
+            "intelligence": 1,
+            "wise": 1,
+            "luck": 1,
+            "devotion": 0,
+            "potential": 1
+        },
+        "balance": {
+            "coins": 0,
+            "gems": 0
+        },
+        "exp": {
+            "xp": 0,
+            "level": 0
+        },
+        "cards": {
+            "name": [
+                "Water Nymph"
+            ]
+        },
+        "class": null,
+        "race": null
     },
-    "atkBar": 0,
-    "attackBarEmoji": "[■■■■■■■■■■]"
-  },
-  "266939098017562625": {
-    "name": "scammedsirol",
-    "location": "Krizzland",
-    "inventory": {
-      "active": [],
-      "backpack": []
+    "353623899184824330": {
+        "name": "pure",
+        "location": "Krizzland",
+        "inventory": {
+            "active": [],
+            "backpack": []
+        },
+        "stats": {
+            "attack": 1,
+            "tactics": 0,
+            "magic": 1,
+            "training": 0,
+            "defense": 1,
+            "speed": 1,
+            "hitpoints": 10,
+            "intelligence": 1,
+            "wise": 1,
+            "luck": 1,
+            "devotion": 0,
+            "potential": 1
+        },
+        "balance": {
+            "coins": 0,
+            "gems": 0
+        },
+        "exp": {
+            "xp": 0,
+            "level": 0
+        },
+        "cards": {
+            "name": [
+                "Fire Dragon"
+            ]
+        },
+        "class": null,
+        "race": null,
+        "stuff": {
+            "generatedRandomElements": false,
+            "generatedRandomElements2": false
+        },
+        "playerpos": {
+            "x": 100,
+            "y": 50
+        }
     },
-    "stats": {
-      "attack": 1,
-      "tactics": 0,
-      "magic": 1,
-      "training": 0,
-      "defense": 1,
-      "speed": 1,
-      "hitpoints": 10,
-      "intelligence": 1,
-      "wise": 1,
-      "luck": 1,
-      "devotion": 0,
-      "potential": 1,
-      "hp": null
+    "452490042028589057": {
+        "name": "jinkk",
+        "location": "Krizzland",
+        "inventory": {
+            "active": [],
+            "backpack": []
+        },
+        "stats": {
+            "attack": 1,
+            "tactics": 0,
+            "magic": 1,
+            "training": 0,
+            "defense": 1,
+            "speed": 1,
+            "hitpoints": 10,
+            "intelligence": 1,
+            "wise": 1,
+            "luck": 1,
+            "devotion": 0,
+            "potential": 1
+        },
+        "balance": {
+            "coins": 0,
+            "gems": 0
+        },
+        "exp": {
+            "xp": 0,
+            "level": 0
+        },
+        "cards": {
+            "name": [
+                "Water Nymph"
+            ]
+        },
+        "class": null,
+        "race": null
     },
-    "balance": {
-      "coins": 0,
-      "gems": 0
+    "592707660604899328": {
+        "name": "sarc",
+        "location": "Krizzland",
+        "inventory": {
+            "active": [],
+            "backpack": []
+        },
+        "stats": {
+            "attack": 1,
+            "tactics": 0,
+            "magic": 1,
+            "training": 0,
+            "defense": 1,
+            "speed": 1,
+            "hitpoints": 10,
+            "intelligence": 1,
+            "wise": 1,
+            "luck": 1,
+            "devotion": 0,
+            "potential": 1
+        },
+        "balance": {
+            "coins": 0,
+            "gems": 0
+        },
+        "exp": {
+            "xp": 0,
+            "level": 0
+        },
+        "cards": {
+            "name": [
+                "Water Nymph"
+            ]
+        },
+        "class": null,
+        "race": null,
+        "stuff": {
+            "generatedRandomElements": false,
+            "generatedRandomElements2": false
+        },
+        "playerpos": {
+            "x": 100,
+            "y": 50
+        }
     },
-    "exp": {
-      "xp": 0,
-      "level": 0
+    "318356639130583040": {
+        "name": "aka2",
+        "location": "Krizzland",
+        "inventory": {
+            "active": [],
+            "backpack": []
+        },
+        "stats": {
+            "attack": 1,
+            "tactics": 0,
+            "magic": 1,
+            "training": 0,
+            "defense": 1,
+            "speed": 1,
+            "hitpoints": 10,
+            "intelligence": 1,
+            "wise": 1,
+            "luck": 1,
+            "devotion": 0,
+            "potential": 1
+        },
+        "balance": {
+            "coins": 0,
+            "gems": 0
+        },
+        "exp": {
+            "xp": 0,
+            "level": 0
+        },
+        "cards": {
+            "name": [
+                "Fire Dragon"
+            ]
+        },
+        "class": null,
+        "race": null,
+        "stuff": {
+            "generatedRandomElements": false,
+            "generatedRandomElements2": false
+        },
+        "playerpos": {
+            "x": 100,
+            "y": 50
+        }
     },
-    "cards": {
-      "name": [
-        "Fire Dragon"
-      ]
+    "449749334754328587": {
+        "name": "zero",
+        "location": "Krizzland",
+        "inventory": {
+            "active": [],
+            "backpack": []
+        },
+        "stats": {
+            "attack": 1,
+            "tactics": 0,
+            "magic": 1,
+            "training": 0,
+            "defense": 1,
+            "speed": 1,
+            "hitpoints": 10,
+            "intelligence": 1,
+            "wise": 1,
+            "luck": 1,
+            "devotion": 0,
+            "potential": 1
+        },
+        "balance": {
+            "coins": 0,
+            "gems": 0
+        },
+        "exp": {
+            "xp": 0,
+            "level": 0
+        },
+        "cards": {
+            "name": [
+                "Fire Dragon"
+            ]
+        },
+        "class": null,
+        "race": null,
+        "stuff": {
+            "generatedRandomElements": false,
+            "generatedRandomElements2": false
+        },
+        "playerpos": {
+            "x": 100,
+            "y": 50
+        }
     },
-    "class": null,
-    "race": null,
-    "stuff": {
-      "generatedRandomElements": "true",
-      "generatedRandomElements2": false
-    },
-    "playerpos": {
-      "x": 500,
-      "y": 350
+    "502151267796123650": {
+        "name": "Rimuru",
+        "location": "Krizzland",
+        "inventory": {
+            "active": [],
+            "backpack": []
+        },
+        "stats": {
+            "attack": 1,
+            "tactics": 0,
+            "magic": 1,
+            "training": 0,
+            "defense": 1,
+            "speed": 1,
+            "hitpoints": 10,
+            "intelligence": 1,
+            "wise": 1,
+            "luck": 1,
+            "devotion": 0,
+            "potential": 1
+        },
+        "balance": {
+            "coins": 0,
+            "gems": 0
+        },
+        "exp": {
+            "xp": 0,
+            "level": 0
+        },
+        "cards": {
+            "name": [
+                "cards"
+            ]
+        },
+        "class": null,
+        "race": null,
+        "stuff": {
+            "generatedRandomElements": false,
+            "generatedRandomElements2": false
+        },
+        "playerpos": {
+            "x": 50,
+            "y": 50
+        }
     }
-  },
-  "169160763091451904": {
-    "name": "crowdslay",
-    "location": "Krizzland",
-    "inventory": {
-      "active": [],
-      "backpack": []
-    },
-    "stats": {
-      "attack": 1,
-      "tactics": 0,
-      "magic": 1,
-      "training": 0,
-      "defense": 1,
-      "speed": 1,
-      "hitpoints": 10,
-      "intelligence": 1,
-      "wise": 1,
-      "luck": 1,
-      "devotion": 0,
-      "potential": 1
-    },
-    "balance": {
-      "coins": 0,
-      "gems": 0
-    },
-    "exp": {
-      "xp": 0,
-      "level": 0
-    },
-    "cards": {
-      "name": [
-        "Water Nymph"
-      ]
-    },
-    "class": null,
-    "race": "Orc",
-    "stuff": {
-      "generatedRandomElements": false,
-      "generatedRandomElements2": false
-    },
-    "playerpos": {
-      "x": 100,
-      "y": 50
-    }
-  },
-  "430236084744749058": {
-    "name": "hound",
-    "location": "Krizzland",
-    "inventory": {
-      "active": [],
-      "backpack": []
-    },
-    "stats": {
-      "attack": 1,
-      "tactics": 0,
-      "magic": 1,
-      "training": 0,
-      "defense": 1,
-      "speed": 1,
-      "hitpoints": 10,
-      "intelligence": 1,
-      "wise": 1,
-      "luck": 1,
-      "devotion": 0,
-      "potential": 1
-    },
-    "balance": {
-      "coins": 0,
-      "gems": 0
-    },
-    "exp": {
-      "xp": 0,
-      "level": 0
-    },
-    "cards": {
-      "name": [
-        "Fire Dragon"
-      ]
-    },
-    "class": null,
-    "race": null,
-    "playerpos": {
-      "x": 100,
-      "y": 50
-    }
-  },
-  "738949480111407164": {
-    "name": "muspy",
-    "location": "Krizzland",
-    "inventory": {
-      "active": [],
-      "backpack": []
-    },
-    "stats": {
-      "attack": 1,
-      "tactics": 0,
-      "magic": 1,
-      "training": 0,
-      "defense": 1,
-      "speed": 1,
-      "hitpoints": 10,
-      "intelligence": 1,
-      "wise": 1,
-      "luck": 1,
-      "devotion": 0,
-      "potential": 1
-    },
-    "balance": {
-      "coins": 0,
-      "gems": 0
-    },
-    "exp": {
-      "xp": 0,
-      "level": 0
-    },
-    "cards": {
-      "name": [
-        "Water Nymph"
-      ]
-    },
-    "class": null,
-    "race": null
-  },
-  "532798408340144148": {
-    "name": "rei",
-    "location": "Krizzland",
-    "inventory": {
-      "active": [],
-      "backpack": []
-    },
-    "stats": {
-      "attack": 1,
-      "tactics": 0,
-      "magic": 1,
-      "training": 0,
-      "defense": 1,
-      "speed": 1,
-      "hitpoints": 10,
-      "intelligence": 1,
-      "wise": 1,
-      "luck": 1,
-      "devotion": 0,
-      "potential": 1
-    },
-    "balance": {
-      "coins": 0,
-      "gems": 0
-    },
-    "exp": {
-      "xp": 0,
-      "level": 0
-    },
-    "cards": {
-      "name": [
-        "Fire Dragon"
-      ]
-    },
-    "class": null,
-    "race": null
-  },
-  "269039696242278401": {
-    "name": "krizzler",
-    "location": "Krizzland",
-    "inventory": {
-      "active": [],
-      "backpack": []
-    },
-    "stats": {
-      "attack": 1,
-      "tactics": 0,
-      "magic": 1,
-      "training": 0,
-      "defense": 1,
-      "speed": 1,
-      "hitpoints": 10,
-      "intelligence": 1,
-      "wise": 1,
-      "luck": 1,
-      "devotion": 0,
-      "potential": 1
-    },
-    "balance": {
-      "coins": 0,
-      "gems": 0
-    },
-    "exp": {
-      "xp": 0,
-      "level": 0
-    },
-    "cards": {
-      "name": [
-        "Fire Dragon"
-      ]
-    },
-    "class": null,
-    "race": null,
-    "stuff": {
-      "generatedRandomElements": false,
-      "generatedRandomElements2": false
-    },
-    "playerpos": {
-      "x": 100,
-      "y": 50
-    }
-  },
-  "562668850097946694": {
-    "name": "hvcker",
-    "location": "Krizzland",
-    "inventory": {
-      "active": [],
-      "backpack": []
-    },
-    "stats": {
-      "attack": 1,
-      "tactics": 0,
-      "magic": 1,
-      "training": 0,
-      "defense": 1,
-      "speed": 1,
-      "hitpoints": 10,
-      "intelligence": 1,
-      "wise": 1,
-      "luck": 1,
-      "devotion": 0,
-      "potential": 1
-    },
-    "balance": {
-      "coins": 0,
-      "gems": 0
-    },
-    "exp": {
-      "xp": 0,
-      "level": 0
-    },
-    "cards": {
-      "name": [
-        "Water Nymph"
-      ]
-    },
-    "class": null,
-    "race": null
-  },
-  "353623899184824330": {
-    "name": "pure",
-    "location": "Krizzland",
-    "inventory": {
-      "active": [],
-      "backpack": []
-    },
-    "stats": {
-      "attack": 1,
-      "tactics": 0,
-      "magic": 1,
-      "training": 0,
-      "defense": 1,
-      "speed": 1,
-      "hitpoints": 10,
-      "intelligence": 1,
-      "wise": 1,
-      "luck": 1,
-      "devotion": 0,
-      "potential": 1
-    },
-    "balance": {
-      "coins": 0,
-      "gems": 0
-    },
-    "exp": {
-      "xp": 0,
-      "level": 0
-    },
-    "cards": {
-      "name": [
-        "Fire Dragon"
-      ]
-    },
-    "class": null,
-    "race": null,
-    "stuff": {
-      "generatedRandomElements": false,
-      "generatedRandomElements2": false
-    },
-    "playerpos": {
-      "x": 100,
-      "y": 50
-    }
-  },
-  "452490042028589057": {
-    "name": "jinkk",
-    "location": "Krizzland",
-    "inventory": {
-      "active": [],
-      "backpack": []
-    },
-    "stats": {
-      "attack": 1,
-      "tactics": 0,
-      "magic": 1,
-      "training": 0,
-      "defense": 1,
-      "speed": 1,
-      "hitpoints": 10,
-      "intelligence": 1,
-      "wise": 1,
-      "luck": 1,
-      "devotion": 0,
-      "potential": 1
-    },
-    "balance": {
-      "coins": 0,
-      "gems": 0
-    },
-    "exp": {
-      "xp": 0,
-      "level": 0
-    },
-    "cards": {
-      "name": [
-        "Water Nymph"
-      ]
-    },
-    "class": null,
-    "race": null
-  },
-  "592707660604899328": {
-    "name": "sarc",
-    "location": "Krizzland",
-    "inventory": {
-      "active": [],
-      "backpack": []
-    },
-    "stats": {
-      "attack": 1,
-      "tactics": 0,
-      "magic": 1,
-      "training": 0,
-      "defense": 1,
-      "speed": 1,
-      "hitpoints": 10,
-      "intelligence": 1,
-      "wise": 1,
-      "luck": 1,
-      "devotion": 0,
-      "potential": 1
-    },
-    "balance": {
-      "coins": 0,
-      "gems": 0
-    },
-    "exp": {
-      "xp": 0,
-      "level": 0
-    },
-    "cards": {
-      "name": [
-        "Water Nymph"
-      ]
-    },
-    "class": null,
-    "race": null,
-    "stuff": {
-      "generatedRandomElements": false,
-      "generatedRandomElements2": false
-    },
-    "playerpos": {
-      "x": 100,
-      "y": 50
-    }
-  },
-  "318356639130583040": {
-    "name": "aka2",
-    "location": "Krizzland",
-    "inventory": {
-      "active": [],
-      "backpack": []
-    },
-    "stats": {
-      "attack": 1,
-      "tactics": 0,
-      "magic": 1,
-      "training": 0,
-      "defense": 1,
-      "speed": 1,
-      "hitpoints": 10,
-      "intelligence": 1,
-      "wise": 1,
-      "luck": 1,
-      "devotion": 0,
-      "potential": 1
-    },
-    "balance": {
-      "coins": 0,
-      "gems": 0
-    },
-    "exp": {
-      "xp": 0,
-      "level": 0
-    },
-    "cards": {
-      "name": [
-        "Fire Dragon"
-      ]
-    },
-    "class": null,
-    "race": null,
-    "stuff": {
-      "generatedRandomElements": false,
-      "generatedRandomElements2": false
-    },
-    "playerpos": {
-      "x": 100,
-      "y": 50
-    }
-  },
-  "449749334754328587": {
-    "name": "zero",
-    "location": "Krizzland",
-    "inventory": {
-      "active": [],
-      "backpack": []
-    },
-    "stats": {
-      "attack": 1,
-      "tactics": 0,
-      "magic": 1,
-      "training": 0,
-      "defense": 1,
-      "speed": 1,
-      "hitpoints": 10,
-      "intelligence": 1,
-      "wise": 1,
-      "luck": 1,
-      "devotion": 0,
-      "potential": 1
-    },
-    "balance": {
-      "coins": 0,
-      "gems": 0
-    },
-    "exp": {
-      "xp": 0,
-      "level": 0
-    },
-    "cards": {
-      "name": [
-        "Fire Dragon"
-      ]
-    },
-    "class": null,
-    "race": null,
-    "stuff": {
-      "generatedRandomElements": false,
-      "generatedRandomElements2": false
-    },
-    "playerpos": {
-      "x": 100,
-      "y": 50
-    }
-  }
 }
