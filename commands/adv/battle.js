@@ -39,7 +39,7 @@ for (const familiarName of this.playerFamiliar) {
     this.familiarInfo.push(familiarData);
   }
 }
-    this.playerName = this.player.name.toUpperCase();
+    this.playerName = this.player.name;
     this.playerClass = this.player.class
     this.playerRace = this.player.race
     this.boss = bosses[bossName];
@@ -82,18 +82,16 @@ for (const familiarName of this.playerFamiliar) {
   await this.getNextTurn()
 
     this.initialMessage = await this.sendInitialEmbed(message);
-    this.initialMessage = await message.channel.send({ embeds: [this.initialMessage], components: await this.getDuelActionRow()});
-// const authorMoves = this.playerFamiliar.map(cardName => getCardMoves(cardName));
-//    console.log('authorMoves:', authorMoves[0])
-      //   this.performTurn();
-   
-      const filter = i => (i.user.id === message.user.id) && i.customId.startsWith('action_') || i.customId === 'starter';
+    this.initialMessage = await message.channel.send({ embeds: [this.initialMessage], components: await     
+    this.getDuelActionRow()});
+    const filter = i => (i.user.id === message.user.id) && i.customId.startsWith('action_') || i.customId === 'starter';
   
   const collector = this.initialMessage.createMessageComponentCollector({ filter, time: 600000 });
    // Handle button interactions
   collector.on('collect', async (i) => {
    await i.deferUpdate();
     console.log('customid:', i.customId)
+    
     if (i.customId === 'action_normal') {
    try{
      this.performTurn(message);
@@ -113,7 +111,8 @@ for (const familiarName of this.playerFamiliar) {
    
    } catch (error) {
     console.error('Error on hit:', error);
- }} else if (i.customId === 'starter') {
+ }}
+    else if (i.customId === 'starter') {
 const selectedClassValue = i.values[0]; // Get the selected value // gae shit
     console.log('selectedValues', selectedClassValue)
       if (selectedClassValue.startsWith('player_ability_')) {
@@ -151,11 +150,11 @@ const selectedClassValue = i.values[0]; // Get the selected value // gae shit
           console.log('abilityName:a', abilityNameCamel)
 if (typeof this.ability[abilityNameCamel] === 'function') {
     // Execute the ability by calling it using square brackets
-   for (const familiar of this.familiarInfo) {
-    if (familiar.name === this.currentTurn) {
-    this.ability[abilityNameCamel](familiar, this.boss);
-      await this.performEnemyTurn(message);
-   await this.getNextTurn()
+     for (const familiar of this.familiarInfo) {
+      if (familiar.name === this.currentTurn) {
+      this.ability[abilityNameCamel](familiar, this.boss);
+      await this.getNextTurn()
+     await this.performEnemyTurn(message);
      console.log('currentTurn:', this.currentTurn);
      const updatedEmbed = await this.sendInitialEmbed(message);
      this.initialMessage.edit({ embeds: [updatedEmbed], components: await this.getDuelActionRow() });
@@ -175,8 +174,8 @@ if (typeof this.ability[abilityNameCamel] === 'function') {
     }
 // components: getDuelActionRow(authorCards, opponentCards, attackedUsers, opponent, authorMoves, opponentMoves)
  async getDuelActionRow() {
-   console.log('thiscurenttyrn:', this.currentTurn)
-      console.log('thiscurenttyrn:', this.playerFamiliar)
+   // console.log('thiscurenttyrn:', this.currentTurn)
+   //    console.log('thiscurenttyrn:', this.playerFamiliar)
     if (this.playerFamiliar.includes(this.currentTurn)) {
    let familiarArray = [];
       familiarArray.push(this.currentTurn);
@@ -201,7 +200,7 @@ const moveFinder = familiarArray.map(cardName => getCardMoves(cardName));
     }
     if (this.currentTurn === this.player.name) {
       const playerAbility = classes[this.player.class].abilities;
-    console.log('stuffimportant:', playerAbility)
+    // console.log('stuffimportant:', playerAbility)
       try { 
         const moveFinder = playerAbility.map(cardName => getPlayerMoves(cardName));
         // console.log('moveFinder:', moveFinder)
@@ -278,41 +277,59 @@ const moveFinder = familiarArray.map(cardName => getCardMoves(cardName));
   }
   
  async generateAttackBarEmoji(atkBar) {
-  const emoji = '■';
-  const filledBars = Math.floor(atkBar / 8);
-  const emptyBars = 12.5 - filledBars;
-    // Set an if case, so that filledBars and emptyBars cant reach negative values
-  if (filledBars < 0) {
-    filledBars = 0;
-  }
-  if (emptyBars < 0) {
-    emptyBars = 0;
-  }
+     const emoji = '■';
+   let emptyBars = 0;
+    const filledBars = Math.floor(atkBar / 5);
   
+     emptyBars = Math.floor(21 - filledBars);
+   
+   if (atkBar > 100) {
+      emptyBars = Math.floor(22 - filledBars);
+   
+   }
+ 
+
   const attackBarString = `${emoji.repeat(filledBars)}${' '.repeat(emptyBars)}`;
   return `[${attackBarString}]`;
 }
 
- async getNextTurn() {
-    let nextTurn = null;
-   while (true) {
+async getNextTurn() {
+  let nextTurn = null;
+  while (true) {
     await this.fillAtkBars();
     
-    // Check if any character has reached 100 attack bar
-    const characterWith100AtkBar = this.characters.find((character) => character.atkBar >= 100);
-    
-    if (characterWith100AtkBar) {
+    // Get all characters that have reached 100 attack bar
+    const charactersWith100AtkBar = this.characters.filter((character) => character.atkBar >= 100);
+    // console.log('charactersWITHQ100ATKBAR:', charactersWith100AtkBar.length)
+    if (charactersWith100AtkBar.length === 1) {
+      const characterWith100AtkBar = charactersWith100AtkBar[0];
       console.log(`${characterWith100AtkBar.name} has reached 100 attack bar.`);
-      this.currentTurn = characterWith100AtkBar.name
+      this.currentTurn = characterWith100AtkBar.name;
       characterWith100AtkBar.attackBarEmoji = await this.generateAttackBarEmoji(characterWith100AtkBar.atkBar);
       characterWith100AtkBar.atkBar = 0;
       console.log(`${characterWith100AtkBar.name} - ${characterWith100AtkBar.attackBarEmoji}`);
       break; // Exit the loop
+    } else if (charactersWith100AtkBar.length > 1) {
+      // If multiple characters have reached 100 attack bar, determine the next turn based on speed
+      let fastestCharacter = charactersWith100AtkBar[0];
+      for (const character of charactersWith100AtkBar) {
+        if (character.atkBar > fastestCharacter.atkBar) {
+          fastestCharacter = character;
+        }
+      }
+      console.log(`${fastestCharacter.name} has the highest atkBar and will take the next turn.`);
+      this.currentTurn = fastestCharacter.name;
+      fastestCharacter.attackBarEmoji = await this.generateAttackBarEmoji(fastestCharacter.atkBar);
+      
+      console.log(`${fastestCharacter.name} - ${fastestCharacter.atkBar} - ${fastestCharacter.attackBarEmoji}`);
+      fastestCharacter.atkBar -= 100;
+      break; // Exit the loop
     }
   }
 
-    return nextTurn;
-  }
+  return nextTurn;
+}
+
 
  async sendInitialEmbed() {
   try{   
@@ -345,8 +362,21 @@ const moveFinder = familiarArray.map(cardName => getCardMoves(cardName));
 
     initialEmbed.addFields({ name: 'Your Team Info:', value: `\`\`\`ini\n${playerAndFamiliarsInfo}\`\`\``, inline: false });
 }
+    console.log('battleLOgsLengthBefore', this.battleLogs.length);
+if (this.battleLogs.length > 6 && this.battleLogs.length <= 7) {
+    this.battleLogs.shift();
+} else if (this.battleLogs.length > 7 && this.battleLogs.length <= 8) {
+    this.battleLogs.shift()
+    this.battleLogs.shift();
+}  else if (this.battleLogs.length > 8) {
+    this.battleLogs.shift();
+    this.battleLogs.shift();
+    this.battleLogs.shift();
+}
+    console.log('battleLogsLengthAfterr:', this.battleLogs.length)
+
    if (this.battleLogs.length > 0) {
-      console.log('isitanArray???:', this.battleLogs.join('\n'))
+   
       initialEmbed.addFields({ name: 'Battle Logs', value: '```diff\n' + this.battleLogs.join('\n') + '```',            inline: false });
       } else {
       initialEmbed.addFields({ name: 'Battle Logs', value: 'No battle logs yet.', inline: false });
@@ -370,7 +400,6 @@ const moveFinder = familiarArray.map(cardName => getCardMoves(cardName));
 
       // Update HP and battle logs
       this.boss.physicalStats.hp -= damage;
-      console.log('playerHp:', this.boss.physicalStats.hp);
       this.battleLogs.push(`+ ${this.currentTurn} attacks ${target} for ${damage} damage using gayness`);
       console.log('loglength:', this.battleLogs.length)
       console.log(`${this.currentTurn} attacks ${target} for ${damage} damage using gayness`)
@@ -379,13 +408,11 @@ const moveFinder = familiarArray.map(cardName => getCardMoves(cardName));
     } else if (this.playerFamiliar.includes(this.currentTurn)) {
   const target = this.boss.name; // Implement target selection logic
   let damage = 0;
-  console.log('True');
-
+ 
   // Loop through the familiars to find the attacking familiar
   for (const familiar of this.familiarInfo) {
     if (familiar.name === this.currentTurn) {
-       console.log('Truetoo');
-      // Calculate damage for the attacking familiar
+       // Calculate damage for the attacking familiar
       damage = calculateDamage(familiar.stats.attack, this.boss.physicalStats.defense);
 
       // Update HP and battle logs

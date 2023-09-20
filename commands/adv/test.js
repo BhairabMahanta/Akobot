@@ -26,6 +26,9 @@ const { GameImage, Player, Element } = require('./sumfunctions');
     async execute(client, message, args, interaction) {
   
       let player = players[message.author.id];
+      if (!player) {
+        return message.channel.send('You have to register first!')
+      }
 
       const playerName = player.name; const playerFloorIndex = 0; // Replace with the actual floor index for the player 
       const playerLocationIndex = 0; // Replace with the actual location index for the player

@@ -3,9 +3,17 @@ const { EmbedBuilder, ButtonBuilder, ActionRowBuilder } = require('discord.js');
 const fs = require('fs');
 const players = require('../../data/players.json');
 const locations = require('../../data/locations');
-const cards = require('../fun/cards.js');
+const {cards }= require('../fun/cards.js');
 let startedTutorial = [537619455409127442];
 let deniedTutorial = [];
+// function getRandomCard() {
+//   const cardNames = Object.keys(cards);
+//       console.log('cardnames:', cardNames)
+//   const randomCardName = cardNames[Math.floor(Math.random() * cardNames.length)];
+//   const randomCard = cards[randomCardName];
+//       console.log('name:', randomCardName, 'card:', randomCard);
+//   return { name: randomCardName, card: randomCard };
+// }
 
 module.exports = {
   name: 'register',
@@ -45,8 +53,10 @@ module.exports = {
 }*/
     function getRandomCard() {
   const cardNames = Object.keys(cards);
+      console.log('cardnames:', cardNames)
   const randomCardName = cardNames[Math.floor(Math.random() * cardNames.length)];
   const randomCard = cards[randomCardName];
+      console.log('name:', randomCardName, 'card:', randomCard);
   return { name: randomCardName, card: randomCard };
 }
 const randomCardData = getRandomCard();

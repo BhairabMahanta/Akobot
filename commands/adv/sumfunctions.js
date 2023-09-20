@@ -11,10 +11,14 @@ class GameImage {
     this.imgW = imgW;
     this.name = player.name;
     this.elements = [];
+    this.monsterArray = [];
+    this.npcArray = [];
     this.generatedRandomElements = false;
     this.generatedRandomElements2 = false;
     this.image = null;
     this.gaeImage = null;
+    this.distanceToNpc = 0;
+    this.distanceToMonster = 0;
     this.whichMon = null;
     this.playerpos = player.playerpos
   }
@@ -34,13 +38,15 @@ class GameImage {
 
       if (this.getRandomBoolean(monsterProbability) && monsterCount < 7) {
         this.elements.push({ type: `monster${i}`, x: col, y: row });
+        this.monsterArray.push({ type: `monster${i}`, x: col, y: row });
         monsterCount++;
       } else if (this.getRandomBoolean(npcProbability) && npcCount < 5) {
         this.elements.push({ type: `npc${i}`, x: col, y: row });
+        this.npcArray.push({ type: `npc${i}`, x: col, y: row });
         npcCount++;
       }
 
-      if (monsterCount >= 5 && npcCount >= 2) {
+      if (monsterCount > 5 && npcCount > 2) {
         break;
       }
     }
@@ -102,20 +108,20 @@ class GameImage {
    
   }
   async nearElement(hasAttackButton, message, initialMessage, navigationRow, attackButton, talkNpc, bothButton, hasTalkButton) {
-    const attackRadius = 400; // Adjust the radius as needed
+    const attackRadius = 40; // Adjust the radius as needed
 
-    for (const element of this.elements) {
+    for (const element of this.monsterArray) {
       
-      const distanceToMonster = Math.sqrt(
+      this.distanceToMonster = Math.sqrt(
         Math.pow(this.playerpos.x - element.x, 2) +
         Math.pow(this.playerpos.y - element.y, 2)
       );
  console.log('elementtype:', element.type);
-      console.log('Distance to monster:', distanceToMonster);
+      console.log('Distance to monster:', this.distanceToMonster);
      
 
       if (
-        distanceToMonster <= attackRadius &&
+        this.distanceToMonster <= attackRadius &&
         element.type.startsWith('monster') &&
         !hasAttackButton
       ) {
@@ -125,11 +131,11 @@ class GameImage {
         this.whichMon = element.type;
         console.log('whichMon:', this.whichMon);
         initialMessage.edit({
-          components: [navigationRow, attackButton],
+          components: [...navigationRow, attackButton],
         });
         break;
       } else if (
-        distanceToMonster >= attackRadius &&
+        this.distanceToMonster >= attackRadius &&
         element.type === this.whichMon &&
         hasAttackButton
       ) {
@@ -137,10 +143,10 @@ class GameImage {
         console.log('element:', element.type);
         message.channel.send('You moved out of attack range.');
         initialMessage.edit({
-          components: [navigationRow],
+          components: [...navigationRow],
         });
         break;
-      } else if (
+      } /*else if (
         distanceToMonster <= attackRadius &&
         element.type === 'npc' &&
         !hasTalkButton
@@ -150,7 +156,7 @@ class GameImage {
         );
         this.whichMon = element.type;
         initialMessage.edit({
-          components: [navigationRow, talkNpc],
+          components: [...navigationRow, talkNpc],
         });
         break;
       } else if (
@@ -162,10 +168,11 @@ class GameImage {
         console.log('element:', element.type);
         message.channel.send('You moved out of talk range.');
         initialMessage.edit({
-          components: [navigationRow],
+          components: [...navigationRow],
         });
         break;
-      } //else if (
+      }*/ 
+      //else if (
       //   distanceToMonster <= attackRadius &&
       //   !hasAttackButton &&
       //   !hasTalkButton
@@ -179,8 +186,77 @@ class GameImage {
       //   break;
       // }
     }
+
+    for (const element of this.npcArray) {
+      
+      this.distanceToNpc = Math.sqrt(
+        Math.pow(this.playerpos.x - element.x, 2) +
+        Math.pow(this.playerpos.y - element.y, 2)
+      );
+ console.log('elementtype:', element.type);
+      console.log('Distance to monster:', this.distanceToNpc);
+     
+
+      if (
+        this.distanceToNpc <= attackRadius &&
+        element.type.startsWith('npc') &&
+        !hasTalkButton
+      ) {
+        message.channel.send(
+          'You see an NPC, click the \'Talk\' button to interact.'
+        );
+        this.whichMon = element.type;
+        console.log('whichMonNpcOne:', this.whichMon);
+        initialMessage.edit({
+          components: [...navigationRow, talkNpc],
+        });
+        break;
+      } else if (
+        this.distanceToNpc >= attackRadius &&
+        element.type === this.whichMon &&
+        hasTalkButton
+      ) {
+        console.log('whichMonNpcTwo:', this.whichMon);
+        console.log('element2:', element.type);
+        message.channel.send('You moved out of NPC\'s range.');
+        initialMessage.edit({
+          components: [...navigationRow],
+        });
+        break;
+      }
+    }
+    if ((this.distanceToMonster <= attackRadius) && (this.distanceToNpc <= attackRadius)
+        && (!hasAttackButton && !hasTalkButton)
+        ) {
+         message.channel.send(
+           'You see an \'NPC\' and a \'Monster\', click the buttons to interact.'
+         );
+         initialMessage.edit({
+           components: [...navigationRow, ...bothButton],
+        });
+         
+       }
+    
+  }
+  // Method to deactivate an element
+  async deactivate() {
+    this.isActive = false;
   }
 
+  // Method to check if the element is active
+  async isActive() {
+    return this.isActive;
+  }
+
+  // Method to perform an action related to the element
+  async performAction() {
+    if (this.isActive) {
+      // Implement logic for the element's action
+      console.log(`${this.type} is active at x: ${this.x}, y: ${this.y}.`);
+    } else {
+      console.log(`${this.type} is inactive.`);
+    }
+  }  
   
 }
 
@@ -218,34 +294,10 @@ class Player {
   }
 }
 
-class Element {
-  constructor(type, x, y) {
-    this.type = type;
-    this.x = x;
-    this.y = y;
-    this.isActive = true;
-  }
 
-  // Method to deactivate an element
-  deactivate() {
-    this.isActive = false;
-  }
 
-  // Method to check if the element is active
-  isActive() {
-    return this.isActive;
-  }
 
-  // Method to perform an action related to the element
-  performAction() {
-    if (this.isActive) {
-      // Implement logic for the element's action
-      console.log(`${this.type} is active at x: ${this.x}, y: ${this.y}.`);
-    } else {
-      console.log(`${this.type} is inactive.`);
-    }
-  }
-}
+
 
 
 
@@ -253,20 +305,5 @@ class Element {
 module.exports = {
   GameImage,
   Player,
-  Element,
+  
 };
-
-  //       if (!fucka) {
-   //          generatedRandomElements = false;
-   //         generatedRandomElements2 = true;
-   //         player.stuff.generatedRandomElements = 'true';
-   //        fs.writeFileSync('./data/players.json', JSON.stringify(players, null, 4));
-   //         player.stuff.generatedRandomElements2 = 'true';
-   //        fs.writeFileSync('./data/players.json', JSON.stringify(players, null, 4));
-   // }  
-      
-   //  // Generate random elements
-   // if (!generatedRandomElements) {
-   //    generateRandomElements(elements, monsterProbability, npcProbability, maxElements);
-   //    generatedRandomElements = true; // Set the flag to true after generating elements
-   //  }

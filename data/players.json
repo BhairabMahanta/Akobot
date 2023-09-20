@@ -48,11 +48,11 @@
             "generatedRandomElements2": false
         },
         "playerpos": {
-            "x": 300,
-            "y": 250
+            "x": 550,
+            "y": 50
         },
-        "atkBar": 0,
-        "attackBarEmoji": "[■■■■■■■■■■]"
+        "atkBar": 98.00000000000001,
+        "attackBarEmoji": "[■■■■■■■■■■■■]"
     },
     "266939098017562625": {
         "name": "scammedsirol",
@@ -224,7 +224,7 @@
         "race": null
     },
     "532798408340144148": {
-        "name": "rei",
+        "name": "reiChan",
         "location": "Krizzland",
         "inventory": {
             "active": [],
@@ -254,11 +254,19 @@
         },
         "cards": {
             "name": [
-                "Fire Dragon"
+                "Water Nymph"
             ]
         },
         "class": null,
-        "race": null
+        "race": null,
+        "stuff": {
+            "generatedRandomElements": false,
+            "generatedRandomElements2": false
+        },
+        "playerpos": {
+            "x": 250,
+            "y": 400
+        }
     },
     "269039696242278401": {
         "name": "krizzler",

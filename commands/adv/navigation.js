@@ -12,25 +12,58 @@ let hasAttackButton = false;
 let hasTalkButton = false;
 
  // Create a button-based navigation interface
-  const navigationRow = new ActionRowBuilder()
+ const navigationRowUp = new ActionRowBuilder()
     .addComponents(
        new ButtonBuilder()
-        .setCustomId('west')
-        .setLabel('← West')
-        .setStyle('Secondary'),
+        .setCustomId('Empty')
+        .setLabel('a     a')
+        .setStyle('Secondary')
+        .setDisabled(true),
       new ButtonBuilder()
         .setCustomId('north')
         .setLabel('↑ North')
         .setStyle('Danger'),
+       new ButtonBuilder()
+        .setCustomId('Empty2')
+        .setLabel('a     a')
+        .setStyle('Secondary')
+        .setDisabled(true)
+      );
+const navigationRowMid = new ActionRowBuilder()
+.addComponents(
       new ButtonBuilder()
-        .setCustomId('south')
-        .setLabel('↓ South')
-        .setStyle('Primary'),
+         .setCustomId('west')
+         .setLabel('← West')
+         .setStyle('Success'),
+      new ButtonBuilder()
+        .setCustomId('ig')
+        .setLabel('a     a')
+        .setStyle('Secondary')
+        .setDisabled(true),
       new ButtonBuilder()
         .setCustomId('east')
         .setLabel('→ East')
         .setStyle('Success')
     );
+ const navigationRowBot = new ActionRowBuilder()
+    .addComponents(
+       new ButtonBuilder()
+        .setCustomId('Empty3')
+        .setLabel('a     a')
+        .setStyle('Secondary')
+        .setDisabled(true),
+      new ButtonBuilder()
+        .setCustomId('south')
+        .setLabel('↓ South')
+        .setStyle('Danger'),
+       new ButtonBuilder()
+        .setCustomId('a     a')
+        .setLabel('a     a')
+        .setStyle('Secondary')
+        .setDisabled(true)
+      );
+const navigationRow = [navigationRowUp, navigationRowMid, navigationRowBot]
+
  // Player is in attack range, show an attack button
       attackButton = new ActionRowBuilder().addComponents(
            new ButtonBuilder()
@@ -89,7 +122,7 @@ gameImage.generateRandomElements(0.55, 0.5, 10);
   initialMessage.edit({
     // content: `You are at: ${selectedLocation.name}\nDescription: ${selectedLocation.description}`,
     embeds: [nowBattling],
-    components: [navigationRow],
+    components: [...navigationRow],
             files: [updatedImageBuffer]
   });
 

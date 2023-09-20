@@ -70,8 +70,7 @@ function getPlayerMoves(cardName) {
     const card = abilities[cardName];
     if (card && card.description) {
       // Check for cooldown status and handle it accordingly
-      console.log('cardDesc:', card.description)
-      return card;
+     return card;
     }
   else{
     return null; // Return null if the card is not found in the 'cards' data

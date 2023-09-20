@@ -14,7 +14,7 @@ class Ability {
     console.log('bossHp:', target.physicalStats.hp)
     target.physicalStats.hp -= damage;
     console.log('bossHpafter:', target.physicalStats.hp)
-    this.battleLogs.push(`${user.name} uses Shield Bash on ${target.name} dealing ${damage}. ${target.name} is slowed!`);
+    this.battleLogs.push(`+ ${user.name} uses Shield Bash on ${target.name} dealing ${damage}. ${target.name} is slowed!`);
     console.log(this.battleLogs.length)
     console.log(`${user.name} uses Shield Bash on ${target.name}. ${target.name} is slowed!`);
     // Implement slow effect on the target here
@@ -22,7 +22,7 @@ class Ability {
 
  defend(user) {
     user.stats.defense += 10; // Example: Increase defense by 10
-    this.battleLogs.push(`${user.name} uses Defend. Their defense is increased.`);
+    this.battleLogs.push(`+ ${user.name} uses Defend. Their defense is increased.`);
   }
 
   bloodlust(user) {
