@@ -141,6 +141,7 @@ const selectedClassValue = i.values[0]; // Get the selected value // gae shit
    
    } catch (error) {
     console.error('Error on hit:', error);
+     message.channel.send('You perhaps have not selected a class yet. Please select it using "a!classselect", and select race using "a!raceselect".')
  }}
       else if (selectedClassValue.startsWith('fam-')) {
         try{

@@ -48,8 +48,8 @@
             "generatedRandomElements2": false
         },
         "playerpos": {
-            "x": 550,
-            "y": 50
+            "x": 350,
+            "y": 100
         },
         "atkBar": 98.00000000000001,
         "attackBarEmoji": "[■■■■■■■■■■■■]"
@@ -231,13 +231,13 @@
             "backpack": []
         },
         "stats": {
-            "attack": 1,
+            "attack": 100,
             "tactics": 0,
             "magic": 1,
             "training": 0,
-            "defense": 1,
-            "speed": 1,
-            "hitpoints": 10,
+            "defense": 100,
+            "speed": 100,
+            "hitpoints": 1000,
             "intelligence": 1,
             "wise": 1,
             "luck": 1,
@@ -269,8 +269,8 @@
             "generatedRandomElements2": false
         },
         "playerpos": {
-            "x": 150,
-            "y": 450
+            "x": 200,
+            "y": 500
         }
     },
     "269039696242278401": {
