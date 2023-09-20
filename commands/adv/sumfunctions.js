@@ -80,7 +80,7 @@ class GameImage {
           }
         }
       }
-
+console.log('work lol')
       // Load the base image
       this.gaeImage = await sharp(this.image)
         .composite([{ input: 'commands/adv/Old_man.png', left: playerpos.x, top: playerpos.y }])
