@@ -2,8 +2,9 @@ const { EmbedBuilder } = require('discord.js')
 const players = require('../../data/players.json')
 
 module.exports = {
-	name: 'me',
+	name: 'statuswindow',
 	description: 'shows status window of the player',
+  aliases: ['sw', 'me', 'status'],
 	async execute(client, message, args) {
 		let player = players[message.author.id]
     const charEmbed = new EmbedBuilder()

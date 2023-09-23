@@ -80,5 +80,5 @@ const context = {
   // ...
 
   // Battle Logs
-  battlelogs: [],
+ logs: [],
 };

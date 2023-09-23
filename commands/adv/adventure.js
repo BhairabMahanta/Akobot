@@ -15,6 +15,7 @@ const areaImage = 'commands/adv/area2.png';
 module.exports = {
   name: 'adventure',
   description: 'Start an adventure!',
+   aliases: ['a', 'adv'],
   async execute(client, message, args, interaction) {
 const player = players[message.author.id]
 // Simulate player data (replace with your actual data)

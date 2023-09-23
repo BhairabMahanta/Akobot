@@ -36,8 +36,15 @@ if (fs.existsSync(enginePath)) {
 
     for (const file of advFiles) {
       const command = require(path.join(advPath, file));
-      client.commands.set(command.name, command);
+       if (command.name && command.description && command.execute) {
+        client.commands.set(command.name, command);
       console.log(`Command added: ${command.name}`);
+       if (command.aliases && Array.isArray(command.aliases)) {
+    for (const alias of command.aliases) {
+      client.commands.set(alias, command.name);
+      console.log(`Alias added: ${alias} => ${command.name}`);
+    }
+  }}
     }
   }
   // Read files from the "fun" folder
@@ -48,8 +55,15 @@ if (fs.existsSync(enginePath)) {
 
     for (const file of funFiles) {
       const command = require(path.join(funPath, file));
+      if (command.name && command.description && command.execute) {
       client.commands.set(command.name, command);
       console.log(`Command added: ${command.name}`);
+          if (command.aliases && Array.isArray(command.aliases)) {
+    for (const alias of command.aliases) {
+      client.commands.set(alias, command.name);
+      console.log(`Alias added: ${alias} => ${command.name}`);
+    }
+  }}
     }
   }
 
@@ -60,8 +74,15 @@ if (fs.existsSync(enginePath)) {
 
     for (const file of utilFiles) {
       const command = require(path.join(utilPath, file));
+      if (command.name && command.description && command.execute) {
       client.commands.set(command.name, command);
       console.log(`Command added: ${command.name}`);
+          if (command.aliases && Array.isArray(command.aliases)) {
+    for (const alias of command.aliases) {
+      client.commands.set(alias, command);
+      console.log(`Alias added: ${alias} => ${command.name}`);
+    }
+  }}
     }
   }
 }

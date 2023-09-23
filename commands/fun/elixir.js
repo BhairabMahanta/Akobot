@@ -2,6 +2,7 @@
 module.exports = {
   name: 'elixir2',
   description:'something',
+  aliases: ['e', 'e2'],
   async execute  (client, message, args) {
     let inputData = `'${args}'`
     let array = [];

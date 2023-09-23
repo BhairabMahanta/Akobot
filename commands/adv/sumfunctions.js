@@ -1,5 +1,6 @@
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, AttachmentBuilder } = require('discord.js');
 const players = require('../../data/players.json');
+const {areas} = require('./areas.js');
 const sharp = require('sharp');
 const fs = require('fs');
 
@@ -51,6 +52,63 @@ class GameImage {
       }
     }
   }
+  async generateAreaElements(areaName) {
+  // Fetch area data from area.js based on areaName
+  const areaData = areas[areaName];
+
+  // Initialize counts for monsters and NPCs
+  let monsterCount = 0;
+  let npcCount = 0;
+   const maxElements = 10
+
+  // Loop through the area data and generate elements
+  for (let i = this.elements.length; i < maxElements; i++) {
+    // const row = Math.floor(Math.random() * (this.imgH - 50)) + 50;
+    // const col = Math.floor(Math.random() * (this.imgW - 50)) + 50;
+
+    // Generate monsters
+    if (monsterCount < areaData.monsters.length) {
+      const monster = areaData.monsters[monsterCount];
+      this.elements.push({
+        type: monster.type,
+        x: monster.position.x,
+        y: monster.position.y,
+        area: areaName, // Store the area name with the element
+      });
+      this.monsterArray.push({
+        type: monster.type,
+        x: monster.position.x,
+        y: monster.position.y,
+        area: areaName, // Store the area name with the element
+      });
+      monsterCount++;
+    }
+
+    // Generate NPCs
+    if (npcCount < areaData.npcs.length) {
+      const npc = areaData.npcs[npcCount];
+      this.elements.push({
+        type: npc.type,
+        x: npc.position.x,
+        y: npc.position.y,
+        area: areaName, // Store the area name with the element
+      });
+      this.npcArray.push({
+        type: npc.type,
+        x: npc.position.x,
+        y: npc.position.y,
+        area: areaName, // Store the area name with the element
+      });
+      npcCount++;
+    }
+
+    // Break if we've generated enough monsters and NPCs
+    if (monsterCount >= areaData.monsters.length && npcCount >= areaData.npcs.length) {
+      break;
+    }
+  }
+}
+
 
   async generateUpdatedImage(areaImage, playerpos) {
     try {
@@ -231,7 +289,7 @@ class GameImage {
            'You see an \'NPC\' and a \'Monster\', click the buttons to interact.'
          );
          initialMessage.edit({
-           components: [...navigationRow, ...bothButton],
+           components: [...navigationRow, bothButton],
         });
          
        }

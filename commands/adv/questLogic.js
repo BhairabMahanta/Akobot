@@ -1,6 +1,8 @@
 // QuestLogic.js
 class QuestLogic {
   constructor(that) {
+    this.player = that.player
+    
     // Initialize quest logic variables and methods here
   }
 

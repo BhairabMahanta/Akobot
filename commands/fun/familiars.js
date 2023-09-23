@@ -6,6 +6,7 @@ const FAMILIARS_PER_PAGE = 5; // Set the number of familiars per page
 module.exports = {
   name: 'familiars',
   description: 'View information about all familiars',
+  aliases: ['familiar', 'fam'],
   execute(client, message, args) {
     // Get the page number from the command arguments (defaults to page 1)
     const page = args[0] ? parseInt(args[0], 10) : 1;

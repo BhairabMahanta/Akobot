@@ -48,14 +48,20 @@
             "generatedRandomElements2": false
         },
         "playerpos": {
-            "x": 350,
-            "y": 100
+            "x": 200,
+            "y": 300
         },
         "atkBar": 98.00000000000001,
-        "attackBarEmoji": "[■■■■■■■■■■■■]"
+        "attackBarEmoji": "[■■■■■■■■■■■■]",
+        "quests": [
+            "Monster Subjugation",
+            "Gather Ingredients",
+            "Defeat the Spiders",
+            "Conquer the Temple"
+        ]
     },
     "266939098017562625": {
-        "name": "scammedsirol",
+        "name": "sitol",
         "location": "Krizzland",
         "inventory": {
             "active": [],
@@ -73,8 +79,7 @@
             "wise": 1,
             "luck": 1,
             "devotion": 0,
-            "potential": 1,
-            "hp": null
+            "potential": 1
         },
         "balance": {
             "coins": 0,
@@ -92,11 +97,11 @@
         "class": null,
         "race": null,
         "stuff": {
-            "generatedRandomElements": "true",
+            "generatedRandomElements": false,
             "generatedRandomElements2": false
         },
         "playerpos": {
-            "x": 500,
+            "x": 250,
             "y": 350
         }
     },
@@ -614,6 +619,51 @@
         },
         "playerpos": {
             "x": 50,
+            "y": 50
+        }
+    },
+    "637931483218051102": {
+        "name": "Kyla",
+        "location": "Krizzland",
+        "inventory": {
+            "active": [],
+            "backpack": []
+        },
+        "stats": {
+            "attack": 1,
+            "tactics": 0,
+            "magic": 1,
+            "training": 0,
+            "defense": 1,
+            "speed": 1,
+            "hitpoints": 10,
+            "intelligence": 1,
+            "wise": 1,
+            "luck": 1,
+            "devotion": 0,
+            "potential": 1
+        },
+        "balance": {
+            "coins": 0,
+            "gems": 0
+        },
+        "exp": {
+            "xp": 0,
+            "level": 0
+        },
+        "cards": {
+            "name": [
+                "Water Nymph"
+            ]
+        },
+        "class": null,
+        "race": null,
+        "stuff": {
+            "generatedRandomElements": false,
+            "generatedRandomElements2": false
+        },
+        "playerpos": {
+            "x": 100,
             "y": 50
         }
     }

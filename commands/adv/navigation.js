@@ -5,7 +5,7 @@ const { generateUpdatedImage, elements, generateRandomElements, movePlayer, near
 const { GameImage, Player, Element } = require('./sumfunctions');
 const players = require('../../data/players.json');
 const {  Battle, BossMonster, Environment } = require('./battle.js')
-
+const {  NPC } = require('./npc.js')
 let updatedImageBuffer = null;
 let attackButton = null;
 let hasAttackButton = false;
@@ -16,7 +16,7 @@ let hasTalkButton = false;
     .addComponents(
        new ButtonBuilder()
         .setCustomId('Empty')
-        .setLabel('a     a')
+        .setLabel('x Dead')
         .setStyle('Secondary')
         .setDisabled(true),
       new ButtonBuilder()
@@ -25,7 +25,7 @@ let hasTalkButton = false;
         .setStyle('Danger'),
        new ButtonBuilder()
         .setCustomId('Empty2')
-        .setLabel('a     a')
+        .setLabel('x Dead')
         .setStyle('Secondary')
         .setDisabled(true)
       );
@@ -35,17 +35,21 @@ const navigationRowMid = new ActionRowBuilder()
          .setCustomId('west')
          .setLabel('← West')
          .setStyle('Success'),
-      new ButtonBuilder()
-        .setCustomId('ig')
-        .setLabel('a     a')
-        .setStyle('Secondary')
-        .setDisabled(true),
+        new ButtonBuilder()
+        .setCustomId('south')
+        .setLabel('↓ South')
+        .setStyle('Danger'),
+      // new ButtonBuilder()
+      //   .setCustomId('ig')
+      //   .setLabel('a     a')
+      //   .setStyle('Secondary')
+      //   .setDisabled(true),
       new ButtonBuilder()
         .setCustomId('east')
         .setLabel('→ East')
         .setStyle('Success')
     );
- const navigationRowBot = new ActionRowBuilder()
+ /*const navigationRowBot = new ActionRowBuilder()
     .addComponents(
        new ButtonBuilder()
         .setCustomId('Empty3')
@@ -61,8 +65,8 @@ const navigationRowMid = new ActionRowBuilder()
         .setLabel('a     a')
         .setStyle('Secondary')
         .setDisabled(true)
-      );
-const navigationRow = [navigationRowUp, navigationRowMid, navigationRowBot]
+      );*/
+const navigationRow = [navigationRowUp, navigationRowMid]
 
  // Player is in attack range, show an attack button
       attackButton = new ActionRowBuilder().addComponents(
@@ -108,11 +112,13 @@ async function handleNavigation(allFloors, message, adventureEmbed, initialMessa
   
      // Create instances of the classes
 const gameImage = new GameImage(600, 600, player);
+  const newNpc = new NPC(player, 'npc1', message)
   const playerpos = gameImage.playerpos
 // const player = new Player('PlayerName', 100); // Replace with actual player name and health
 // const element = new Element('Monster', 200, 300); // Replace with actual element details
 
 // Call methods on the instances
+   gameImage.generateAreaElements("Forest Clearing") 
 gameImage.generateRandomElements(0.55, 0.5, 10);
   
  // Generate the updated image with the player's position
@@ -196,13 +202,15 @@ gameImage.generateRandomElements(0.55, 0.5, 10);
           // Handle the attack logic here
        const battle = new Battle(player, 'Dragon Lord');
  battle.startBattle(message);
+   initialMessage.edit({components: []});
             
          
     } 
  else if (i.customId === 'talk_npc' && i.user.id === message.user.id)  {
           // Handle the attack logic here
-            message.channel.send('You are talking with \`\`NpcName\`\`!');
-         
+            // message.channel.send('You are talking with \`\`NpcName\`\`!');
+         newNpc.initiateTalk()
+    initialMessage.edit({components: []});
     }
   
     

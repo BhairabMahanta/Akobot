@@ -22,6 +22,7 @@ let selectedRaceValue;
 module.exports = {
     name: 'selectrace',
     description: 'Select your race and class!',
+  aliases: ['sr', 'selectr'],
     async execute(client, message, args, interaction) {
         try {
             const userId = message.author.id;

@@ -6,6 +6,7 @@ const { EmbedBuilder, ButtonBuilder, ActionRowBuilder, } = require('discord.js')
 module.exports = {
   name: 'trivia',
   description: 'Starts a trivia game with pre-made questions',
+  aliases: ['scramble', 'quiz'],
   async execute(client, message, args) {
 
 

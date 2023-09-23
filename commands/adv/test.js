@@ -23,6 +23,7 @@ const { GameImage, Player, Element } = require('./sumfunctions');
   module.exports = {
     name: 'testpng',
     description: 'Start an adventure!',
+     aliases: ['tp'],
     async execute(client, message, args, interaction) {
   
       let player = players[message.author.id];

@@ -1,0 +1,313 @@
+{
+  "dialogues": [
+    {
+    
+      "id": 1,
+      "text": "Hey there Newbie, how is it going?",
+      "answers": [
+        {
+          "id": 1,
+          "selection": "A",
+          "text": "Pretty good! How about you?",
+          "outcome": {
+            "id": 1,
+            "text": "Outcome 1",
+            "nextQuestionId": 2
+            
+          }
+        },
+        {
+          "id": 2,
+          "selection": "B",
+          "text": "I'm not a newbie",
+          "outcome": {
+            "id": 2,
+            "text": "Outcome 2",
+            "nextQuestionId": 3
+          }
+        },
+        {
+          "id": 3,
+          "selection": "C",
+          "text": "Just give a quest.",
+          "outcome": {
+            "id": 2,
+            "text": "Outcome 2",
+            "nextQuestionId": 4
+          }
+        },
+        {
+          "id": 4,
+          "selection": "D",
+          "text": "Sorry, I didn't mean to talk to you.",
+          "outcome": {
+            "id": 2,
+            "text": "Outcome 2",
+            "nextQuestionId": 0
+          }
+        }
+      ],
+      "imageUrl": "https://cdn.discordapp.com/attachments/984382901716148234/1128719300484669650/output.png"
+    },
+    {
+    
+      "id": 2,
+      "text": "Haha, I'm doing plenty good, just hard being a farmer in these monster filled lands. ",
+      "answers": 
+      
+      [{
+          "id": 1,
+        "selection": "A",
+          "text": "I could help you out!",
+          "outcome": {
+            "id": 1,
+            "text": "Outcome 1",
+            "nextQuestionId": 5
+          }
+        },
+        {
+          "id": 2,
+          "selection": "B",
+          "text": "That sounds rough.",
+          "outcome": {
+            "id": 2,
+            "text": "Outcome 2",
+            "nextQuestionId": 5
+          }
+        },
+        {
+          "id": 3,
+          "selection": "C",
+          "text": "Skill issues.",
+          "outcome": {
+            "id": 2,
+            "text": "Outcome 2",
+            "nextQuestionId": 3
+          }
+        },
+        {
+          "id": 4,
+          "selection": "D",
+          "text": "Okay, give me a quest.",
+          "outcome": {
+            "id": 2,
+            "text": "Outcome 2",
+            "nextQuestionId": 4
+          }
+        }
+      ]
+
+      
+    },
+    
+    {
+      
+      "id": 3,
+      "text": "Hahaha, newbies These days.",
+      "imageUrl": "https://cdn.discordapp.com/attachments/984382901716148234/1128749270657417317/main-qimg-1e20142d1e62db8f22456d7b049b1782-lq.png",
+      "answers":
+      
+      [{
+          "id": 1,
+        "selection": "A",
+          "text": "You seem pretty troubled. Do you need a hand?",
+          "outcome": {
+            "id": 1,
+            "text": "Outcome 1",
+            "nextQuestionId": 5
+          }
+        },
+        {
+          "id": 2,
+          "selection": "B",
+          "text": "Whatever.",
+          "outcome": {
+            "id": 2,
+            "text": "Outcome 2",
+            "nextQuestionId": 4
+          }
+        },
+        {
+          "id": 3,
+          "selection": "D",
+          "text": "Big talks for someone with a small cock.",
+          "outcome": {
+            "id": 2,
+            "text": "Outcome 2",
+            "nextQuestionId": 2
+          }
+        },
+        {
+          "id": 2,
+          "selection": "D",
+          "text": "Alright, see you off.",
+          "outcome": {
+            "id": 2,
+            "text": "Outcome 2",
+            "nextQuestionId": 0
+          }
+        }
+      ]
+ 
+    },
+    {
+    
+      "id": 4,
+      "text": "Sorry Lad, I'm just a poor troubled farmer, I dont have a quest to give. ",
+      "answers": 
+      
+      [{
+          "id": 1,
+        "selection": "A",
+          "text": "Alrighty! I hope you do good.",
+          "outcome": {
+            "id": 1,
+            "text": "Outcome 1",
+            "nextQuestionId": 5
+          }
+        },
+        {
+          "id": 2,
+          "selection": "B",
+          "text": "Is this a joke old man?",
+          "outcome": {
+            "id": 2,
+            "text": "Outcome 2",
+            "nextQuestionId": 0
+          }
+        },
+        {
+          "id": 3,
+          "selection": "C",
+          "text": "Filthy peasant.",
+          "outcome": {
+            "id": 2,
+            "text": "Outcome 2",
+            "nextQuestionId": 0
+          }
+        },
+        {
+          "id": 4,
+          "selection": "D",
+          "text": "Ignore and leave.",
+          "outcome": {
+            "id": 2,
+            "text": "Outcome 2",
+            "nextQuestionId": 0
+          }
+        }
+      ]
+
+      
+    },
+    {
+      
+      "id": 5,
+      "text": "Mind helping this old man out?.",
+      "imageUrl": "https://cdn.discordapp.com/attachments/984382901716148234/1128749270657417317/main-qimg-1e20142d1e62db8f22456d7b049b1782-lq.png",
+      "answers":
+      
+      [{
+          "id": 1,
+        "selection": "A",
+          "text": "I would love to, just give me the orders!",
+          "outcome": {
+            "id": 1,
+            "text": "quest_Monster Subjugation"
+          }
+        },
+        {
+          "id": 2,
+          "selection": "B",
+          "text": "Depends on the rewards",
+          "outcome": {
+            "id": 2,
+             "text": "quest"
+          }
+        },
+        {
+          "id": 3,
+          "selection": "D",
+          "text": "No! I got other things to do.",
+          "outcome": {
+            "id": 2,
+            "text": "Outcome 2",
+            "nextQuestionId": 0
+          }
+        },
+        {
+          "id": 2,
+          "selection": "D",
+          "text": "Ignore and leave.",
+          "outcome": {
+            "id": 2,
+            "text": "Outcome 2",
+            "nextQuestionId": 0
+          }
+        }
+      ]
+ 
+    },
+    {
+      
+      "id": 6,
+      "text": "You can type a!selectrace to select your race.\n The races have quite a huge impact so its advised to read carefully before choosing your race. As you cannot switch your race once you've hit lvl 10 unless your level resets.",
+      "imageUrl": "https://cdn.discordapp.com/attachments/984382901716148234/1128749270657417317/main-qimg-1e20142d1e62db8f22456d7b049b1782-lq.png",
+      "answers":
+      
+      [{
+          "id": 1,
+        "selection": "A",
+          "text": "Stay silent, dont make any moves.",
+          "outcome": {
+            "id": 1,
+            "text": "Don't be so shy lol, try it out. Use a!tutorial again to start where you left off."
+            
+          }
+        },
+        {
+          "id": 2,
+          "selection": "B",
+          "text": "You're quick to catch on",
+          "outcome": {
+            "id": 2,
+            "text": "Quite full of yourself arent you? Try to take a decision on selecting your race. Use a!tutorial again to start where you left off."
+            
+          }
+        },
+        {
+          "id": 3,
+          "selection": "D",
+          "text": "Stay silent but, show a surprised expression.",
+          "outcome": {
+            "id": 2,
+            "text": "Don't be so shy lol, try it out. Use a!tutorial again to start where you left off."
+            
+          }
+        },
+        {
+          "id": 2,
+          "selection": "D",
+          "text": "Being calculative is in my bones.",
+          "outcome": {
+            "id": 2,
+           "text": "Cringe, Try to take a decision on selecting your race. Use a!tutorial again to start where you left off."
+          }
+        }
+      ]
+ 
+    }
+  ],
+  "outcomes": [
+    {
+      "id": 1,
+      "text": "Outcome 69",
+      "nextQuestionId": 1
+    },
+    {
+      "id": 2,
+      "text": "Outcome 420",
+      "nextQuestionId": 2
+    }
+  ]
+}
