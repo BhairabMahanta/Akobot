@@ -5,6 +5,7 @@ const fs = require('fs');
 module.exports = {
   name: 'selectfamiliar',
   description: 'Select up to 3 familiars!',
+  aliases: ['sf'],
   async execute(client, message, args, interaction) {
     // Check if the player exists in the data
     const playerId = message.author.id;

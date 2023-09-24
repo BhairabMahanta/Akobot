@@ -24,8 +24,9 @@ module.exports = {
 
     // Populate the fields with the list of quests
     questList.forEach((questName, index) => {
+      console.log('questName:', questName)
        const questDetails = quests[questName];
-      embed.addFields({ name: `${index + 1}.  ${questDetails.title}`, value: `>>> ${questDetails.objective}`, inline: false });
+      embed.addFields({ name: `${index + 1}.  ${questDetails.title}`, value: `>>> ${questDetails.description}`, inline: false });
     });
 
     // Create a select menu with quest options
@@ -49,10 +50,11 @@ module.exports = {
     const collector = sentMessage.createMessageComponentCollector({ time: 300000 });
 
     collector.on('collect', async (interaction) => {
-    // console.log('GAEINTERNATION:', interaction.values[0])
+     console.log('GAEINTERNATION:', interaction.values[0])
       if (interaction.isSelectMenu()) {
         const selectedQuest = interaction.values[0];
         const questDetails = quests[selectedQuest];
+        console.log('qwustDetails:', questDetails)
 
        embed.setFields(
           {
@@ -62,14 +64,14 @@ module.exports = {
           },
           {
             name: 'Quest Objective:',
-            value: questDetails.objective,
+            value: questDetails.description,
             inline: false
           },
           {
             name: 'Quest Time Limit:',
-            value: questDetails.time,
+            value: `${questDetails.timeLimit} Days`,
             inline: false
-          },
+          }
           // Add more fields as needed
         );
 afterButtonRow = new ActionRowBuilder().addComponents(
@@ -85,6 +87,7 @@ afterButtonRow = new ActionRowBuilder().addComponents(
         // ];
           );
           const row2 = afterButtonRow
+        console.log('isErrorHere?')
         await interaction.update({ embeds: [embed], components: [row, row2] });
       }
     });

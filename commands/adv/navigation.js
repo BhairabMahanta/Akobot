@@ -7,7 +7,6 @@ const players = require('../../data/players.json');
 const {  Battle, BossMonster, Environment } = require('./battle.js')
 const {  NPC } = require('./npc.js')
 let updatedImageBuffer = null;
-let attackButton = null;
 let hasAttackButton = false;
 let hasTalkButton = false;
 
@@ -16,7 +15,7 @@ let hasTalkButton = false;
     .addComponents(
        new ButtonBuilder()
         .setCustomId('Empty')
-        .setLabel('x Dead')
+        .setLabel('☠️ ded')
         .setStyle('Secondary')
         .setDisabled(true),
       new ButtonBuilder()
@@ -25,7 +24,7 @@ let hasTalkButton = false;
         .setStyle('Danger'),
        new ButtonBuilder()
         .setCustomId('Empty2')
-        .setLabel('x Dead')
+        .setLabel('☠️ ded')
         .setStyle('Secondary')
         .setDisabled(true)
       );
@@ -39,56 +38,55 @@ const navigationRowMid = new ActionRowBuilder()
         .setCustomId('south')
         .setLabel('↓ South')
         .setStyle('Danger'),
-      // new ButtonBuilder()
-      //   .setCustomId('ig')
-      //   .setLabel('a     a')
-      //   .setStyle('Secondary')
-      //   .setDisabled(true),
-      new ButtonBuilder()
+         new ButtonBuilder()
         .setCustomId('east')
         .setLabel('→ East')
         .setStyle('Success')
     );
- /*const navigationRowBot = new ActionRowBuilder()
+ const navigationRowTalk = new ActionRowBuilder()
     .addComponents(
        new ButtonBuilder()
-        .setCustomId('Empty3')
-        .setLabel('a     a')
-        .setStyle('Secondary')
-        .setDisabled(true),
-      new ButtonBuilder()
-        .setCustomId('south')
-        .setLabel('↓ South')
+          .setCustomId('talk_npc')
+          .setLabel('💬 Talk')
+          .setStyle('Primary'),
+         new ButtonBuilder()
+        .setCustomId('north')
+        .setLabel('↑ North')
         .setStyle('Danger'),
        new ButtonBuilder()
-        .setCustomId('a     a')
-        .setLabel('a     a')
+        .setCustomId('Empty2')
+        .setLabel('☠️ ded')
         .setStyle('Secondary')
         .setDisabled(true)
-      );*/
-const navigationRow = [navigationRowUp, navigationRowMid]
-
- // Player is in attack range, show an attack button
-      attackButton = new ActionRowBuilder().addComponents(
+      );
+const navigationRowAttack = new ActionRowBuilder()
+       .addComponents(
+       new ButtonBuilder()
+        .setCustomId('Empty')
+        .setLabel('☠️ ded')
+        .setStyle('Secondary')
+        .setDisabled(true),
+         new ButtonBuilder()
+        .setCustomId('north')
+        .setLabel('↑ North')
+        .setStyle('Danger'),
            new ButtonBuilder()
           .setCustomId('attack_monster')
           .setLabel('Attack')
           .setStyle('Primary')
-               );
- talkNpc = new ActionRowBuilder().addComponents(
-           new ButtonBuilder()
-          .setCustomId('talk_npc')
-          .setLabel('Talk')
-          .setStyle('Primary')
-               );
+      );
+ 
+const navigationRow = [navigationRowUp, navigationRowMid]
+const talktRow = [navigationRowTalk, navigationRowMid]
+const attackRow = [navigationRowAttack, navigationRowMid]
  bothButton = new ActionRowBuilder().addComponents(
            new ButtonBuilder()
           .setCustomId('talk_npc')
-          .setLabel('Talk')
+          .setLabel(' 🗣️ Talk')
           .setStyle('Primary'),
    new ButtonBuilder()
           .setCustomId('attack_monster')
-          .setLabel('Attack')
+          .setLabel('⚔️ Attack')
           .setStyle('Primary')
                );
 const nowBattling = new EmbedBuilder()
@@ -214,7 +212,7 @@ gameImage.generateRandomElements(0.55, 0.5, 10);
     }
   
     
-    gameImage.nearElement(hasAttackButton, message, initialMessage, navigationRow, attackButton, talkNpc, bothButton, hasTalkButton) 
+    gameImage.nearElement(hasAttackButton, message, initialMessage, navigationRow, attackRow, talktRow, bothButton, hasTalkButton) 
 
   });
 

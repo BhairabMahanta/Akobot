@@ -39,12 +39,8 @@ if (fs.existsSync(enginePath)) {
        if (command.name && command.description && command.execute) {
         client.commands.set(command.name, command);
       console.log(`Command added: ${command.name}`);
-       if (command.aliases && Array.isArray(command.aliases)) {
-    for (const alias of command.aliases) {
-      client.commands.set(alias, command.name);
-      console.log(`Alias added: ${alias} => ${command.name}`);
-    }
-  }}
+       
+       }
     }
   }
   // Read files from the "fun" folder
@@ -58,12 +54,7 @@ if (fs.existsSync(enginePath)) {
       if (command.name && command.description && command.execute) {
       client.commands.set(command.name, command);
       console.log(`Command added: ${command.name}`);
-          if (command.aliases && Array.isArray(command.aliases)) {
-    for (const alias of command.aliases) {
-      client.commands.set(alias, command.name);
-      console.log(`Alias added: ${alias} => ${command.name}`);
-    }
-  }}
+        }
     }
   }
 
@@ -77,12 +68,8 @@ if (fs.existsSync(enginePath)) {
       if (command.name && command.description && command.execute) {
       client.commands.set(command.name, command);
       console.log(`Command added: ${command.name}`);
-          if (command.aliases && Array.isArray(command.aliases)) {
-    for (const alias of command.aliases) {
-      client.commands.set(alias, command);
-      console.log(`Alias added: ${alias} => ${command.name}`);
-    }
-  }}
+        
+      }
     }
   }
 }

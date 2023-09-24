@@ -22,7 +22,7 @@ class Quest {
   }
   async editFields() {
     this.embed = new EmbedBuilder()
-      .setTitle(`Quest Details: ${this.questName}`)
+      .setTitle(`Quest Details: ${quests[this.questName].title}`)
       .setDescription(`Have something like {dialogueindex}`)
       .setColor("#0099ff");
   }
@@ -32,15 +32,15 @@ class Quest {
     this.questDetails = questDetails;
     console.log('questDetails:', questDetails)
       await this.editFields();
-    this.embed.setDescription(`### - Description: ${questDetails.objective}`);
+    this.embed.setDescription(`### - Description: ${questDetails.description}`);
 
     const rewardFields = [];
 questDetails.rewards.forEach((reward) => {
-  console.log('answer:', reward.experience)
+  console.log('xp:', reward.experience)
 
     rewardFields.push({
       name: `- **Rewards:** `, // Combine index and answer text
-      value: `- **Experience: ${reward.experience}**\n **Items: ${reward.items}**`, // Empty value for alternating
+      value: `- **Experience: ${reward.experience}** \n\n **Items: ${reward.items}**`, // Empty value for alternating
       inline: false,
     });
   console.log('rewardsFields:',rewardFields);
@@ -99,7 +99,7 @@ if (playerData[this.playerId].quests.includes(this.questDetails.title)) {
 
   async declineQuest() {
      this.editFields()
-    this.embed.setDescription(`- ### You have declined the quest ${this.questDetails.title}.\n- Objective: ${this.questDetails.objective}\n- You can view your selected quests by typing a!myquests`)
+    this.embed.setDescription(`### - You have declined the quest ${this.questDetails.title}.\n- Objective: ${this.questDetails.objective}\n- You can view your selected quests by typing a!myquests`)
     await this.collectorMessage.edit({ embeds: [this.embed], components: [] });
 
     // Implement logic to decline the quest

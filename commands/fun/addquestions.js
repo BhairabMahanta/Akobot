@@ -4,6 +4,7 @@ const file = require('./questions.json')
 module.exports = {
   name: 'aq',
   description:'something',
+    aliases: ['addquestions', 'addq'],
   async execute  (client, message, args) {
     
     if (args.length < 5) {

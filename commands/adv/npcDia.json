@@ -130,7 +130,7 @@
         {
           "id": 3,
           "selection": "D",
-          "text": "Big talks for someone with a small cock.",
+          "text": "Big talk for someone with a small cock.",
           "outcome": {
             "id": 2,
             "text": "Outcome 2",
@@ -213,7 +213,7 @@
           "text": "I would love to, just give me the orders!",
           "outcome": {
             "id": 1,
-            "text": "quest_Monster Subjugation"
+            "text": "quest_monster_subjugation"
           }
         },
         {

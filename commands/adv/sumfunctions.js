@@ -164,7 +164,7 @@ class GameImage {
     return new AttachmentBuilder(updatedImageBuffer, { name: 'updatedMap.png' });
    
   }
-  async nearElement(hasAttackButton, message, initialMessage, navigationRow, attackButton, talkNpc, bothButton, hasTalkButton) {
+  async nearElement(hasAttackButton, message, initialMessage, navigationRow, attackButton, talktRow, bothButton, hasTalkButton) {
     const attackRadius = 40; // Adjust the radius as needed
 
     for (const element of this.monsterArray) {
@@ -188,7 +188,7 @@ class GameImage {
         this.whichMon = element.type;
         console.log('whichMon:', this.whichMon);
         initialMessage.edit({
-          components: [...navigationRow, attackButton],
+          components: [...attackRow],
         });
         break;
       } else if (
@@ -203,45 +203,7 @@ class GameImage {
           components: [...navigationRow],
         });
         break;
-      } /*else if (
-        distanceToMonster <= attackRadius &&
-        element.type === 'npc' &&
-        !hasTalkButton
-      ) {
-        message.channel.send(
-          'You see an NPC, click the \'Talk\' button to interact.'
-        );
-        this.whichMon = element.type;
-        initialMessage.edit({
-          components: [...navigationRow, talkNpc],
-        });
-        break;
-      } else if (
-        distanceToMonster >= attackRadius &&
-        element.type === this.whichMon &&
-        hasTalkButton
-      ) {
-        console.log('whichMon2:', this.whichMon);
-        console.log('element:', element.type);
-        message.channel.send('You moved out of talk range.');
-        initialMessage.edit({
-          components: [...navigationRow],
-        });
-        break;
-      }*/ 
-      //else if (
-      //   distanceToMonster <= attackRadius &&
-      //   !hasAttackButton &&
-      //   !hasTalkButton
-      // ) {
-      //   message.channel.send(
-      //     'You see an \'NPC\' and a \'Monster\', click the buttons to interact.'
-      //   );
-      //   initialMessage.edit({
-      //     components: [navigationRow, bothButton],
-      //   });
-      //   break;
-      // }
+      } 
     }
 
     for (const element of this.npcArray) {
@@ -265,7 +227,7 @@ class GameImage {
         this.whichMon = element.type;
         console.log('whichMonNpcOne:', this.whichMon);
         initialMessage.edit({
-          components: [...navigationRow, talkNpc],
+          components: [...talktRow],
         });
         break;
       } else if (

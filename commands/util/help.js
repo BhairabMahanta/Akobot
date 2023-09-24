@@ -23,6 +23,8 @@ module.exports = {
 
     const startIndex = (page - 1) * perPage;
     const endIndex = startIndex + perPage;
+    const startIndexTwo = endIndex + 1;
+    const endIndexTwp = endIndex + perPage;
 
     console.log('Start index:', startIndex);
     console.log('End index:', endIndex);
@@ -49,13 +51,15 @@ module.exports = {
     };
 
     fields.push(field);
-    console.log('fields:', field);
+    console.log('fields:', field);  
 
     if (command.aliases && Array.isArray(command.aliases) && command.aliases.length > 0) {
       console.log('Adding aliases for command:', command.name);
       fields.push({ name: 'Aliases', value: command.aliases.join(', '), inline: false });
     }
-  } });
+  } 
+   
+   });
 
 
     helpEmbed.addFields(...fields);

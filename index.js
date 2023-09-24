@@ -14,6 +14,12 @@ const mongoClient = new MongoClient(uri, {
   }
 });
 
+// const ExtendedClient = require('./extendedClient.js');
+
+// const client = new ExtendedClient();
+
+// client.start();
+
 
 async function connectToDB() {
   try {
@@ -48,13 +54,16 @@ loadCommands(client);
 
 
 client.on('messageCreate', message => {
+  try {
   if (message.content.startsWith('a!')) {
     const args = message.content.slice(2).trim().split(/ +/);
     const commandName = args.shift().toLowerCase();
     console.log(`Received command: ${commandName}`);
+console.log('commandAlias:', client.commands)
 
+  
 
-    const command = client.commands.get(commandName);
+    const command = client.commands.get(commandName) ?? client.commands.find(c => c.aliases.includes(commandName.toLowerCase()));;
 
     if (!command) return;
 
@@ -66,6 +75,9 @@ client.on('messageCreate', message => {
       message.reply('An error occurred while executing the command.');
     }
   }
+    } catch (error) {
+  console.log('what the fuck:', error)
+}
 });
 
 client.on('ready', () => {

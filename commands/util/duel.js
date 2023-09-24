@@ -15,6 +15,7 @@ const {cards} = require('../fun/cards.js'); // Import the cards data from 'cards
 module.exports = {
     name: 'duel',
     description: 'Challenge someone to a duel!',
+    aliases: ['fight', 'challenge', 'battle'],
   async execute(client, message, args, interaction) {
    // const collector = message.createMessageComponentCollector({ idle: 30000 });
 

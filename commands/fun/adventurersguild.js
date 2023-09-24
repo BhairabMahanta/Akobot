@@ -4,6 +4,7 @@ const players = require('../../data/players.json')
 module.exports = {
   name: "ag",
   description: "stuff",
+    aliases: ['adventurersguild', 'adventurerguild', 'guild'],
   async execute (client, message, args) {
 
     if (!message.author.bot) {

@@ -21,4 +21,4 @@ class QuestLogic {
   // Other quest-related methods and logic
 }
 
-module.exports = QuestLogic;
+module.exports = {QuestLogic};
