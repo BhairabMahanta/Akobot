@@ -109,7 +109,7 @@ async function handleNavigation(allFloors, message, adventureEmbed, initialMessa
   console.log('player:', player.name)
   
      // Create instances of the classes
-const gameImage = new GameImage(600, 600, player);
+const gameImage = new GameImage(600, 600, player, message);
   const newNpc = new NPC(player, 'npc1', message)
   const playerpos = gameImage.playerpos
 // const player = new Player('PlayerName', 100); // Replace with actual player name and health
@@ -198,8 +198,12 @@ gameImage.generateRandomElements(0.55, 0.5, 10);
     } 
  else if (i.customId === 'attack_monster' && i.user.id === message.user.id)  {
           // Handle the attack logic here
-       const battle = new Battle(player, 'Dragon Lord');
+       const battle = new Battle(player, 'Dragon Lord', message);
+    // await  battle.isSelected();
+   if (battle.continue) {
+  console.log('playerSElECTFAMILOIAR:', battle.player.selectedFamilar )
  battle.startBattle(message);
+   }
    initialMessage.edit({components: []});
             
          
@@ -212,7 +216,7 @@ gameImage.generateRandomElements(0.55, 0.5, 10);
     }
   
     
-    gameImage.nearElement(hasAttackButton, message, initialMessage, navigationRow, attackRow, talktRow, bothButton, hasTalkButton) 
+    gameImage.nearElement(hasAttackButton, message, initialMessage, navigationRow, attackRow, talktRow, bothButton, hasTalkButton, nowBattling) 
 
   });
 

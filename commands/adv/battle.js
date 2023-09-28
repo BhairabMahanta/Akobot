@@ -20,27 +20,50 @@ const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, StringSelectMenuBuilder }
         .setStyle('Danger')
     );
 
-class Battle {
- constructor(player, bossName) {
-    this.player = player;
-    this.abilityOptions = [];
-    try{
-    this.playerFamiliar = player.selectedFamiliars.name;
-    console.log('selectedplayerFamiliar:', this.playerFamiliar)
-   } catch (error) {
-      console.log('No selected Familiars!', error);
-   }
-     this.familiarInfo = [];
+  class Battle {
+   constructor(player, bossName, message) {
+     this.message = message;
+      this.player = player;
+      this.abilityOptions = [];
+      try{
+        
+        console.log('TRYING MY ARSAEAWSS OFF', this.player.selectedFamiliars )
+         if(this.player.selectedFamiliars) {
+          console.log('true', player.selectedFamiliars)
+      this.playerFamiliar = player.selectedFamiliars.name;
+      console.log('selectedplayerFamiliar:', this.playerFamiliar)
+         }  else if (!this.player.selectedFamiliars) {
+          console.log('gay')
+         this.playerFamiliar = ["Fire Dragon"];
+         this.message.channel.send('You have to select your familiar first using a!selectFamiliar')
+          return this.continue = false;
+        }
 
+     } catch (error) {
+        console.log('No selected Familiars!', error);
+     }
+     this.familiarInfo = [];
 // Loop through each familiar name in the array
-for (const familiarName of this.playerFamiliar) {
+     console.log('TRYING MY ASS OFF', this.playerFamiliar)
+  for (const familiarName of this.playerFamiliar) {
   const familiarData = cards[familiarName];
   if (familiarData) {
     this.familiarInfo.push(familiarData);
   }
+
 }
     this.playerName = this.player.name;
+    if(this.player.class != null) {
+      
     this.playerClass = this.player.class
+      this.continue = true;
+    } else if (this.player.class === null) {
+       this.message.channel.send('You have to select a class first, use a!selectclass');
+      return this.continue = false;
+      
+    }
+
+      
     this.playerRace = this.player.race
     this.boss = bosses[bossName];
     this.currentTurn = null;
@@ -59,7 +82,8 @@ for (const familiarName of this.playerFamiliar) {
     this.initialMessage = initialMessage;
     
   }
-
+  
+    
   
   async toCamelCase(str) {
    

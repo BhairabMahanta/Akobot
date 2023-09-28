@@ -2,33 +2,7 @@
 const { Client, IntentsBitField, EmbedBuilder, ButtonBuilder, ActionRowBuilder, SlashCommandBuilder, Events, ModalBuilder, Collection } = require('discord.js');
 const path = require('path');
 const fs = require('fs');
-const { MongoClient, ServerApiVersion } = require('mongodb');
-const uri = "mongodb+srv://Akaimnky:57n57ng96969@cluster0.ukxb93z.mongodb.net/?retryWrites=true&w=majority";
-// MongoDB connection setup
-const mongoClient = new MongoClient(uri, {
-
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  }
-});
-
-// const ExtendedClient = require('./extendedClient.js');
-
-// const client = new ExtendedClient();
-
-// client.start();
-
-
-async function connectToDB() {
-  try {
-    await mongoClient.connect();
-    console.log('Connected to MongoDB');
-  } catch (error) {
-    console.error('Error connecting to MongoDB:', error);
-  }
-}
+const {mongoClient, connectToDB} = require('./data/mongo/mongo.js')
 
 
 
@@ -59,11 +33,12 @@ client.on('messageCreate', message => {
     const args = message.content.slice(2).trim().split(/ +/);
     const commandName = args.shift().toLowerCase();
     console.log(`Received command: ${commandName}`);
-console.log('commandAlias:', client.commands)
+// console.log('commandAlias:', client.commands)
 
-  
+   
 
-    const command = client.commands.get(commandName) ?? client.commands.find(c => c.aliases.includes(commandName.toLowerCase()));;
+    const command = client.commands.get(commandName) || client.commands.find(c => c.aliases && c.aliases.includes(commandName.toLowerCase()));
+
 
     if (!command) return;
 
@@ -79,7 +54,7 @@ console.log('commandAlias:', client.commands)
   console.log('what the fuck:', error)
 }
 });
-
+const BOT_PREFIX = "a!";
 client.on('ready', () => {
   console.log(`${client.user.tag} is ready!🚀`);
   connectToDB(); // Connect to MongoDB when the bot is ready
@@ -87,79 +62,7 @@ client.on('ready', () => {
 }); //tells that bot is hot and on
 client.on('messageCreate', (message) => {
   const goe = message.content.toLowerCase().substring(BOT_PREFIX.length);
-  if (message.channel && !message.author.bot && (goe === "dbshi" || goe === "db") /*&& !botInfoSent*/) {
-    const db = mongoClient.db('Akaimnky');
-    const collection = db.collection('akaillection');
-
-    const newData = { key: 'value' };
-    collection.insertOne(newData, (err, result) => {
-      if (err) {
-        console.error('Error inserting data:', err);
-      } else {
-        console.log('Data inserted:', result.ops);
-      }
-    });
-    const filter = { key: 'value' };
-    const update = { $set: { key: 'new-value' } };
-    collection.updateOne(filter, update, (err, result) => {
-      if (err) {
-        console.error('Error updating data:', err);
-      } else {
-        console.log('Data updated:', result.modifiedCount);
-      }
-    });
-    collection.find({}).toArray((err, documents) => {
-      if (err) {
-        console.error('Error fetching data:', err);
-      } else {
-        console.log('Fetched data:', documents);
-      }
-    });
-  }
-});
-const BOT_PREFIX = "a!";
-
-//botinfo
-client.on('messageCreate', (message) => {
-
-  const gae = message.content.toLowerCase().substring(BOT_PREFIX.length);
-  if (message.channel && !message.author.bot && (gae === "tes" || gae === "ti") /*&& !botInfoSent*/) {
-
-
-    // Read the contents of the "mageConsts.json" file
-    fs.readFile('./data/config/players/mageConsts.json', 'utf8', (err, data) => {
-      if (err) {
-        console.error('Error reading mageConsts.json:', err);
-        return;
-      }
-
-      try {
-        // Parse the JSON data into a JavaScript object
-        const mageConsts = JSON.parse(data);
-
-        // Now you can use the "mageConsts" object in your code
-        console.log('mageconstsfr:', mageConsts);
-
-        // For example, you can access the name and description of the Mage class like this:
-        //console.log('Class Name:', mageConsts.className);
-        //console.log('Description:', mageConsts.description);
-
-        // Access the ability constants like this:
-        //  console.log('Fireball Ability:', mageConsts.abilityConstants.fireball);
-
-        // ...and so on
-
-      } catch (parseError) {
-        console.error('Error parsing mageConsts.json:', parseError);
-      }
-    });
-
-    // const data = fs.readFileSync('../')
-  }
-
-
-
-
+ 
 
 
 

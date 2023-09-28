@@ -1,5 +1,5 @@
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder } = require('discord.js');
-const cards = require('./cards.js'); // Update the path to the 'cards.js' file
+const {cards} = require('./cards.js'); // Update the path to the 'cards.js' file
 
 const FAMILIARS_PER_PAGE = 5; // Set the number of familiars per page
 
@@ -28,6 +28,7 @@ module.exports = {
     // Loop through each familiar on the current page and add its data to the embed
     for (const familiar of familiars) {
       const stats = familiar.stats;
+      console.log('STATSI', stats)
 
       // Create a string representation of the stats
       const statsString = `Attack: ${stats.attack} | Defense: ${stats.defense} | Speed: ${stats.speed} | HP: ${stats.hp}`;

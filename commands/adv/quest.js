@@ -13,7 +13,7 @@ class Quest {
     this.playerId = that.playerId
     this.questName = that.questName;
     this.questDetails = null;
-    // this.questLogic = new QuestLogic(this);
+    this.questLogic = new QuestLogic(this.player);
     this.embed = that.embed;
     this.row = that.row
     this.message = that.message

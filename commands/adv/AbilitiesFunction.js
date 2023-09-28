@@ -235,7 +235,7 @@ class Ability {
     const power = 20
     const damage = calculateAbilityDamage(power);
     target.physicalStats.hp -= damage;
-    this.battleLogs.push(`${user.name} uses Flame Strike on ${target.name} dealing ${damage}.`);
+    this.battleLogs.push(`+ ${user.name} uses Flame Strike on ${target.name} dealing ${damage}.`);
     // Implement additional effects for Flame Strike here
   }
 
@@ -243,7 +243,7 @@ class Ability {
     const power = 20
     const damage = calculateAbilityDamage(power);
     target.physicalStats.hp -= damage;
-    this.battleLogs.push(`${user.name} uses Dragon Claw on ${target.name} dealing ${damage}.`);
+    this.battleLogs.push(`+ ${user.name} uses Dragon Claw on ${target.name} dealing ${damage}.`);
     // Implement additional effects for Dragon Claw here
   }
 
@@ -251,7 +251,7 @@ class Ability {
     const power = 20
     const damage = calculateAbilityDamage(power);
     target.physicalStats.hp -= damage;
-    this.battleLogs.push(`${user.name} uses Aqua Blast on ${target.name} dealing ${damage}.`);
+    this.battleLogs.push(`+ ${user.name} uses Aqua Blast on ${target.name} dealing ${damage}.`);
     // Implement additional effects for Aqua Blast here
   }
 
@@ -259,7 +259,7 @@ class Ability {
     const power = 20
     const healingAmount = calculateAbilityDamage(power);
     user.stats.hp += healingAmount;
-    this.battleLogs.push(`${user.name} uses Healing Wave and heals for ${healingAmount}.`);
+    this.battleLogs.push(`+ ${user.name} uses Healing Wave and heals for ${healingAmount}.`);
     // Implement additional effects for Healing Wave here
   }
 

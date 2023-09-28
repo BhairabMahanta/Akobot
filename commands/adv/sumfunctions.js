@@ -3,11 +3,12 @@ const players = require('../../data/players.json');
 const {areas} = require('./areas.js');
 const sharp = require('sharp');
 const fs = require('fs');
-
+const path = require('path');
 
 class GameImage {
-  constructor(imgH, imgW, player) {
+  constructor(imgH, imgW, player, message) {
     console.log('playername', player.name)
+    this.message = message;
     this.imgH = imgH;
     this.imgW = imgW;
     this.name = player.name;
@@ -111,16 +112,32 @@ class GameImage {
 
 
   async generateUpdatedImage(areaImage, playerpos) {
+   let name;
+    let inputImagePath;
     try {
       this.generatedRandomElements2 = false;
 
       if (!this.generatedRandomElements2) {
+         
         // Add elements to the image
         this.generatedRandomElements2 = true;
         for (const element of this.elements) {
-          const inputImagePath = element.type.startsWith('monster')
-            ? 'commands/adv/monster.png'
-            : 'commands/adv/npc.png';
+          const elementName = element.type
+     name = `commands/adv/npcimg/${elementName}.png`
+    console.log('name:', name)
+          const filePath = path.join(name);
+          console.log('filepath:', filePath);
+
+// Use fs.existsSync to check if the file exists
+if (fs.existsSync(name)) {
+  // The file exists, you can now use it
+  inputImagePath = name;
+  console.log(`The file ${filePath} exists.`);
+} else {
+           inputImagePath = element.type.startsWith('monster')
+            ? 'commands/adv/npcimg/monster.png'
+            : 'commands/adv/npcimg/npc.png';
+}
           if (element === this.elements[0]) {
             // For the first element, apply the composite directly to the updatedImage
             this.image = await sharp(areaImage)
@@ -164,7 +181,7 @@ class GameImage {
     return new AttachmentBuilder(updatedImageBuffer, { name: 'updatedMap.png' });
    
   }
-  async nearElement(hasAttackButton, message, initialMessage, navigationRow, attackButton, talktRow, bothButton, hasTalkButton) {
+  async nearElement(hasAttackButton, message, initialMessage, navigationRow, attackRow, talktRow, bothButton, hasTalkButton, nowBattling) {
     const attackRadius = 40; // Adjust the radius as needed
 
     for (const element of this.monsterArray) {
@@ -182,12 +199,13 @@ class GameImage {
         element.type.startsWith('monster') &&
         !hasAttackButton
       ) {
-        message.channel.send(
-          'You are in the monster field radius, click the attack button to attack.'
+        nowBattling.setFooter({text:
+          'You are in the monster field radius, click the attack button to attack.'}
         );
         this.whichMon = element.type;
         console.log('whichMon:', this.whichMon);
         initialMessage.edit({
+          embeds: [nowBattling],
           components: [...attackRow],
         });
         break;
@@ -198,8 +216,9 @@ class GameImage {
       ) {
         console.log('whichMon2:', this.whichMon);
         console.log('element:', element.type);
-        message.channel.send('You moved out of attack range.');
+        nowBattling.setFooter({text:'You moved out of attack range.'});
         initialMessage.edit({
+          embeds: [nowBattling],
           components: [...navigationRow],
         });
         break;
@@ -221,12 +240,13 @@ class GameImage {
         element.type.startsWith('npc') &&
         !hasTalkButton
       ) {
-        message.channel.send(
-          'You see an NPC, click the \'Talk\' button to interact.'
+        nowBattling.setFooter({text:
+          'You see an NPC, click the \'Talk\' button to interact.'}
         );
         this.whichMon = element.type;
         console.log('whichMonNpcOne:', this.whichMon);
         initialMessage.edit({
+          embeds: [nowBattling],
           components: [...talktRow],
         });
         break;
@@ -237,8 +257,9 @@ class GameImage {
       ) {
         console.log('whichMonNpcTwo:', this.whichMon);
         console.log('element2:', element.type);
-        message.channel.send('You moved out of NPC\'s range.');
+         nowBattling.setFooter({text:'You moved out of NPC\'s range.'});
         initialMessage.edit({
+          embeds: [nowBattling],
           components: [...navigationRow],
         });
         break;

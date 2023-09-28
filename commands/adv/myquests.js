@@ -4,6 +4,12 @@ const { quests } = require('./quests'); // Assuming you have quests defined in a
 const path = require('path');
 const playersFilePath = path.join(__dirname, '..', '..', 'data', 'players.json');
 const playerData = JSON.parse(fs.readFileSync(playersFilePath, 'utf8'));
+const { QuestLogic } = require('./questLogic');
+let startingThisQuest = null;
+let embed;
+let row;
+let row2
+let sentMessage;
 module.exports = {
   name: 'myquests',
   description: 'View your selected quests',
@@ -17,7 +23,7 @@ module.exports = {
     }
 
     const questList = playerData[playerId].quests;
-    const embed = new EmbedBuilder()
+     embed = new EmbedBuilder()
       .setTitle('My Quests')
       .setDescription('### Select a quest from the list below to view details:')
       
@@ -35,25 +41,28 @@ module.exports = {
       .setPlaceholder('Select a Quest')
       .addOptions(
         questList.map((quest, index) => ({
-          label: `${index + 1}. ${quest}`,
+          
+          label: `${index + 1}. ${quests[quest].title}`,
           value: quest,
         }))
       );
 
-    const row = new ActionRowBuilder().addComponents(selectMenu);
+     row = new ActionRowBuilder().addComponents(selectMenu);
 
     // Send the initial embed with the select menu
-    const sentMessage = await message.channel.send({ embeds: [embed], components: [row] });
+     sentMessage = await message.channel.send({ embeds: [embed], components: [row] });
 
     // Create a collector for the select menu interaction
     const filter = i => (i.user.id === playerId) 
     const collector = sentMessage.createMessageComponentCollector({ time: 300000 });
 
     collector.on('collect', async (interaction) => {
-     console.log('GAEINTERNATION:', interaction.values[0])
-      if (interaction.isSelectMenu()) {
+     
+     // console.log('GAEINTERNATION:', interaction.values[0])
+      if (interaction.isStringSelectMenu()) {
         const selectedQuest = interaction.values[0];
-        const questDetails = quests[selectedQuest];
+        var questDetails = quests[selectedQuest];
+        startingThisQuest = questDetails;
         console.log('qwustDetails:', questDetails)
 
        embed.setFields(
@@ -79,16 +88,23 @@ afterButtonRow = new ActionRowBuilder().addComponents(
           new ButtonBuilder()
             .setStyle("Primary")
             .setLabel("Go back")
-            .setCustomId("start"),
+            .setCustomId("cancel"),
           new ButtonBuilder()
             .setStyle("Primary")
             .setLabel("Start Quest")
-            .setCustomId("cancel"),
+            .setCustomId("start_quest"),
         // ];
           );
-          const row2 = afterButtonRow
+          row2 = afterButtonRow
         console.log('isErrorHere?')
         await interaction.update({ embeds: [embed], components: [row, row2] });
+      }
+      if (interaction.customId === 'start_quest') {
+         await interaction.deferUpdate();
+         // console.log('questName lol?:', startingThisQuest)
+        console.log('questName lolv2:', startingThisQuest.id)
+        const startQuest = new QuestLogic(message, interaction, sentMessage, embed, row, row2)
+        startQuest.startQuest(startingThisQuest.id)
       }
     });
 
