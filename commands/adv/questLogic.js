@@ -7,6 +7,7 @@ const path = require('path');
 const playersFilePath = path.join(__dirname, '..', '..', 'data', 'players.json');
 const playerData = JSON.parse(fs.readFileSync(playersFilePath, 'utf8'));
 
+
 class QuestLogic {
   constructor(message, interaction, sentMessage, embed, row, row2) {
     this.player = players[message.author.id]
@@ -40,17 +41,18 @@ class QuestLogic {
       return this.sentMessage.edit({ embeds: [this.embed], components: [this.row, this.row2] });
     } 
 // Check if the player has the "gather_ingredients" quest
-if (!playerData[this.message.author.id].activeQuests[questId]) {
+if (!players[this.message.author.id].activeQuests[questId]) {
   // Edit the "gather_ingredients" quest
-  playerData[this.message.author.id].activeQuest[questId] = {}
-  console.log('things get out of hand:',  playerData[this.message.author.id].activeQuests[questId])
-  playerData[this.message.author.id].activeQuest[questId] = {
+// players[this.message.author.id].activeQuests[questId] = questId
+    console.log('things get out of hand:',  players[this.message.author.id].activeQuests)
+  console.log('APNA TIME NAI AYEGA:', this.quests[questId])
+  players[this.message.author.id].activeQuests[questId] = {
     objectives: [
       {
-        id: `${this.quests[questId].objectives.id}`,
-        target: `${this.quests[questId].objectives.target}`,
-        current: `${this.quests[questId].objectives.current}`,
-        required: `${this.quests[questId].objectives.required}`,
+        id: `${this.quests[questId].objectives[0].id}`,
+        target: `${this.quests[questId].objectives[0].target}`,
+        current: `${this.quests[questId].objectives[0].current}`,
+        required: `${this.quests[questId].objectives[0].required}`,
       },
     ],
     timeLimit: {
@@ -60,7 +62,7 @@ if (!playerData[this.message.author.id].activeQuests[questId]) {
     questChannel: "newChannelId",
   };
 }
-console.log('playerData:', playerData)
+console.log('playerData:', players[this.message.author.id].activeQuests[questId])
 // Save the updated player's data back to players.json
 // fs.writeFileSync(playersFilePath, JSON.stringify(playerData, null, 2), 'utf8');
 

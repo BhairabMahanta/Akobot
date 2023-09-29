@@ -1,3 +1,9 @@
+const {mongoClient} = require('../../data/mongo/mongo.js')
+const mongoose = require('mongoose');
+const {playerModel} = require('../../data/mongo/playerschema.js'); // Adjust the path to match your schema file location
+const {Tutorial} = require('./tutorial.js')
+// Specify the collection name (you can use the 'collection' property of the schema)
+const collectionName = 'akaillection';
 const story = require('./story.json'); // Load the story from the JSON file
 const { EmbedBuilder, ButtonBuilder, ActionRowBuilder } = require('discord.js');
 const fs = require('fs');
@@ -6,26 +12,21 @@ const locations = require('../../data/locations');
 const {cards }= require('../fun/cards.js');
 let startedTutorial = [537619455409127442];
 let deniedTutorial = [];
-// function getRandomCard() {
-//   const cardNames = Object.keys(cards);
-//       console.log('cardnames:', cardNames)
-//   const randomCardName = cardNames[Math.floor(Math.random() * cardNames.length)];
-//   const randomCard = cards[randomCardName];
-//       console.log('name:', randomCardName, 'card:', randomCard);
-//   return { name: randomCardName, card: randomCard };
-// }
 
 module.exports = {
   name: 'register',
+  aliases: ['reg', 'r'],
   description: 'Lets begin',
 
   async execute(client, message, args) {
+    const {db} = client;
+const Player  = await playerModel(db)
      if (!startedTutorial.includes(message.author.id)) {
     if (!args[0] || args[0].length > 16 || args[0].length < 3) {
       // Check character name validity
       const registerErrorEmbed = new EmbedBuilder()
         .setColor(0x992e22)
-        .setDescription('Provide a valid character name (3 < name < 16)');
+        .setDescription('Provide a valid character name. (The name should be 3 < name < 16 characters)');
       return message.channel.send({ embeds: [registerErrorEmbed] });
     }
      }
@@ -47,10 +48,20 @@ module.exports = {
         );
       return message.channel.send({ embeds: [existingNameErrorEmbed] });
     }
-/*function getRandomCard() {
-  const randomIndex = Math.floor(Math.random() * cards.length);
-  return { ...cards[randomIndex] }; // Create a copy of the selected card to avoid modifying the original array
-}*/
+        // Check if the user exists in the database
+const userExists = await Player.exists({ _id: message.author.id });
+
+// If the user exists, send a message
+if (userExists) {
+//   const tutorial = new Tutorial(players, 'My Tutorial', message);
+// tutorial.initiateTutorial();
+return message.channel.send('chillax, you dont needa register more than once (using database)');
+}
+    if (players[message.author.id]) {
+      return message.channel.send('chillax, you dont needa register more than once');
+    }
+
+
     function getRandomCard() {
   const cardNames = Object.keys(cards);
       console.log('cardnames:', cardNames)
@@ -59,6 +70,8 @@ module.exports = {
       console.log('name:', randomCardName, 'card:', randomCard);
   return { name: randomCardName, card: randomCard };
 }
+
+    
 const randomCardData = getRandomCard();
     // Initialize the player's data with the character name
     const playerId = message.author.id;
@@ -76,12 +89,53 @@ const randomCardData = getRandomCard();
       race: null,
       stuff: { generatedRandomElements: false, generatedRandomElements2: false},
       playerpos: { x: 100, y: 50 },
-    };
-    players[playerId] = playerData;
+    };  
+        if (!players[message.author.id]) {
+      players[playerId] = playerData;
+ console.log("PLAYER AFTER:", players[playerId])
+        }
+  const playerData2 = new Player({
+  _id: playerId,
+    name: characterName,
+    location: locations[0],
+    inventory: { active: [], backpack: [] },
+    stats: {
+      attack: 1,
+      tactics: 0,
+      magic: 1,
+      training: 0,
+      defense: 1,
+      speed: 1,
+      hitpoints: 10,
+      intelligence: 1,
+      wise: 1,
+      luck: 1,
+      devotion: 0,
+      potential: 1,
+    },
+    balance: { coins: 0, gems: 0 },
+    exp: { xp: 0, level: 0 },
+    cards: { name: [randomCardData.name] },
+    class: null,
+    race: null,
+    stuff: { generatedRandomElements: false, generatedRandomElements2: false },
+    playerpos: { x: 100, y: 50 },
+  });
 
-    fs.writeFile('./data/players.json', JSON.stringify(players, null, 3), (err) => {
-      if (err) console.log(err);
-    });
+  // Save the player data to the database
+  try {
+// If the user exists, send a message
+if (!userExists) {
+    await playerData2.save();
+
+    console.log('Player data saved:', playerData);
+}
+  } catch (error) {
+    console.error('Error saving player data:', error);
+  }
+    // fs.writeFile('./data/players.json', JSON.stringify(players, null, 3), (err) => {
+    //   if (err) console.log(err);
+    // });
 //send the embed to ask if they want to start tutorial and if they dont want, dont send that shit.
     
     const wantTutorial = new EmbedBuilder()
@@ -124,13 +178,15 @@ const randomCardData = getRandomCard();
                               console.log('id:', i.customId);
                              startedTutorial.push(i.user.id);
                                 // console.log('First question:', firstQuestion);
-     askQuestion(message.channel, firstQuestion);
+   const tutorial = new Tutorial(players, 'My Tutorial', message);
+tutorial.initiateTutorial();
                            } else if (i.customId === 'select_buttonA')  {
                              console.log('heclicked:', i.user.id);
                               console.log('id:', i.customId);
                              startedTutorial.push(i.user.id);
                                 // console.log('First question:', firstQuestion);
-     askQuestion(message.channel, firstQuestion);
+    const tutorial = new Tutorial(players, 'My Tutorial', message);
+tutorial.initiateTutorial();
                            }
                           else {
                             deniedTutorial.push(i.user.id);
@@ -153,74 +209,74 @@ const randomCardData = getRandomCard();
   },
 };
 
-async function askQuestion(channel, question, index) {
-  const { text, answers, imageUrl } = question;
-  const selectionMap = {}; // Map button selection (A, B, C, D) to next question ID
+// async function askQuestion(channel, question, index) {
+//   const { text, answers, imageUrl } = question;
+//   const selectionMap = {}; // Map button selection (A, B, C, D) to next question ID
 
-  // Create the answer buttons
-  const answerButtons = answers.map((answer, index) => {
-    const label = String.fromCharCode(65 + index); // Convert index to A, B, C, D labels
-    const selection = label.toLowerCase();
-    selectionMap[selection] = answer.outcome.nextQuestionId;
-    return new ButtonBuilder()
-      .setStyle('Danger')
-      .setCustomId(`answer_${index + 1}`)
-      .setLabel(label);
+//   // Create the answer buttons
+//   const answerButtons = answers.map((answer, index) => {
+//     const label = String.fromCharCode(65 + index); // Convert index to A, B, C, D labels
+//     const selection = label.toLowerCase();
+//     selectionMap[selection] = answer.outcome.nextQuestionId;
+//     return new ButtonBuilder()
+//       .setStyle('Danger')
+//       .setCustomId(`answer_${index + 1}`)
+//       .setLabel(label);
    
-  });
+//   });
 
 
-  // Create the row with answer buttons
-  const row = new ActionRowBuilder().addComponents(...answerButtons);
+//   // Create the row with answer buttons
+//   const row = new ActionRowBuilder().addComponents(...answerButtons);
 
 
 
-  // Create the answer fields for the embed
-  const answerFields = answers.map((answer, index) => {
-    return {
-      name: `Answer ${index + 1}`,
-      value: answer.text,
-      inline: false,
-    };
-  });
+//   // Create the answer fields for the embed
+//   const answerFields = answers.map((answer, index) => {
+//     return {
+//       name: `Answer ${index + 1}`,
+//       value: answer.text,
+//       inline: false,
+//     };
+//   });
 
-  // Create the question embed
-  const questionEmbed = new EmbedBuilder()
-    .setColor(0x992e22)
-    .setDescription(text)
-    .setImage(imageUrl, { format: "png", dynamic: true, size: 1024 })
-    .addFields(...answerFields);
+//   // Create the question embed
+//   const questionEmbed = new EmbedBuilder()
+//     .setColor(0x992e22)
+//     .setDescription(text)
+//     .setImage(imageUrl, { format: "png", dynamic: true, size: 1024 })
+//     .addFields(...answerFields);
 
-  // Send the question embed
-  const sentMessage = await channel.send({ embeds: [questionEmbed], components: [row] });
+//   // Send the question embed
+//   const sentMessage = await channel.send({ embeds: [questionEmbed], components: [row] });
 
-  const collector = sentMessage.createMessageComponentCollector({ idle: 60000 });
+//   const collector = sentMessage.createMessageComponentCollector({ idle: 60000 });
 
-  collector.on('collect', async (interaction) => {
-    await interaction.deferUpdate();
-    const selectedAnswerId = parseInt(interaction.customId.split('_')[1]);
-    const selectedAnswer = answers.find((answer) => answer.id === selectedAnswerId);
+//   collector.on('collect', async (interaction) => {
+//     await interaction.deferUpdate();
+//     const selectedAnswerId = parseInt(interaction.customId.split('_')[1]);
+//     const selectedAnswer = answers.find((answer) => answer.id === selectedAnswerId);
 
-    if (selectedAnswer) {
-      const outcome = selectedAnswer.outcome;
+//     if (selectedAnswer) {
+//       const outcome = selectedAnswer.outcome;
   
-      if (outcome.nextQuestionId) {
-        // If the outcome is another question, ask the next question
-        const nextQuestion = story.questions.find((q) => q.id === outcome.nextQuestionId);
-        askQuestion(channel, nextQuestion, index + 1);
-      } else if (outcome.text) {
-        // If the outcome is a result, show the final result to the user
-        console.log('Outcome:', outcome);
-        showResult(channel, outcome);
-      }
-    }
-  });
-}
+//       if (outcome.nextQuestionId) {
+//         // If the outcome is another question, ask the next question
+//         const nextQuestion = story.questions.find((q) => q.id === outcome.nextQuestionId);
+//         askQuestion(channel, nextQuestion, index + 1);
+//       } else if (outcome.text) {
+//         // If the outcome is a result, show the final result to the user
+//         console.log('Outcome:', outcome);
+//         showResult(channel, outcome);
+//       }
+//     }
+//   });
+// }
 
-function showResult(channel, outcome) {
-  const { text } = outcome;
+// function showResult(channel, outcome) {
+//   const { text } = outcome;
 
-  const resultEmbed = new EmbedBuilder().setColor(0x992e22).setDescription(text);
+//   const resultEmbed = new EmbedBuilder().setColor(0x992e22).setDescription(text);
 
-  channel.send({ embeds: [resultEmbed] });
-}
+//   channel.send({ embeds: [resultEmbed] });
+// }

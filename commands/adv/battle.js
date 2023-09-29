@@ -255,6 +255,7 @@ const moveFinder = familiarArray.map(cardName => getCardMoves(cardName));
 
     
     const stringMenuRow = new ActionRowBuilder().addComponents(stringMenu);
+
     
   
  const rows = [buttonRow, stringMenuRow];
@@ -317,6 +318,20 @@ const moveFinder = familiarArray.map(cardName => getCardMoves(cardName));
   const attackBarString = `${emoji.repeat(filledBars)}${' '.repeat(emptyBars)}`;
   return `[${attackBarString}]`;
 }
+    
+  async generateHPBarEmoji(currentHP, maxHP) {
+  const emoji = '■';
+  const filledBars = Math.floor(currentHP / maxHP);
+  const emptyBars = Math.floor(maxHP - filledBars);
+
+  let hpBarString = emoji.repeat(filledBars);
+  if (emptyBars > 0) {
+    hpBarString += ' '.repeat(emptyBars);
+  }
+
+  return `[${hpBarString}]`;
+}
+
 
 async getNextTurn() {
   let nextTurn = null;
@@ -368,7 +383,7 @@ async getNextTurn() {
       .setFooter({text: 'You can run if you want lol no issues'})
       .addFields(   
         { name: `Enemies Info:`,
-        value: `\`\`\`ini\n> ${this.boss.name} HP: ${this.boss.physicalStats.hp}\nAttackBar: ${this.boss.attackBarEmoji}\`\`\``,
+        value: `\`\`\`ansi\n[2;31m> ${this.boss.name} HP: ${this.boss.physicalStats.hp}\nAttackBar: [2;34m${this.boss.attackBarEmoji}\`\`\``,
         inline: false},
         { name: `Current Turn`, 
         value: `\`\`\`${this.currentTurn}\`\`\``, 
@@ -379,13 +394,13 @@ async getNextTurn() {
 
     for (const familiar of this.familiarInfo) {
         const familiarHP = familiar.stats.hp;
-        playerAndFamiliarsInfo += `> ${familiar.name} HP: ${familiarHP}:\nAttackBar: ${familiar.attackBarEmoji}\n`;
+        playerAndFamiliarsInfo += `[2;35m> ${familiar.name} HP: ${familiarHP}:\nAttackBar: [2;34m${familiar.attackBarEmoji}\n`;
     }
 
     // Add the player's HP and AttackBar to the info
-    playerAndFamiliarsInfo += `> Player HP: ${this.player.stats.hitpoints}:\nAttackBar: ${this.player.attackBarEmoji}`;
+    playerAndFamiliarsInfo += `[2;35m> Player HP: ${this.player.stats.hitpoints}:\nAttackBar: [2;34m${this.player.attackBarEmoji}`;
 
-    initialEmbed.addFields({ name: 'Your Team Info:', value: `\`\`\`ini\n${playerAndFamiliarsInfo}\`\`\``, inline: false });
+    initialEmbed.addFields({ name: 'Your Team Info:', value: `\`\`\`ansi\n${playerAndFamiliarsInfo}\`\`\``, inline: false });
 }
     console.log('battleLOgsLengthBefore', this.battleLogs.length);
 if (this.battleLogs.length > 6 && this.battleLogs.length <= 7) {

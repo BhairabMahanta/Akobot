@@ -88,7 +88,6 @@ module.exports = {
       },
       questChannel: 'channelId',
     },
-    gather_ingredients: {},
   },
 };
     const newGatherIngredientsQuest = {
@@ -134,26 +133,26 @@ module.exports = {
       // Retrieve the player's document
       const playerData2 = await collection.findOne(filter);
 
-      if (playerData2) {
-        // Check if the player has the "gather_ingredients" quest
-        if (!playerData2.activeQuests.gather_ingredients) {
-          // Add the "gather_ingredients" quest
-          playerData2.activeQuests.gather_ingredients = newGatherIngredientsQuest;
-          console.log('NEWGATHER:', newGatherIngredientsQuest)
-          console.log('Added gather_ingredients quest.');
-        } else {
-           playerData2.activeQuests.gather_ingredients = newGatherIngredientsQuest;
-          // You can add your logic to update the quest here
-          console.log('Updated gather_ingredients quest.');
-        }
+      // if (playerData2) {
+      //   // Check if the player has the "gather_ingredients" quest
+      //   if (!playerData2.activeQuests.gather_ingredients) {
+      //     // Add the "gather_ingredients" quest
+      //     playerData2.activeQuests.gather_ingredients = newGatherIngredientsQuest;
+      //     console.log('NEWGATHER:', newGatherIngredientsQuest)
+      //     console.log('Added gather_ingredients quest.');
+      //   } else {
+      //      playerData2.activeQuests.gather_ingredients = newGatherIngredientsQuest;
+      //     // You can add your logic to update the quest here
+      //     console.log('Updated gather_ingredients quest.');
+      //   }
 
-        // Update the player's document
-        await collection.updateOne(filter, { $set: playerData2 });
+      //   // Update the player's document
+      //   await collection.updateOne(filter, { $set: playerData2 });
 
-        console.log('Player data updated:', playerData2);
-      } else {
-        console.log('Player not found.');
-      }
+      //   console.log('Player data updated:', playerData2);
+      // } else {
+      //   console.log('Player not found.');
+      // }
 
     } catch (err) {
       console.error('Error updating/adding gather_ingredients quest:', err);

@@ -1,6 +1,9 @@
   const { ActionRowBuilder, ButtonBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, EmbedBuilder } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
+const mongoose = require('mongoose');
+const {playerModel} = require('../../data/mongo/playerschema.js'); // Adjust the path to match your schema file location
+
 
 // Read classes and races data
 const classesData = require('../../data/classes/allclasses');
@@ -25,8 +28,21 @@ module.exports = {
    aliases: ['sc', 'selectc'],
     async execute(client, message, args, interaction) {
         try {
+          const {db} = client;
             const userId = message.author.id;
+          
+         async function updateClass(playerId, className) {
+  const PlayerModel = await playerModel(db);
 
+
+  // Find the document with the _id `playerId`
+  const player = await PlayerModel.findByIdAndUpdate(`${playerId}`, { class: `${className}` });
+
+console.log('AFTERCLASS:', player)
+  // Save the document
+  await player.save();
+}
+          
             // Create options for classes
             const classOptions = Object.keys(classesData).map(className => ({
                 label: className,
@@ -135,6 +151,8 @@ module.exports = {
         // Update user data with selected race
         userData[userId].class = className;
         fs.writeFileSync('./data/players.json', JSON.stringify(userData, null, 4));
+      await updateClass(userId, className)
+
 
         // Prepare and send reply
         await message.channel.send(`You've selected the race: ${className}`);

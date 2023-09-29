@@ -2,7 +2,7 @@
 const { Client, IntentsBitField, EmbedBuilder, ButtonBuilder, ActionRowBuilder, SlashCommandBuilder, Events, ModalBuilder, Collection } = require('discord.js');
 const path = require('path');
 const fs = require('fs');
-const {mongoClient, connectToDB} = require('./data/mongo/mongo.js')
+const { connectToDB} = require('./data/mongo/mongo.js')
 
 
 
@@ -14,6 +14,7 @@ const client = new Client({
   ]
 
 });
+client.db = null;
 
 
 const Discord = require('discord.js');
@@ -55,11 +56,18 @@ client.on('messageCreate', message => {
 }
 });
 const BOT_PREFIX = "a!";
-client.on('ready', () => {
+
+
+client.on('ready', async () => {
   console.log(`${client.user.tag} is ready!🚀`);
-  connectToDB(); // Connect to MongoDB when the bot is ready
+const db = await connectToDB(); // Connect to MongoDB when the bot is ready
+
+ client.db = db;
+
   client.user.setPresence({ activities: [{ name: 'Watching myself being coded!' }], status: 'idle' });
 }); //tells that bot is hot and on
+
+
 client.on('messageCreate', (message) => {
   const goe = message.content.toLowerCase().substring(BOT_PREFIX.length);
  
@@ -96,7 +104,6 @@ client.on('messageCreate', (message) => {
     }, 1000); // delay for 1 second
   }
 });
-
 
 client.login(config.token);
                                                                                                                                   

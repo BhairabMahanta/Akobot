@@ -238,7 +238,7 @@
           }
         },
         {
-          "id": 2,
+          "id": 4,
           "selection": "D",
           "text": "Being calculative is in my bones.",
           "outcome": {
@@ -253,7 +253,7 @@
     {
       
       "id": 6,
-      "text": "You can type a!selectrace to select your race.\n The races have quite a huge impact so its advised to read carefully before choosing your race. As you cannot switch your race once you've hit lvl 10 unless your level resets.",
+      "text": "You can type a!selectrace to select your race.\n>>> **The races have quite a huge impact so its advised to read carefully before choosing your race. As you cannot switch your race once you've hit lvl 10 unless your level resets.**",
       "imageUrl": "https://cdn.discordapp.com/attachments/984382901716148234/1128749270657417317/main-qimg-1e20142d1e62db8f22456d7b049b1782-lq.png",
       "answers":
       
@@ -270,7 +270,7 @@
         {
           "id": 2,
           "selection": "B",
-          "text": "You're quick to catch on",
+          "text": "Sure you dont need to teach me bitch.",
           "outcome": {
             "id": 2,
             "text": "Quite full of yourself arent you? Try to take a decision on selecting your race. Use a!tutorial again to start where you left off."
@@ -288,7 +288,7 @@
           }
         },
         {
-          "id": 2,
+          "id": 4,
           "selection": "D",
           "text": "Being calculative is in my bones.",
           "outcome": {

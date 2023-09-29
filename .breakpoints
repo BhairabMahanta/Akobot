@@ -15,6 +15,14 @@
         "version": 6,
         "index": 1066
       }
+    ],
+    "commands/util/selectclass.js": [
+      {
+        "id": "8fdc5f6e-a53e-491e-b31e-6501ca3def6a",
+        "line": 34,
+        "version": 295,
+        "index": 1365
+      }
     ]
   }
 }

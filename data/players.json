@@ -1,6 +1,6 @@
 {
     "537619455409127442": {
-        "name": "akai",
+        "name": "akaiiii",
         "location": "Krizzland",
         "inventory": {
             "active": [],
@@ -13,13 +13,12 @@
             "training": 0,
             "defense": 150,
             "speed": 100,
-            "hitpoints": 1000,
+            "hitpoints": 792,
             "intelligence": 1,
             "wise": 1,
             "luck": 1,
             "devotion": 0,
-            "potential": 1,
-            "hp": null
+            "potential": 1
         },
         "balance": {
             "coins": 0,
@@ -31,58 +30,28 @@
         },
         "selectedFamiliars": {
             "name": [
-                "Fire Dragon",
                 "Water Nymph",
-                "cumpokemon"
+                "Fire Dragon"
             ]
         },
         "cards": {
             "name": [
+                "Water Nymph",
                 "Fire Dragon"
             ]
         },
         "class": "Knight",
-        "race": null,
+        "race": "Human",
         "stuff": {
             "generatedRandomElements": false,
             "generatedRandomElements2": false
         },
         "playerpos": {
             "x": 100,
-            "y": 300
+            "y": 250
         },
-        "atkBar": 98.00000000000001,
-        "attackBarEmoji": "[■■■■■■■■■■■■]",
-        "quests": [
-            "monster_subjugation",
-            "gather_ingredients",
-            "defeat_spiders",
-            "conquer_temple"
-        ],
-        "activeQuests": {
-            "monster_subjugation": {
-                "objectives": [
-                    {
-                        "id": "goblin_defeat",
-                        "target": "Goblin",
-                        "current": 0,
-                        "required": 1
-                    },
-                    {
-                        "id": "wolf_defeat",
-                        "target": "Wolf",
-                        "current": 0,
-                        "required": 2
-                    }
-                ],
-                "timeLimit": {
-                    "totalDays": 7,
-                    "daysLeft": 7
-                },
-                "questChannel": "channelId"
-            },
-            "gather_ingredients": {}
-        }
+        "atkBar": 42.00000000000001,
+        "attackBarEmoji": "[■■■■■■■■             ]"
     },
     "266939098017562625": {
         "name": "sitol",
