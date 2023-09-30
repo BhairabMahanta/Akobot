@@ -8,7 +8,7 @@ const cards = {
     stats: {
       attack: 80,
       defense: 60,
-      speed: 101,
+      speed: 102,
       hp: 100,
     },
     moves: [

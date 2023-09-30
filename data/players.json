@@ -11,9 +11,9 @@
             "tactics": 0,
             "magic": 1,
             "training": 0,
-            "defense": 150,
+            "defense": 100,
             "speed": 100,
-            "hitpoints": 792,
+            "hitpoints": 856,
             "intelligence": 1,
             "wise": 1,
             "luck": 1,
@@ -50,8 +50,10 @@
             "x": 100,
             "y": 250
         },
-        "atkBar": 42.00000000000001,
-        "attackBarEmoji": "[■■■■■■■■             ]"
+        "maxHp": 1000,
+        "atkBar": 70.00000000000001,
+        "attackBarEmoji": "[■■■■■■■■■■■■■■       ]",
+        "hpBarEmoji": "[■■■■■■■■■■■■■■■■■    ]"
     },
     "266939098017562625": {
         "name": "sitol",

@@ -88,9 +88,24 @@ class Battle {
         this.mobs = null;
         this.characters = [this.player, ...this.familiarInfo, this.boss];
         for (const character of this.characters) {
+           try {
+            for (const character of this.characters) {  
+              if (character === this.boss) {
+                character.maxHp = character.physicalStats.hp
+              }else if (character === this.player) {
+                character.maxHp = character.stats.hitpoints
+              }else {
+              character.maxHp = character.stats.hp
+            }
+               
+            }
+        } catch (error) {
+            console.log('fillBarError:', error);
+        }
             character.atkBar = 0;
             character.attackBarEmoji = [];
-            console.log(character.name, '-', character.attackBarEmoji);
+            character.hpBarEmoji = [];
+            console.log(character.name, '-', character.attackBarEmoji), '-', character.hpBarEmoji;
         }
         this.environment = [];
         this.currentTurnIndex = 0; // Index of the character whose turn it is
@@ -98,6 +113,7 @@ class Battle {
         this.battleLogs = [];
         this.ability = new Ability(this);
         this.initialMessage = initialMessage;
+        
 
     }
 
@@ -163,7 +179,8 @@ class Battle {
                 } catch (error) {
                     console.error('Error on hit:', error);
                 }
-            } else if (i.customId === 'starter') {
+            }
+            else if (i.customId === 'starter') {
                 const selectedClassValue = i.values[0]; // Get the selected value // gae shit
                 console.log('selectedValues', selectedClassValue)
                 if (selectedClassValue.startsWith('player_ability_')) {
@@ -216,6 +233,7 @@ class Battle {
                                         embeds: [updatedEmbed],
                                         components: await this.getDuelActionRow()
                                     });
+                                  break;
                                 }
                             }
                         } else {
@@ -322,14 +340,66 @@ class Battle {
         }
     }
 
+    async calculateOverallHp(character) {
+        try {
+            if (character === this.player) {
+
+                return this.player.stats.hitpoints;
+
+            } else if (this.playerFamiliar.includes(character.name)) {
+                // Find the familiar's speed by matching it with this.familiarInfo
+                const familiarInfo = this.familiarInfo.find((fam) => fam.name === character.name);
+                const familiarHp = familiarInfo ? familiarInfo.stats.hp : 0; // Default to 0 if not found
+
+                return familiarHp;
+            } else if (character === this.boss) {
+
+                return this.boss.physicalStats.hp;
+            } else {
+                console.log(`Calculating speed for unknown character type: 0`);
+                return 0; // Default to 0 for unknown character types
+            }
+        } catch (error) {
+            console.log('speedcalculator:', error);
+        }
+    }
+
     async fillAtkBars() {
         try {
             for (const character of this.characters) {
                 const speed = await this.calculateOverallSpeed(character);
+              const hp = await this.calculateOverallHp(character);
                 const speedMultiplier = character.speedBuff ? 1.3 : 1; // Apply Speed Buff if active
                 character.atkBar += speed * 0.07 * speedMultiplier;
                 character.attackBarEmoji = await this.generateAttackBarEmoji(character.atkBar);
-                // console.log(character.name, '-', character.attackBarEmoji);
+              if (character === this.boss) {
+                character.hpBarEmoji = await this.generateHPBarEmoji(character.physicalStats.hp, character.physicalStats.hp)
+              }else if (character === this.player) {
+                character.hpBarEmoji = await this.generateHPBarEmoji(character.stats.hitpoints, character.stats.hitpoints)
+              }else {
+              character.hpBarEmoji = await this.generateHPBarEmoji(character.stats.hp, character.stats.hp)
+            }
+               
+            }
+        } catch (error) {
+            console.log('fillBarError:', error);
+        }
+    }
+
+     async fillHpBars() {
+        try {
+            for (const character of this.characters) {
+               
+              const hp = await this.calculateOverallHp(character);
+              
+              if (character === this.boss) {
+                character.hpBarEmoji = await this.generateHPBarEmoji(character.physicalStats.hp, character.maxHp)
+              }else if (character === this.player) {
+                character.hpBarEmoji = await this.generateHPBarEmoji(character.stats.hitpoints, character.maxHp)
+              }else {
+              character.hpBarEmoji = await this.generateHPBarEmoji(character.stats.hp, character.maxHp)
+            }
+               
             }
         } catch (error) {
             console.log('fillBarError:', error);
@@ -355,8 +425,8 @@ class Battle {
 
     async generateHPBarEmoji(currentHP, maxHP) {
         const emoji = '■';
-        const filledBars = Math.floor(currentHP / maxHP);
-        const emptyBars = Math.floor(maxHP - filledBars);
+        const filledBars = Math.floor((currentHP / maxHP) * 21); 
+        const emptyBars = Math.floor(21 - filledBars);
 
         let hpBarString = emoji.repeat(filledBars);
         if (emptyBars > 0) {
@@ -364,6 +434,7 @@ class Battle {
         }
 
         return `[${hpBarString}]`;
+      
     }
 
 
@@ -400,7 +471,7 @@ class Battle {
                 break; // Exit the loop
             }
         }
-
+        await this.fillHpBars()
         return nextTurn;
     }
 
@@ -419,7 +490,7 @@ class Battle {
                 })
                 .addFields({
                     name: `Enemies Info:`,
-                    value: `\`\`\`ansi\n[2;31m> ${this.boss.name} HP: ${this.boss.physicalStats.hp}\nAttackBar: [2;34m${this.boss.attackBarEmoji}\`\`\``,
+                    value: `\`\`\`ansi\n[2;31m> ${this.boss.name}\n[2;32m HitPoints: ${this.boss.hpBarEmoji} ${this.boss.physicalStats.hp}\n[2;36m AttackBar: [2;34m${this.boss.attackBarEmoji} ${Math.floor(this.boss.atkBar)}\`\`\``,
                     inline: false
                 }, {
                     name: `Current Turn`,
@@ -431,11 +502,11 @@ class Battle {
 
                 for (const familiar of this.familiarInfo) {
                     const familiarHP = familiar.stats.hp;
-                    playerAndFamiliarsInfo += `[2;35m> ${familiar.name} HP: ${familiarHP}:\nAttackBar: [2;34m${familiar.attackBarEmoji}\n`;
+                    playerAndFamiliarsInfo += `[2;35m> ${familiar.name}\n[2;32m HitPoints: ${familiar.hpBarEmoji}  ${familiarHP}\n[2;36m AttackBar: [2;34m${familiar.attackBarEmoji} ${Math.floor(familiar.atkBar)}\n`;
                 }
 
                 // Add the player's HP and AttackBar to the info
-                playerAndFamiliarsInfo += `[2;35m> Player HP: ${this.player.stats.hitpoints}:\nAttackBar: [2;34m${this.player.attackBarEmoji}`;
+                playerAndFamiliarsInfo += `[2;35m> ${this.playerName}\n[2;32m HitPoints: ${this.player.hpBarEmoji} ${this.player.stats.hitpoints}\n[2;36m AttackBar: [2;34m${this.player.attackBarEmoji} ${Math.floor(this.player.atkBar)}`;
 
                 initialEmbed.addFields({
                     name: 'Your Team Info:',
