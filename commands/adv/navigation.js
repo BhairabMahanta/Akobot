@@ -5,6 +5,7 @@ const { generateUpdatedImage, elements, generateRandomElements, movePlayer, near
 const { GameImage, Player, Element } = require('./sumfunctions');
 const players = require('../../data/players.json');
 const {  Battle, BossMonster, Environment } = require('./battle.js')
+const {mongoClient} = require('../../data/mongo/mongo.js')
 const {  NPC } = require('./npc.js')
 let updatedImageBuffer = null;
 let hasAttackButton = false;
@@ -95,6 +96,15 @@ const nowBattling = new EmbedBuilder()
         .setDescription('Use the navigation buttons to move around the area!')
 
 async function handleNavigation(allFloors, message, adventureEmbed, initialMessage, areaImage, player) {
+
+       const db = mongoClient.db('Akaimnky');
+      const collection = db.collection('akaillection');
+// Define the filter based on the _id
+  const dbFilter = { _id: message.user.id };
+        const playerData2 = await collection.findOne(dbFilter);
+      console.log('playerDATA2:', playerData2);
+
+  
   // Simulate player data (replace with your actual data)
 
   
@@ -110,7 +120,7 @@ async function handleNavigation(allFloors, message, adventureEmbed, initialMessa
   
      // Create instances of the classes
 const gameImage = new GameImage(600, 600, player, message);
-  const newNpc = new NPC(player, 'npc1', message)
+  const newNpc = new NPC(playerData2, 'npc1', message)
   const playerpos = gameImage.playerpos
 // const player = new Player('PlayerName', 100); // Replace with actual player name and health
 // const element = new Element('Monster', 200, 300); // Replace with actual element details
@@ -198,7 +208,7 @@ gameImage.generateRandomElements(0.55, 0.5, 10);
     } 
  else if (i.customId === 'attack_monster' && i.user.id === message.user.id)  {
           // Handle the attack logic here
-       const battle = new Battle(player, 'Dragon Lord', message);
+       const battle = new Battle(playerData2, 'Dragon Lord', message);
     // await  battle.isSelected();
    if (battle.continue) {
   console.log('playerSElECTFAMILOIAR:', battle.player.selectedFamilar )

@@ -58,8 +58,6 @@ module.exports = {
     x: 100,
     y: 300,
   },
-  atkBar: 98.00000000000001,
-  attackBarEmoji: '[■■■■■■■■■■■■]',
   quests: [
     'monster_subjugation',
     'gather_ingredients',

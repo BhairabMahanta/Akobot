@@ -6,7 +6,7 @@ const areas = {
       {
         type: "monsterA",
         position: { x: 100, y: 200 }, // Fixed position for MonsterA
-      },
+      }, 
       {
         type: "monsterB",
         position: { x: 100, y: 250 }, // Fixed position for MonsterB

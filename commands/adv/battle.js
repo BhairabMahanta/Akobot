@@ -1,4 +1,6 @@
 const players = require('../../data/players.json');
+const {mongoClient} = require('../../data/mongo/mongo.js')
+
 const {
     bosses
 } = require('./bosses.js');
@@ -7,8 +9,6 @@ const {
 } = require('../fun/cards.js'); // Import the cards data from 'cards.js'
 const {
     checkResults,
-    updateMovesOnCd,
-    calculateAbilityDamage,
     getCardStats,
     getCardMoves,
     calculateDamage,
@@ -39,7 +39,7 @@ const buttonRow = new ActionRowBuilder()
     );
 
 class Battle {
-    constructor(player, bossName, message) {
+    constructor(player, bossName, message ) {
         this.message = message;
         this.player = player;
         this.abilityOptions = [];
@@ -48,7 +48,7 @@ class Battle {
             console.log('TRYING MY ARSAEAWSS OFF', this.player.selectedFamiliars)
             if (this.player.selectedFamiliars) {
                 console.log('true', player.selectedFamiliars)
-                this.playerFamiliar = player.selectedFamiliars.name;
+                this.playerFamiliar = this.player.selectedFamiliars.name;
                 console.log('selectedplayerFamiliar:', this.playerFamiliar)
             } else if (!this.player.selectedFamiliars) {
                 console.log('gay')
@@ -93,7 +93,7 @@ class Battle {
               if (character === this.boss) {
                 character.maxHp = character.physicalStats.hp
               }else if (character === this.player) {
-                character.maxHp = character.stats.hitpoints
+                character.maxHp = character.stats.hp
               }else {
               character.maxHp = character.stats.hp
             }
@@ -172,8 +172,15 @@ class Battle {
                     // this.printBattleResult();
                     if (this.boss.physicalStats.hp < 0) {
                         message.channel.send("You won the battle against the Monster, you can continue the journey where you left off (I lied  you can't)")
-                    } else if (this.player.stats.hitpoints < 0) {
+                    } else if (this.player.stats.hp < 0) {
                         message.channel.send("You lost, skill issue.")
+                      this.player.stats.speed = 0;
+                    }  for (const character of this.familiarInfo)  {
+                       console.log('character:L', character)
+                          if (character.stats.hp < 0) {
+                            message.channel.send(`${character.name} died lol`)
+                            character.stats.speed = 0;
+                        } break;
                     }
 
                 } catch (error) {
@@ -206,10 +213,17 @@ class Battle {
                         // this.printBattleResult();
                         if (this.boss.physicalStats.hp < 0) {
                             message.channel.send("You won the battle against the Monster, you can continue the journey where you left off (I lied  you can't)")
-                        } else if (this.player.stats.hitpoints < 0) {
+                        } else if (this.player.stats.hp < 0) {
                             message.channel.send("You lost, skill issue.")
-                        }
+                                                this.player.stats.speed = 0;
 
+                        }  for (const character of this.familiarInfo)  {
+                          console.log('character:L', character)
+                          if (character.stats.hp < 0) {
+                            message.channel.send(`${character.name} died lol`)
+                            character.stats.speed = 0;
+                        }
+                        }
                     } catch (error) {
                         console.error('Error on hit:', error);
                         message.channel.send('You perhaps have not selected a class yet. Please select it using "a!classselect", and select race using "a!raceselect".')
@@ -249,7 +263,7 @@ class Battle {
         });
 
     }
-    // components: getDuelActionRow(authorCards, opponentCards, attackedUsers, opponent, authorMoves, opponentMoves)
+   
     async getDuelActionRow() {
         // console.log('thiscurenttyrn:', this.currentTurn)
         //    console.log('thiscurenttyrn:', this.playerFamiliar)
@@ -344,7 +358,7 @@ class Battle {
         try {
             if (character === this.player) {
 
-                return this.player.stats.hitpoints;
+                return this.player.stats.hp;
 
             } else if (this.playerFamiliar.includes(character.name)) {
                 // Find the familiar's speed by matching it with this.familiarInfo
@@ -375,7 +389,7 @@ class Battle {
               if (character === this.boss) {
                 character.hpBarEmoji = await this.generateHPBarEmoji(character.physicalStats.hp, character.physicalStats.hp)
               }else if (character === this.player) {
-                character.hpBarEmoji = await this.generateHPBarEmoji(character.stats.hitpoints, character.stats.hitpoints)
+                character.hpBarEmoji = await this.generateHPBarEmoji(character.stats.hp, character.stats.hp)
               }else {
               character.hpBarEmoji = await this.generateHPBarEmoji(character.stats.hp, character.stats.hp)
             }
@@ -386,7 +400,7 @@ class Battle {
         }
     }
 
-     async fillHpBars() {
+    async fillHpBars() {
         try {
             for (const character of this.characters) {
                
@@ -395,7 +409,7 @@ class Battle {
               if (character === this.boss) {
                 character.hpBarEmoji = await this.generateHPBarEmoji(character.physicalStats.hp, character.maxHp)
               }else if (character === this.player) {
-                character.hpBarEmoji = await this.generateHPBarEmoji(character.stats.hitpoints, character.maxHp)
+                character.hpBarEmoji = await this.generateHPBarEmoji(character.stats.hp, character.maxHp)
               }else {
               character.hpBarEmoji = await this.generateHPBarEmoji(character.stats.hp, character.maxHp)
             }
@@ -425,7 +439,11 @@ class Battle {
 
     async generateHPBarEmoji(currentHP, maxHP) {
         const emoji = '■';
-        const filledBars = Math.floor((currentHP / maxHP) * 21); 
+let filledBars;
+         filledBars = Math.floor((currentHP / maxHP) * 21); 
+            if (currentHP < 0)  {
+              filledBars = 0
+      }
         const emptyBars = Math.floor(21 - filledBars);
 
         let hpBarString = emoji.repeat(filledBars);
@@ -436,7 +454,6 @@ class Battle {
         return `[${hpBarString}]`;
       
     }
-
 
     async getNextTurn() {
         let nextTurn = null;
@@ -475,7 +492,6 @@ class Battle {
         return nextTurn;
     }
 
-
     async sendInitialEmbed() {
         try {
             // const filledBars = Math.floor(atkBar / 10);
@@ -502,11 +518,11 @@ class Battle {
 
                 for (const familiar of this.familiarInfo) {
                     const familiarHP = familiar.stats.hp;
-                    playerAndFamiliarsInfo += `[2;35m> ${familiar.name}\n[2;32m HitPoints: ${familiar.hpBarEmoji}  ${familiarHP}\n[2;36m AttackBar: [2;34m${familiar.attackBarEmoji} ${Math.floor(familiar.atkBar)}\n`;
+                    playerAndFamiliarsInfo += `[2;35m> ${familiar.name}\n[2;32m HitPoints: ${familiar.hpBarEmoji} ${familiarHP}\n[2;36m AttackBar: [2;34m${familiar.attackBarEmoji} ${Math.floor(familiar.atkBar)}\n\n`;
                 }
 
                 // Add the player's HP and AttackBar to the info
-                playerAndFamiliarsInfo += `[2;35m> ${this.playerName}\n[2;32m HitPoints: ${this.player.hpBarEmoji} ${this.player.stats.hitpoints}\n[2;36m AttackBar: [2;34m${this.player.attackBarEmoji} ${Math.floor(this.player.atkBar)}`;
+                playerAndFamiliarsInfo += `[2;35m> ${this.playerName}\n[2;32m HitPoints: ${this.player.hpBarEmoji} ${this.player.stats.hp}\n[2;36m AttackBar: [2;34m${this.player.attackBarEmoji} ${Math.floor(this.player.atkBar)}`;
 
                 initialEmbed.addFields({
                     name: 'Your Team Info:',
@@ -598,11 +614,15 @@ class Battle {
         } else if (this.currentTurn === this.boss.name) {
             // If the current turn is the environment, let it make a move
             // const move = this.environment.makeMove();
-            const target = this.playerName;
-            const damage = calculateDamage(this.boss.physicalStats.attack, this.player.stats.defense);
+             const isTargetingPlayer = Math.random() < 0.3; // 30% chance to target the player
+    const targetInfo = isTargetingPlayer ? this.player : this.familiarInfo[Math.floor(Math.random() * this.familiarInfo.length)];
+
+            const target = targetInfo.name;
+            console.log('TARGETNAME:', target)   
+            const damage = calculateDamage(this.boss.physicalStats.attack, targetInfo.stats.defense);
 
             // Update HP and battle logs
-            this.player.stats.hitpoints -= damage;
+            targetInfo.stats.hp -= damage;
             console.log('My turn now bitches')
             this.battleLogs.push(`- ${this.currentTurn} attacks ${target} for ${damage} damage using cum!\n ============================================`);
             // message.channel.send(`\`\`\`${logsString}\`\`\``);
