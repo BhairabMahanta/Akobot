@@ -168,6 +168,7 @@ gameImage.generateRandomElements(0.55, 0.5, 10);
    console.log('click1test :', playerpos)
    updatedImageBuffer = await gameImage.movePlayer(player);
            console.log('i should work:')
+    
            initialMessage.edit({ files: [updatedImageBuffer] })
     // ...
     } 
@@ -201,12 +202,15 @@ gameImage.generateRandomElements(0.55, 0.5, 10);
    
    console.log('click1test :', playerpos)
    updatedImageBuffer = await gameImage.movePlayer(player);
+    
           
            initialMessage.edit({ files: [updatedImageBuffer] })
 
                 // ...
     } 
  else if (i.customId === 'attack_monster' && i.user.id === message.user.id)  {
+   const thatArray = gameImage.elementArray
+   console.log('THAT ARA ARAA:', thatArray)
           // Handle the attack logic here
        const battle = new Battle(playerData2, 'Dragon Lord', message);
     // await  battle.isSelected();
@@ -227,6 +231,7 @@ gameImage.generateRandomElements(0.55, 0.5, 10);
   
     
     gameImage.nearElement(hasAttackButton, message, initialMessage, navigationRow, attackRow, talktRow, bothButton, hasTalkButton, nowBattling) 
+    
 
   });
 

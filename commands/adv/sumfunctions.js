@@ -23,6 +23,8 @@ class GameImage {
     this.distanceToMonster = 0;
     this.whichMon = null;
     this.playerpos = player.playerpos
+    this.isTrue = false;
+    this.elementArray = [];
   }
 
   getRandomBoolean(probability) {
@@ -39,12 +41,12 @@ class GameImage {
       const col = Math.floor(Math.random() * (this.imgW - 50)) + 50;
 
       if (this.getRandomBoolean(monsterProbability) && monsterCount < 7) {
-        this.elements.push({ type: `monster${i}`, x: col, y: row });
-        this.monsterArray.push({ type: `monster${i}`, x: col, y: row });
+        this.elements.push({ name: `monster${i}`, x: col, y: row });
+        this.monsterArray.push({ name: `monster${i}`, x: col, y: row });
         monsterCount++;
       } else if (this.getRandomBoolean(npcProbability) && npcCount < 5) {
-        this.elements.push({ type: `npc${i}`, x: col, y: row });
-        this.npcArray.push({ type: `npc${i}`, x: col, y: row });
+        this.elements.push({ name: `npc${i}`, x: col, y: row });
+        this.npcArray.push({ name: `npc${i}`, x: col, y: row });
         npcCount++;
       }
 
@@ -71,16 +73,17 @@ class GameImage {
     if (monsterCount < areaData.monsters.length) {
       const monster = areaData.monsters[monsterCount];
       this.elements.push({
-        type: monster.type,
+        name: monster.name,
         x: monster.position.x,
         y: monster.position.y,
         area: areaName, // Store the area name with the element
       });
       this.monsterArray.push({
-        type: monster.type,
+        name: monster.name,
         x: monster.position.x,
         y: monster.position.y,
         area: areaName, // Store the area name with the element
+        amt: monster.amount,
       });
       monsterCount++;
     }
@@ -89,13 +92,13 @@ class GameImage {
     if (npcCount < areaData.npcs.length) {
       const npc = areaData.npcs[npcCount];
       this.elements.push({
-        type: npc.type,
+        name: npc.name,
         x: npc.position.x,
         y: npc.position.y,
         area: areaName, // Store the area name with the element
       });
       this.npcArray.push({
-        type: npc.type,
+        name: npc.name,
         x: npc.position.x,
         y: npc.position.y,
         area: areaName, // Store the area name with the element
@@ -109,6 +112,26 @@ class GameImage {
     }
   }
 }
+  async forLoop() {
+    const attackRadius = 40; // Adjust the radius as needed
+
+    for (const element of this.monsterArray) {
+     this.distanceToMonster = Math.sqrt(
+        Math.pow(this.playerpos.x - element.x, 2) +
+        Math.pow(this.playerpos.y - element.y, 2)
+      );
+ if (this.distanceToMonster <= attackRadius) {
+   this.isTrue = true
+   this.whichMon = element.name
+   this.elementArray.push(element);
+   console.log('ELEMENT ARRAY BANJA PLS', this.elementArray)
+   console.log('LOOP WALA:', this.whichMon)
+   console.log('isTrue:', this.isTrue)
+   break;
+ } 
+    }
+    return this.isTrue
+  }
 
 
   async generateUpdatedImage(areaImage, playerpos) {
@@ -122,7 +145,7 @@ class GameImage {
         // Add elements to the image
         this.generatedRandomElements2 = true;
         for (const element of this.elements) {
-          const elementName = element.type
+          const elementName = element.name
      name = `commands/adv/npcimg/${elementName}.png`
     console.log('name:', name)
           const filePath = path.join(name);
@@ -134,7 +157,7 @@ if (fs.existsSync(name)) {
   inputImagePath = name;
   console.log(`The file ${filePath} exists.`);
 } else {
-           inputImagePath = element.type.startsWith('monster')
+           inputImagePath = element.name.startsWith('monster')
             ? 'commands/adv/npcimg/monster.png'
             : 'commands/adv/npcimg/npc.png';
 }
@@ -144,14 +167,14 @@ if (fs.existsSync(name)) {
               .composite([{ input: inputImagePath, left: element.x, top: element.y }])
               .png()
               .toBuffer();
-            console.log(`${element.type} placed at x: ${element.x}, y: ${element.y}`);
+            console.log(`${element.name} placed at x: ${element.x}, y: ${element.y}`);
           } else {
             // For the rest of the elements, apply the composite to the updatedImage
             this.image = await sharp(this.image)
               .composite([{ input: inputImagePath, left: element.x, top: element.y }])
               .png()
               .toBuffer();
-            console.log(`${element.type} placed at x: ${element.x}, y: ${element.y}`);
+            console.log(`${element.name} placed at x: ${element.x}, y: ${element.y}`);
           }
         }
       }
@@ -181,49 +204,59 @@ if (fs.existsSync(name)) {
     return new AttachmentBuilder(updatedImageBuffer, { name: 'updatedMap.png' });
    
   }
+  
   async nearElement(hasAttackButton, message, initialMessage, navigationRow, attackRow, talktRow, bothButton, hasTalkButton, nowBattling) {
     const attackRadius = 40; // Adjust the radius as needed
-
+let restartForLoop = true;
+    // while (restartForLoop) {
     for (const element of this.monsterArray) {
+      await this.forLoop()
       
       this.distanceToMonster = Math.sqrt(
         Math.pow(this.playerpos.x - element.x, 2) +
         Math.pow(this.playerpos.y - element.y, 2)
       );
- console.log('elementtype:', element.type);
+ console.log('elementname:', element.name);
       console.log('Distance to monster:', this.distanceToMonster);
      
 
       if (
         this.distanceToMonster <= attackRadius &&
-        element.type.startsWith('monster') &&
+        element.name.startsWith('monster') &&
         !hasAttackButton
       ) {
         nowBattling.setFooter({text:
           'You are in the monster field radius, click the attack button to attack.'}
         );
-        this.whichMon = element.type;
+        this.whichMon = element.name;
         console.log('whichMon:', this.whichMon);
         initialMessage.edit({
           embeds: [nowBattling],
           components: [...attackRow],
         });
+        restartForLoop = false;
         break;
-      } else if (
+      } 
+      else if (
         this.distanceToMonster >= attackRadius &&
-        element.type === this.whichMon &&
-        hasAttackButton
+        element.name === this.whichMon &&
+        hasAttackButton && this.isTrue
       ) {
         console.log('whichMon2:', this.whichMon);
-        console.log('element:', element.type);
+        console.log('element:', element.name);
         nowBattling.setFooter({text:'You moved out of attack range.'});
         initialMessage.edit({
           embeds: [nowBattling],
           components: [...navigationRow],
         });
+        
         break;
-      } 
-    }
+        
+      }
+  }
+      console.log('BROCHANGED ELEMENTS WTFFF')
+    
+    //}
 
     for (const element of this.npcArray) {
       
@@ -231,19 +264,19 @@ if (fs.existsSync(name)) {
         Math.pow(this.playerpos.x - element.x, 2) +
         Math.pow(this.playerpos.y - element.y, 2)
       );
- console.log('elementtype:', element.type);
+ console.log('elementname:', element.name);
       console.log('Distance to monster:', this.distanceToNpc);
      
 
       if (
         this.distanceToNpc <= attackRadius &&
-        element.type.startsWith('npc') &&
+        element.name.startsWith('npc') &&
         !hasTalkButton
       ) {
         nowBattling.setFooter({text:
           'You see an NPC, click the \'Talk\' button to interact.'}
         );
-        this.whichMon = element.type;
+        this.whichMon = element.name;
         console.log('whichMonNpcOne:', this.whichMon);
         initialMessage.edit({
           embeds: [nowBattling],
@@ -252,11 +285,11 @@ if (fs.existsSync(name)) {
         break;
       } else if (
         this.distanceToNpc >= attackRadius &&
-        element.type === this.whichMon &&
+        element.name === this.whichMon &&
         hasTalkButton
       ) {
         console.log('whichMonNpcTwo:', this.whichMon);
-        console.log('element2:', element.type);
+        console.log('element2:', element.name);
          nowBattling.setFooter({text:'You moved out of NPC\'s range.'});
         initialMessage.edit({
           embeds: [nowBattling],
@@ -292,9 +325,9 @@ if (fs.existsSync(name)) {
   async performAction() {
     if (this.isActive) {
       // Implement logic for the element's action
-      console.log(`${this.type} is active at x: ${this.x}, y: ${this.y}.`);
+      console.log(`${this.name} is active at x: ${this.x}, y: ${this.y}.`);
     } else {
-      console.log(`${this.type} is inactive.`);
+      console.log(`${this.name} is inactive.`);
     }
   }  
   

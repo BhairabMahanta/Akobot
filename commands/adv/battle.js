@@ -45,11 +45,9 @@ class Battle {
         this.abilityOptions = [];
         try {
 
-            console.log('TRYING MY ARSAEAWSS OFF', this.player.selectedFamiliars)
             if (this.player.selectedFamiliars) {
-                console.log('true', player.selectedFamiliars)
-                this.playerFamiliar = this.player.selectedFamiliars.name;
-                console.log('selectedplayerFamiliar:', this.playerFamiliar)
+               this.playerFamiliar = this.player.selectedFamiliars.name;
+              
             } else if (!this.player.selectedFamiliars) {
                 console.log('gay')
                 this.playerFamiliar = ["Fire Dragon"];
@@ -62,7 +60,7 @@ class Battle {
         }
         this.familiarInfo = [];
         // Loop through each familiar name in the array
-        console.log('TRYING MY ASS OFF', this.playerFamiliar)
+        
         for (const familiarName of this.playerFamiliar) {
             const familiarData = cards[familiarName];
             if (familiarData) {
@@ -113,7 +111,8 @@ class Battle {
         this.battleLogs = [];
         this.ability = new Ability(this);
         this.initialMessage = initialMessage;
-        
+        this.aliveFam = [];
+      
 
     }
 
@@ -162,6 +161,7 @@ class Battle {
                     await this.getNextTurn()
                     await this.performEnemyTurn(message);
                     console.log('currentTurn:', this.currentTurn);
+                  this.printBattleResult();
                     const updatedEmbed = await this.sendInitialEmbed(message);
                     this.initialMessage.edit({
                         embeds: [updatedEmbed],
@@ -169,20 +169,9 @@ class Battle {
                     });
 
 
-                    // this.printBattleResult();
-                    if (this.boss.physicalStats.hp < 0) {
-                        message.channel.send("You won the battle against the Monster, you can continue the journey where you left off (I lied  you can't)")
-                    } else if (this.player.stats.hp < 0) {
-                        message.channel.send("You lost, skill issue.")
-                      this.player.stats.speed = 0;
-                    }  for (const character of this.familiarInfo)  {
-                       console.log('character:L', character)
-                          if (character.stats.hp < 0) {
-                            message.channel.send(`${character.name} died lol`)
-                            character.stats.speed = 0;
-                        } break;
-                    }
-
+                    
+                   
+                
                 } catch (error) {
                     console.error('Error on hit:', error);
                 }
@@ -202,6 +191,7 @@ class Battle {
                             await this.getNextTurn()
                             await this.performEnemyTurn(message);
                             console.log('currentTurn:', this.currentTurn);
+                          this.printBattleResult();
                             const updatedEmbed = await this.sendInitialEmbed(message);
                             this.initialMessage.edit({
                                 embeds: [updatedEmbed],
@@ -210,20 +200,8 @@ class Battle {
                         } else {
                             console.log(`Ability ${abilityName} not found.`);
                         }
-                        // this.printBattleResult();
-                        if (this.boss.physicalStats.hp < 0) {
-                            message.channel.send("You won the battle against the Monster, you can continue the journey where you left off (I lied  you can't)")
-                        } else if (this.player.stats.hp < 0) {
-                            message.channel.send("You lost, skill issue.")
-                                                this.player.stats.speed = 0;
+                        
 
-                        }  for (const character of this.familiarInfo)  {
-                          console.log('character:L', character)
-                          if (character.stats.hp < 0) {
-                            message.channel.send(`${character.name} died lol`)
-                            character.stats.speed = 0;
-                        }
-                        }
                     } catch (error) {
                         console.error('Error on hit:', error);
                         message.channel.send('You perhaps have not selected a class yet. Please select it using "a!classselect", and select race using "a!raceselect".')
@@ -242,6 +220,7 @@ class Battle {
                                     await this.getNextTurn()
                                     await this.performEnemyTurn(message);
                                     console.log('currentTurn:', this.currentTurn);
+                                  this.printBattleResult();
                                     const updatedEmbed = await this.sendInitialEmbed(message);
                                     this.initialMessage.edit({
                                         embeds: [updatedEmbed],
@@ -253,6 +232,7 @@ class Battle {
                         } else {
                             console.log(`Ability ${abilityName} not found.`);
                         }
+                        
                     } catch (error) {
                         console.log('ErrorFamiliar:', error)
                     }
@@ -612,10 +592,17 @@ let filledBars;
             console.log('notmy turn bitches')
             return
         } else if (this.currentTurn === this.boss.name) {
+          let isTargetingPlayer;
             // If the current turn is the environment, let it make a move
             // const move = this.environment.makeMove();
-             const isTargetingPlayer = Math.random() < 0.3; // 30% chance to target the player
-    const targetInfo = isTargetingPlayer ? this.player : this.familiarInfo[Math.floor(Math.random() * this.familiarInfo.length)];
+              isTargetingPlayer = Math.random() < 0.3; // 30% chance to target the player
+          
+          const aliveFamiliars = this.familiarInfo.filter(familiar => familiar.stats.hp > 0);
+          console.log('length LMAOAWDOJAIHFIAJFOIAJDFFASIF: ', aliveFamiliars.length)
+          if (aliveFamiliars.length < 1) {
+            isTargetingPlayer = true;
+          }
+    const targetInfo = isTargetingPlayer ? this.player : aliveFamiliars[Math.floor(Math.random() * aliveFamiliars.length)];
 
             const target = targetInfo.name;
             console.log('TARGETNAME:', target)   
@@ -641,10 +628,27 @@ let filledBars;
 
     printBattleResult() {
         // Implement code to display the battle result (victory, defeat, or draw)
+                          // this.printBattleResult();
+                    if (this.boss.physicalStats.hp < 0) {
+                        this.message.channel.send("You won the battle against the Monster, you can continue the journey where you left off (I lied  you can't)")
+                    } else if (this.player.stats.hp < 0) {
+                        this.message.channel.send("You lost, skill issue.")
+                      this.player.stats.speed = 0;
+                    }  for (const character of this.familiarInfo)  {
+                       console.log('character:L', character)
+                          if (character.stats.hp < 0 && !this.aliveFam.includes(character.name)) {
+                            this.message.channel.send(`${character.name} died lol`)
+                            character.stats.speed = 0;
+                            character.atkBar = 0;
+                            character.stats.hp = 0;
+                            this.aliveFam.push(character.name)
+                            console.log('ALIVEFAM:', this.aliveFam)
+                             break;
+                        }
+                    }
     }
 }
-// const battle = new Battle(player, new Environment([monster, boss]));
-// battle.startBattle();
+
 module.exports = {
     Battle,
 };

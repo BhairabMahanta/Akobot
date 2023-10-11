@@ -4,23 +4,29 @@ const areas = {
   "Forest Clearing": {
     monsters: [
       {
-        type: "monsterA",
+        name: "monsterA",
         position: { x: 100, y: 200 }, // Fixed position for MonsterA
+        amount: 5,
+        type: 'mob'
       }, 
       {
-        type: "monsterB",
+        name: "monsterB",
         position: { x: 100, y: 250 }, // Fixed position for MonsterB
+        amount: 5,
+        type: 'mob',
       },
       // Add more monsters with fixed positions
     ],
     npcs: [
       {
-        type: "npc1",
+        name: "npc1",
         position: { x: 200, y: 300 }, // Fixed position for NPC1
+        type: 'normal',
       },
       {
-        type: "npc2",
+        name: "npc2",
         position: { x: 200, y: 350 }, // Fixed position for NPC2
+        type: 'normal',
       },
       // Add more NPCs with fixed positions
     ],
