@@ -5,6 +5,9 @@ const {
     bosses
 } = require('./bosses.js');
 const {
+    mobs
+} = require('./mobs.js');
+const {
     cards
 } = require('../fun/cards.js'); // Import the cards data from 'cards.js'
 const {
@@ -38,73 +41,34 @@ const buttonRow = new ActionRowBuilder()
         .setStyle('Danger')
     );
 
+
 class Battle {
-    constructor(player, bossName, message ) {
+    constructor(player, enemy, message ) {
+      this.enemyDetails = enemy
         this.message = message;
         this.player = player;
+        this.mobs = [];
         this.abilityOptions = [];
-        try {
-
-            if (this.player.selectedFamiliars) {
+        try {if (this.player.selectedFamiliars) {
                this.playerFamiliar = this.player.selectedFamiliars.name;
-              
-            } else if (!this.player.selectedFamiliars) {
+                 } else if (!this.player.selectedFamiliars) {
                 console.log('gay')
                 this.playerFamiliar = ["Fire Dragon"];
                 this.message.channel.send('You have to select your familiar first using a!selectFamiliar')
                 return this.continue = false;
-            }
-
-        } catch (error) {
-            console.log('No selected Familiars!', error);
-        }
+            }} catch (error) { console.log('No selected Familiars!', error); }
         this.familiarInfo = [];
-        // Loop through each familiar name in the array
-        
-        for (const familiarName of this.playerFamiliar) {
-            const familiarData = cards[familiarName];
-            if (familiarData) {
-                this.familiarInfo.push(familiarData);
-            }
-
-        }
+        this.mobInfo = [];
         this.playerName = this.player.name;
-        if (this.player.class != null) {
-
-            this.playerClass = this.player.class
-            this.continue = true;
-        } else if (this.player.class === null) {
-            this.message.channel.send('You have to select a class first, use a!selectclass');
-            return this.continue = false;
-
+        this.playerClass = null;
+        this.playerRace = null;
+        if (this.enemyDetails.type === 'boss') {
+        this.boss = bosses[this.enemyDetails.name];
+        } else {
+          this.boss = bosses['Dragon Lord']
         }
-
-
-        this.playerRace = this.player.race
-        this.boss = bosses[bossName];
         this.currentTurn = null;
-        this.mobs = null;
-        this.characters = [this.player, ...this.familiarInfo, this.boss];
-        for (const character of this.characters) {
-           try {
-            for (const character of this.characters) {  
-              if (character === this.boss) {
-                character.maxHp = character.physicalStats.hp
-              }else if (character === this.player) {
-                character.maxHp = character.stats.hp
-              }else {
-              character.maxHp = character.stats.hp
-            }
-               
-            }
-        } catch (error) {
-            console.log('fillBarError:', error);
-        }
-            character.atkBar = 0;
-            character.attackBarEmoji = [];
-            character.hpBarEmoji = [];
-            console.log(character.name, '-', character.attackBarEmoji), '-', character.hpBarEmoji;
-        }
+        this.characters = [];
         this.environment = [];
         this.currentTurnIndex = 0; // Index of the character whose turn it is
         this.turnCounter = 0; // Counter to track overall turns
@@ -112,11 +76,220 @@ class Battle {
         this.ability = new Ability(this);
         this.initialMessage = initialMessage;
         this.aliveFam = [];
-      
+        this.aliveEnemies = [];
+        this.battleEmbed = null;
+        this.allEnemies = [];
+        this.waves = this.enemyDetails.waves
+        this.enemyFirst = false;
+        this.pickEnemyOptions = null;
+        this.selectMenu = null;
+        this.pickedChoice = false
+        this.enemyToHit = null;
 
     }
 
+  
+    async initialiseStuff()
+  {
+    for (const familiarName of this.playerFamiliar) {
+      const familiarData = cards[familiarName];
+      if (familiarData) {
+          this.familiarInfo.push(familiarData);
+      } }
+    if (this.enemyDetails.type === 'boss') {
+    this.boss = bosses[this.enemyDetails.name];
+    this.allEnemies.push(this.boss)
+    } else {
+    this.boss = bosses['Dragon Lord']
+    }
+    if (this.enemyDetails.type === 'mob' && this.enemyDetails.hasAllies.includes('none')) {
+    this.mobs.push(this.enemyDetails.name)
+    } else if (this.enemyDetails.type === 'mob' && !this.enemyDetails.hasAllies.includes('none')) {
+     this.mobs.push(this.enemyDetails.name)
+     this.mobs.push(this.enemyDetails.hasAllies.join(','))
+    }
+    console.log('this.mobs:', this.mobs)
+    for (const mobName of this.mobs) {
+    const mobData = mobs[mobName];
+    if (mobData) {
+      this.mobInfo.push(mobData);
+    } }
+    this.allEnemies.push(...this.mobInfo)
+    if (this.enemyDetails.type === 'boss') {
+    this.characters = [this.player, ...this.familiarInfo, this.boss];
 
+    } else {
+    this.characters = [this.player, ...this.familiarInfo, ...this.mobInfo];
+    }
+    if (this.player.class != null) {
+      this.playerClass = this.player.class
+      this.continue = true;
+    } else if (this.player.class === null) {
+      this.message.channel.send('You have to select a class first, use a!selectclass');
+      return this.continue = false;
+    }
+    if (this.player.race != null) {
+      this.playerRace = this.player.race
+    } else if (this.player.class === null) {
+      this.message.channel.send('You have to select a race first, use a!selectrace');
+    }
+    for (const character of this.characters) {
+     try {
+      character.maxHp = character.stats.hp
+    } catch (error) {
+      console.log('fillBarError:', error);
+    }
+      character.atkBar = 0;
+      character.attackBarEmoji = [];
+      character.hpBarEmoji = [];
+      console.log(character.name, '-', character.attackBarEmoji), '-', character.hpBarEmoji;
+    }
+    console.log('this.allEnemies:', this.allEnemies)
+    this.aliveEnemies = this.allEnemies;
+  }    
+  
+    async startEmbed() {
+      await this.initialiseStuff()
+      console.log('this.aliveEnemies:', this.aliveEnemies)
+      this.pickEnemyOptions = this.aliveEnemies.map((enemy, index) => ({
+        label: enemy.name,
+        description: `Attack ${enemy.name}`,
+        value: `enemy_${index}`
+      }));
+      console.log('This.pickEnemyOptions:', this.pickEnemyOptions)
+      this.selectMenu = new StringSelectMenuBuilder()
+        .setCustomId('action_select')
+        .setPlaceholder('Select the target')
+        .addOptions(this.pickEnemyOptions);
+      console.log('This.selectEmnu:', this.selectMenu)
+      let selectedValue;
+            // Create the embed for the adventure command
+    this.battleEmbed = new EmbedBuilder()
+      .setTitle('Start battle lul')
+      .setDescription(`### - Do you want to really fight the monsters?\n\n>>> **Player and familiars:**\n- __${this.player.name} Level__: ${this.player.exp.level} \n- __Familiars selected__: ${this.familiarInfo.map(familiar => familiar.name).join(', ' )} \n\n **Enemy Info**:\n - __${this.enemyDetails.name} Level__: It not made smh \n\n **Automate this battle?**\n- automating has its own issues it does worse than you would normally do!! \n\n **Your Power Level vs Recommended**\n- somethings you needa make that shit\n\n **Difficulty**\n- bhag le\n\n **Start Battle**\n To start, click on the "Lets Dive into it" button!!`)
+            // Display options for quests, bosses, mobs, and adventures
+    const optionSelectMenu = new StringSelectMenuBuilder()
+      .setCustomId('option_krlo')
+      .setPlaceholder('Select an option')
+      .addOptions([
+        { label: 'Bosses', value: 'klik_bosses' },
+        { label: 'Mobs', value: 'klik_mobs' },
+        { label: 'Fight', value: 'klik_fight' }
+      ]);
+const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
+ const gaeMessage = await this.message.channel.send({embeds: [this.battleEmbed], components: [stringMenuRow]})
+    const filter = i => (['start_adventure', 'cancel_adventure'].includes(i.customId)) || (i.customId === 'option_krlo') || (i.customId === 'go_in');
+       const collector = await gaeMessage.createMessageComponentCollector({ filter, time: 300000 });
+
+    collector.on('collect', async (i) => {
+                      
+      if (i.customId === 'option_krlo') {
+        i.deferUpdate();
+        selectedValue = i.values[0]; // Get the selected value // gae shit
+                  
+                       if (selectedValue.startsWith('klik_')) {
+                        console.log('bro clicked fr??:', selectedValue);
+                         const selectedValueName = selectedValue.replace('klik_', '');
+                         if (selectedValueName === 'fight') {
+                           gaeMessage.delete()
+   if (this.continue) {
+ this.startBattle(this.message);
+   }
+      }
+                       }}  
+                        });
+ // // await  battle.isSelected();
+ //   if (this.continue) {
+ //  console.log('playerSElECTFAMILOIAR:', this.player.selectedFamilar )
+ // this.startBattle(this.message);
+ //   }
+    }
+    
+    async sendInitialEmbed() {
+        try {
+            // const filledBars = Math.floor(atkBar / 10);
+            //  const emptyBars = 10 - filledBars;
+            //  const attackBarString = `${'⚔️'.repeat(filledBars)}${' '.repeat(emptyBars)}`;
+            console.log(this.player.name, '-inside', this.player.attackBarEmoji);
+            this.battleEmbed = new EmbedBuilder()
+                .setTitle('Battle')
+                .setDescription(`You are fighting against ${this.enemyDetails.name}`)
+                .setFooter({
+                    text: 'You can run if you want lol no issues'
+                })
+              .setColor(0x0099FF)
+              if (this.enemyDetails.type === 'boss') {
+                this.battleEmbed.addFields({
+                    name: `Enemies Info:`,
+                    value: `\`\`\`ansi\n[2;31m> ${this.boss.name}\n[2;32m HitPoints: ${this.boss.hpBarEmoji} ${this.boss.stats.hp}\n[2;36m AttackBar: [2;34m${this.boss.attackBarEmoji} ${Math.floor(this.boss.atkBar)}\`\`\``,
+                    inline: false
+                })
+              } else if(this.enemyDetails.type === 'mob') {
+                let mobInfo = ''; // Initialize an empty string to store the info
+              for (const mob of this.mobInfo) {
+                      mobInfo += `[2;35m> ${mob.name}\n[2;32m HitPoints: ${mob.hpBarEmoji} ${mob.stats.hp}\n[2;36m AttackBar: [2;34m${mob.attackBarEmoji} ${Math.floor(mob.atkBar)}\n\n`;
+                }
+                this.battleEmbed.addFields({
+                    name: 'Enemies Info:',
+                    value: `\`\`\`ansi\n${mobInfo}\`\`\``,
+                    inline: false
+                });
+              }
+              this.battleEmbed.addFields({
+                    name: `Current Turn`,
+                    value: `\`\`\`${this.currentTurn}\`\`\``,
+                    inline: false
+                }, );
+            if (this.player) {
+                let playerAndFamiliarsInfo = ''; // Initialize an empty string to store the info
+
+                for (const familiar of this.familiarInfo) {
+                    playerAndFamiliarsInfo += `[2;35m> ${familiar.name}\n[2;32m HitPoints: ${familiar.hpBarEmoji} ${familiar.stats.hp}\n[2;36m AttackBar: [2;34m${familiar.attackBarEmoji} ${Math.floor(familiar.atkBar)}\n\n`;
+                }
+
+                // Add the player's HP and AttackBar to the info
+                playerAndFamiliarsInfo += `[2;35m> ${this.playerName}\n[2;32m HitPoints: ${this.player.hpBarEmoji} ${this.player.stats.hp}\n[2;36m AttackBar: [2;34m${this.player.attackBarEmoji} ${Math.floor(this.player.atkBar)}`;
+
+                this.battleEmbed.addFields({
+                    name: 'Your Team Info:',
+                    value: `\`\`\`ansi\n${playerAndFamiliarsInfo}\`\`\``,
+                    inline: false
+                });
+            }
+            console.log('battleLOgsLengthBefore', this.battleLogs.length);
+            if (this.battleLogs.length > 6 && this.battleLogs.length <= 7) {
+                this.battleLogs.shift();
+            } else if (this.battleLogs.length > 7 && this.battleLogs.length <= 8) {
+                this.battleLogs.shift()
+                this.battleLogs.shift();
+            } else if (this.battleLogs.length > 8) {
+                this.battleLogs.shift();
+                this.battleLogs.shift();
+                this.battleLogs.shift();
+            }
+            console.log('battleLogsLengthAfterr:', this.battleLogs.length)
+
+            if (this.battleLogs.length > 0) {
+
+                this.battleEmbed.addFields({
+                    name: 'Battle Logs',
+                    value: '```diff\n' + this.battleLogs.join('\n') + '```',
+                    inline: false
+                });
+            } else {
+                this.battleEmbed.addFields({
+                    name: 'Battle Logs',
+                    value: 'No battle logs yet.',
+                    inline: false
+                });
+            }
+            return this.battleEmbed
+            // return await message.channel.send({ embeds: [initialEmbed], components: [buttonRow] });
+        } catch (error) {
+            console.error('Error on hit:', error);
+        }
+        // Implement code to send an initial embed with battle information
+    }
 
     async toCamelCase(str) {
 
@@ -132,7 +305,8 @@ class Battle {
             console.log('match:', match);
             return group1.toUpperCase();
         }).replace(/\s/g, ''); // Remove any remaining spaces
-    }
+
+}
 
     async startBattle(message) {
 
@@ -143,7 +317,14 @@ class Battle {
             embeds: [this.initialMessage],
             components: await
             this.getDuelActionRow()
-        });
+        }); if(this.enemyFirst) {
+       this.printBattleResult();
+         const updatedEmbed = await this.sendInitialEmbed(message);
+         await this.initialMessage.edit({
+             embeds: [updatedEmbed],
+             components: await this.getDuelActionRow()
+         });
+        }
         const filter = i => (i.user.id === message.user.id) && i.customId.startsWith('action_') || i.customId === 'starter';
 
         const collector = this.initialMessage.createMessageComponentCollector({
@@ -175,7 +356,12 @@ class Battle {
                 } catch (error) {
                     console.error('Error on hit:', error);
                 }
-            }
+            } else if (i.customId === 'action_select') {
+                        const targetIndex = parseInt(interaction.values[0]);
+                        this.enemyToHit = this.aliveEnemies[targetIndex];
+                        this.pickedChoice = true;
+                        // Continue with your code logic after selecting an enemy
+                      }
             else if (i.customId === 'starter') {
                 const selectedClassValue = i.values[0]; // Get the selected value // gae shit
                 console.log('selectedValues', selectedClassValue)
@@ -269,7 +455,7 @@ class Battle {
                 console.log('moveOptionsError:', error)
             }
         }
-        if (this.currentTurn === this.player.name) {
+       else if (this.currentTurn === this.player.name) {
             const playerAbility = classes[this.player.class].abilities;
             // console.log('stuffimportant:', playerAbility)
             try {
@@ -291,6 +477,18 @@ class Battle {
                 console.log('moveOptionsError:', error)
             }
         }
+      for (const enemy of this.allEnemies) {
+        if (enemy.name === this.currentTurn) {
+          this.enemyFirst = true;
+          this.abilityOptions = [{
+                      label: 'namename',
+                      description: 'whatever',
+                      value: `uh oh`,
+                  }]
+          this.performEnemyTurn(this.message);
+            }
+      }
+       
 
 
         const stringMenu = new StringSelectMenuBuilder()
@@ -300,8 +498,8 @@ class Battle {
 
 
 
-        const stringMenuRow = new ActionRowBuilder().addComponents(stringMenu);
-
+        const stringMenuRow = new ActionRowBuilder().addComponents(stringMenu, await this.stringMenu);
+console.log('stringMENUROW:', stringMenuRow)
 
 
         const rows = [buttonRow, stringMenuRow];
@@ -324,17 +522,25 @@ class Battle {
                 return familiarSpeed;
             } else if (character === this.boss) {
 
-                return this.boss.physicalStats.speed;
-            } else {
+                return this.boss.stats.speed;
+              } else if (this.mobs.includes(character.name)) {
+                // Find the familiar's speed by matching it with this.familiarInfo
+                const familiarInfo = this.mobInfo.find((fam) => fam.name === character.name);
+                const familiarSpeed = familiarInfo ? familiarInfo.stats.speed : 0; // Default to 0 if not found
+
+                return familiarSpeed;
+            }
+              else {
                 console.log(`Calculating speed for unknown character type: 0`);
                 return 0; // Default to 0 for unknown character types
             }
         } catch (error) {
             console.log('speedcalculator:', error);
         }
-    }
+    } 
 
     async calculateOverallHp(character) {
+      // console.log('character:', character)
         try {
             if (character === this.player) {
 
@@ -348,7 +554,13 @@ class Battle {
                 return familiarHp;
             } else if (character === this.boss) {
 
-                return this.boss.physicalStats.hp;
+                return this.boss.stats.hp;
+            } else if (this.mobs.includes(character.name)) {
+              // Find the familiar's speed by matching it with this.familiarInfo
+              const familiarInfo = this.mobInfo.find((fam) => fam.name === character.name);
+              const familiarHp = familiarInfo ? familiarInfo.stats.hp : 0; // Default to 0 if not found
+
+              return familiarHp;
             } else {
                 console.log(`Calculating speed for unknown character type: 0`);
                 return 0; // Default to 0 for unknown character types
@@ -364,15 +576,11 @@ class Battle {
                 const speed = await this.calculateOverallSpeed(character);
               const hp = await this.calculateOverallHp(character);
                 const speedMultiplier = character.speedBuff ? 1.3 : 1; // Apply Speed Buff if active
-                character.atkBar += speed * 0.07 * speedMultiplier;
+                character.atkBar += speed * 0.05 * speedMultiplier;
                 character.attackBarEmoji = await this.generateAttackBarEmoji(character.atkBar);
-              if (character === this.boss) {
-                character.hpBarEmoji = await this.generateHPBarEmoji(character.physicalStats.hp, character.physicalStats.hp)
-              }else if (character === this.player) {
-                character.hpBarEmoji = await this.generateHPBarEmoji(character.stats.hp, character.stats.hp)
-              }else {
+              
               character.hpBarEmoji = await this.generateHPBarEmoji(character.stats.hp, character.stats.hp)
-            }
+            
                
             }
         } catch (error) {
@@ -383,17 +591,7 @@ class Battle {
     async fillHpBars() {
         try {
             for (const character of this.characters) {
-               
-              const hp = await this.calculateOverallHp(character);
-              
-              if (character === this.boss) {
-                character.hpBarEmoji = await this.generateHPBarEmoji(character.physicalStats.hp, character.maxHp)
-              }else if (character === this.player) {
-                character.hpBarEmoji = await this.generateHPBarEmoji(character.stats.hp, character.maxHp)
-              }else {
-              character.hpBarEmoji = await this.generateHPBarEmoji(character.stats.hp, character.maxHp)
-            }
-               
+        character.hpBarEmoji = await this.generateHPBarEmoji(character.stats.hp, character.maxHp)
             }
         } catch (error) {
             console.log('fillBarError:', error);
@@ -401,8 +599,13 @@ class Battle {
     }
 
     async generateAttackBarEmoji(atkBar) {
+      try{
         const emoji = '■';
         let emptyBars = 0;
+      if (atkBar > 113) {
+        console.log('atkBar:', atkBar)
+        atkBar = 113
+      }
         const filledBars = Math.floor(atkBar / 5);
 
         emptyBars = Math.floor(21 - filledBars);
@@ -415,6 +618,9 @@ class Battle {
 
         const attackBarString = `${emoji.repeat(filledBars)}${' '.repeat(emptyBars)}`;
         return `[${attackBarString}]`;
+    } catch (error) {
+        console.log('errorHere:', error)
+    }
     }
 
     async generateHPBarEmoji(currentHP, maxHP) {
@@ -472,79 +678,6 @@ let filledBars;
         return nextTurn;
     }
 
-    async sendInitialEmbed() {
-        try {
-            // const filledBars = Math.floor(atkBar / 10);
-            //  const emptyBars = 10 - filledBars;
-            //  const attackBarString = `${'⚔️'.repeat(filledBars)}${' '.repeat(emptyBars)}`;
-            console.log(this.player.name, '-inside', this.player.attackBarEmoji);
-            const initialEmbed = new EmbedBuilder()
-                .setTitle('Battle')
-                .setDescription(`You are fighting against ${this.boss.name}`)
-                .setFooter({
-                    text: 'You can run if you want lol no issues'
-                })
-                .addFields({
-                    name: `Enemies Info:`,
-                    value: `\`\`\`ansi\n[2;31m> ${this.boss.name}\n[2;32m HitPoints: ${this.boss.hpBarEmoji} ${this.boss.physicalStats.hp}\n[2;36m AttackBar: [2;34m${this.boss.attackBarEmoji} ${Math.floor(this.boss.atkBar)}\`\`\``,
-                    inline: false
-                }, {
-                    name: `Current Turn`,
-                    value: `\`\`\`${this.currentTurn}\`\`\``,
-                    inline: false
-                }, );
-            if (this.player) {
-                let playerAndFamiliarsInfo = ''; // Initialize an empty string to store the info
-
-                for (const familiar of this.familiarInfo) {
-                    const familiarHP = familiar.stats.hp;
-                    playerAndFamiliarsInfo += `[2;35m> ${familiar.name}\n[2;32m HitPoints: ${familiar.hpBarEmoji} ${familiarHP}\n[2;36m AttackBar: [2;34m${familiar.attackBarEmoji} ${Math.floor(familiar.atkBar)}\n\n`;
-                }
-
-                // Add the player's HP and AttackBar to the info
-                playerAndFamiliarsInfo += `[2;35m> ${this.playerName}\n[2;32m HitPoints: ${this.player.hpBarEmoji} ${this.player.stats.hp}\n[2;36m AttackBar: [2;34m${this.player.attackBarEmoji} ${Math.floor(this.player.atkBar)}`;
-
-                initialEmbed.addFields({
-                    name: 'Your Team Info:',
-                    value: `\`\`\`ansi\n${playerAndFamiliarsInfo}\`\`\``,
-                    inline: false
-                });
-            }
-            console.log('battleLOgsLengthBefore', this.battleLogs.length);
-            if (this.battleLogs.length > 6 && this.battleLogs.length <= 7) {
-                this.battleLogs.shift();
-            } else if (this.battleLogs.length > 7 && this.battleLogs.length <= 8) {
-                this.battleLogs.shift()
-                this.battleLogs.shift();
-            } else if (this.battleLogs.length > 8) {
-                this.battleLogs.shift();
-                this.battleLogs.shift();
-                this.battleLogs.shift();
-            }
-            console.log('battleLogsLengthAfterr:', this.battleLogs.length)
-
-            if (this.battleLogs.length > 0) {
-
-                initialEmbed.addFields({
-                    name: 'Battle Logs',
-                    value: '```diff\n' + this.battleLogs.join('\n') + '```',
-                    inline: false
-                });
-            } else {
-                initialEmbed.addFields({
-                    name: 'Battle Logs',
-                    value: 'No battle logs yet.',
-                    inline: false
-                });
-            }
-            return initialEmbed
-            // return await message.channel.send({ embeds: [initialEmbed], components: [buttonRow] });
-        } catch (error) {
-            console.error('Error on hit:', error);
-        }
-        // Implement code to send an initial embed with battle information
-    }
-
     async performTurn(message) {
         // const attacker = this.currentTurn;
         // this.getNextTurn()
@@ -552,11 +685,12 @@ let filledBars;
         // If the current turn is the player, let the player choose a move
         if (this.currentTurn === this.playerName) {
             // const move = attacker.chooseMove(); // Implement this method for the player
-            const target = this.boss.name // Implement target selection logic
-            const damage = calculateDamage(this.player.stats.attack, this.boss.physicalStats.defense);
+          
+            const target = this.boss.name 
+            const damage = calculateDamage(this.player.stats.attack, this.boss.stats.defense);
 
             // Update HP and battle logs
-            this.boss.physicalStats.hp -= damage;
+            this.boss.stats.hp -= damage;
             this.battleLogs.push(`+ ${this.currentTurn} attacks ${target} for ${damage} damage using gayness`);
             console.log('loglength:', this.battleLogs.length)
             console.log(`${this.currentTurn} attacks ${target} for ${damage} damage using gayness`)
@@ -570,10 +704,10 @@ let filledBars;
             for (const familiar of this.familiarInfo) {
                 if (familiar.name === this.currentTurn) {
                     // Calculate damage for the attacking familiar
-                    damage = calculateDamage(familiar.stats.attack, this.boss.physicalStats.defense);
+                    damage = calculateDamage(familiar.stats.attack, this.boss.stats.defense);
 
                     // Update HP and battle logs
-                    this.boss.physicalStats.hp -= damage;
+                    this.boss.stats.hp -= damage;
                     this.battleLogs.push(`+ ${this.currentTurn} attacks ${target} for ${damage} damage using an attack`);
                     console.log(`${this.currentTurn} attacks ${target} for ${damage} damage using an attack`);
                     break; // Exit the loop once the attacking familiar is found
@@ -588,6 +722,43 @@ let filledBars;
     }
 
     async performEnemyTurn(message) {
+      for (const enemies of this.allEnemies) {
+        console.log('enemyname:', enemies.name)
+         if (enemies.name === this.currentTurn) {
+           console.log('enemy:', enemies)
+          console.log('OK BRO IT IS WORKINGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG')
+          let isTargetingPlayer;
+            // If the current turn is the environment, let it make a move
+            // const move = this.environment.makeMove();
+              isTargetingPlayer = Math.random() < 0.3; // 30% chance to target the player
+
+          const aliveFamiliars = this.familiarInfo.filter(familiar => familiar.stats.hp > 0);
+          console.log('length LMAOAWDOJAIHFIAJFOIAJDFFASIF: ', aliveFamiliars.length)
+          if (aliveFamiliars.length < 1) {
+            isTargetingPlayer = true;
+          }
+        const targetInfo = isTargetingPlayer ? this.player : aliveFamiliars[Math.floor(Math.random() * aliveFamiliars.length)];
+
+            const target = targetInfo.name;
+            console.log('TARGETNAME:', target)   
+            const damage = calculateDamage(this.boss.stats.attack, targetInfo.stats.defense);
+
+            // Update HP and battle logs
+            targetInfo.stats.hp -= damage;
+            console.log('My turn now bitches')
+            this.battleLogs.push(`- ${this.currentTurn} attacks ${target} for ${damage} damage using cum!\n ============================================`);
+            // message.channel.send(`\`\`\`${logsString}\`\`\``);
+            console.log('loglength:', this.battleLogs.length)
+            console.log(`${this.currentTurn} attacks ${target} for ${damage} damage using cum!`)
+            await this.getNextTurn()
+            console.log('currentTurnForDragonafter;', this.currentTurn)
+            
+            //  const updatedEmbed = await this.sendInitialEmbed(message);
+            // this.initialMessage.edit({ embeds: [updatedEmbed], components: await this.getDuelActionRow() });
+
+            // console.log('currentTurn:', this.currentTurn);
+        }
+      }
         if (this.currentTurn != this.boss.name) {
             console.log('notmy turn bitches')
             return
@@ -606,7 +777,7 @@ let filledBars;
 
             const target = targetInfo.name;
             console.log('TARGETNAME:', target)   
-            const damage = calculateDamage(this.boss.physicalStats.attack, targetInfo.stats.defense);
+            const damage = calculateDamage(this.boss.stats.attack, targetInfo.stats.defense);
 
             // Update HP and battle logs
             targetInfo.stats.hp -= damage;
@@ -622,21 +793,21 @@ let filledBars;
 
             // console.log('currentTurn:', this.currentTurn);
         }
+     
     }
 
 
 
-    printBattleResult() {
+   async printBattleResult() {
         // Implement code to display the battle result (victory, defeat, or draw)
                           // this.printBattleResult();
-                    if (this.boss.physicalStats.hp < 0) {
+                    if (this.boss.stats.hp < 0) {
                         this.message.channel.send("You won the battle against the Monster, you can continue the journey where you left off (I lied  you can't)")
                     } else if (this.player.stats.hp < 0) {
                         this.message.channel.send("You lost, skill issue.")
                       this.player.stats.speed = 0;
                     }  for (const character of this.familiarInfo)  {
-                       console.log('character:L', character)
-                          if (character.stats.hp < 0 && !this.aliveFam.includes(character.name)) {
+                      if (character.stats.hp < 0 && !this.aliveFam.includes(character.name)) {
                             this.message.channel.send(`${character.name} died lol`)
                             character.stats.speed = 0;
                             character.atkBar = 0;

@@ -102,7 +102,7 @@ async function handleNavigation(allFloors, message, adventureEmbed, initialMessa
 // Define the filter based on the _id
   const dbFilter = { _id: message.user.id };
         const playerData2 = await collection.findOne(dbFilter);
-      console.log('playerDATA2:', playerData2);
+   
 
   
   // Simulate player data (replace with your actual data)
@@ -209,16 +209,18 @@ gameImage.generateRandomElements(0.55, 0.5, 10);
                 // ...
     } 
  else if (i.customId === 'attack_monster' && i.user.id === message.user.id)  {
-   const thatArray = gameImage.elementArray
+   initialMessage.edit({components: []});
+   const thatArray = gameImage.elementArray[0]
    console.log('THAT ARA ARAA:', thatArray)
           // Handle the attack logic here
-       const battle = new Battle(playerData2, 'Dragon Lord', message);
-    // await  battle.isSelected();
-   if (battle.continue) {
-  console.log('playerSElECTFAMILOIAR:', battle.player.selectedFamilar )
- battle.startBattle(message);
-   }
-   initialMessage.edit({components: []});
+       const battle = new Battle(playerData2, thatArray , message);
+   battle.startEmbed()
+ //    // await  battle.isSelected();
+ //   if (battle.continue) {
+ //  console.log('playerSElECTFAMILOIAR:', battle.player.selectedFamilar )
+ // battle.startBattle(message);
+ //   }
+   
             
          
     } 

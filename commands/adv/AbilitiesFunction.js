@@ -10,10 +10,10 @@ class Ability {
  //PLAYER ABILOITIES
   
   shieldBash(user, target) {
-    const damage = calculateDamage(user.stats.attack, target.physicalStats.defense);
-    console.log('bossHp:', target.physicalStats.hp)
-    target.physicalStats.hp -= damage;
-    console.log('bossHpafter:', target.physicalStats.hp)
+    const damage = calculateDamage(user.stats.attack, target.stats.defense);
+    console.log('bossHp:', target.stats.hp)
+    target.stats.hp -= damage;
+    console.log('bossHpafter:', target.stats.hp)
     this.battleLogs.push(`+ ${user.name} uses Shield Bash on ${target.name} dealing ${damage}. ${target.name} is slowed!`);
     console.log(this.battleLogs.length)
     console.log(`${user.name} uses Shield Bash on ${target.name}. ${target.name} is slowed!`);
@@ -32,15 +32,15 @@ class Ability {
   }
 
   ragingStrike(user, target) {
-    const damage = calculateDamage(user.stats.attack * 2, target.physicalStats.defense);
-    target.physicalStats.hp -= damage;
+    const damage = calculateDamage(user.stats.attack * 2, target.stats.defense);
+    target.stats.hp -= damage;
     this.battleLogs.push(`${user.name} unleashes a wild Raging Strike on ${target.name}. It deals massive damage!`);
   }
 
   arenaSpin(user, targets) {
     targets.forEach((target) => {
-      const damage = calculateDamage(user.stats.attack, target.physicalStats.defense);
-      target.physicalStats.hp -= damage;
+      const damage = calculateDamage(user.stats.attack, target.stats.defense);
+      target.stats.hp -= damage;
     });
     this.battleLogs.push(`${user.name} performs an Arena Spin, hitting multiple opponents.`);
   }
@@ -51,8 +51,8 @@ class Ability {
   }
 
   precisionStrike(user, target) {
-    const criticalDamage = calculateDamage(user.stats.attack * 1.5, target.physicalStats.defense);
-    target.physicalStats.hp -= criticalDamage;
+    const criticalDamage = calculateDamage(user.stats.attack * 1.5, target.stats.defense);
+    target.stats.hp -= criticalDamage;
     this.battleLogs.push(`${user.name} executes a precise Precision Strike on ${target.name}. It's a critical hit!`);
   }
 
@@ -62,8 +62,8 @@ class Ability {
   }
 
   fireball(user, target) {
-    const damageOverTime = calculateAbilityDamage(user.stats.magic, target.physicalStats.defense, 3);
-    target.physicalStats.hp -= damageOverTime;
+    const damageOverTime = calculateAbilityDamage(user.stats.magic, target.stats.defense, 3);
+    target.stats.hp -= damageOverTime;
     this.battleLogs.push(`${user.name} hurls a Fireball at ${target.name}. ${target.name} takes damage over time.`);
   }
 
@@ -95,8 +95,8 @@ class Ability {
 
   drainLife(user, target) {
     const drainAmount = calculateAbilityDamage(user.stats.magic, 25); // Example: Drain Life heals for 25 HP
-    target.physicalStats.hp -= drainAmount;
-    user.physicalStats.hp += drainAmount;
+    target.stats.hp -= drainAmount;
+    user.stats.hp += drainAmount;
     this.battleLogs.push(`${user.name} drains the life force from ${target.name}. ${user.name} is healed.`);
   }
 
@@ -111,8 +111,8 @@ class Ability {
   }
 
   backstab(user, target) {
-    const backstabDamage = calculateDamage(user.stats.attack * 2, target.physicalStats.defense); // Example: Backstab deals double damage
-    target.physicalStats.hp -= backstabDamage;
+    const backstabDamage = calculateDamage(user.stats.attack * 2, target.stats.defense); // Example: Backstab deals double damage
+    target.stats.hp -= backstabDamage;
     this.battleLogs.push(`${user.name} strikes ${target.name} from behind. It's a backstab!`);
   }
 
@@ -139,7 +139,7 @@ class Ability {
   shurikenBarrage(user, targets) {
     const shurikenDamage = calculateDamage(user.stats.attack, 10); // Example: Shuriken Barrage deals 10 damage per shuriken
     targets.forEach((target) => {
-      target.physicalStats.hp -= shurikenDamage;
+      target.stats.hp -= shurikenDamage;
     });
     this.battleLogs.push(`${user.name} throws a flurry of shurikens, hitting multiple targets.`);
   }
@@ -156,7 +156,7 @@ class Ability {
 
   healingLight(user, target) {
     const healingAmount = calculateAbilityDamage(user.stats.magic, 30); // Example: Healing Light heals for 30 HP
-    target.physicalStats.hp += healingAmount;
+    target.stats.hp += healingAmount;
     this.battleLogs.push(`${user.name} uses Healing Light on ${target.name}. ${target.name} is healed.`);
   }
 
@@ -234,7 +234,7 @@ class Ability {
  flameStrike(user, target) {
     const power = 20
     const damage = calculateAbilityDamage(power);
-    target.physicalStats.hp -= damage;
+    target.stats.hp -= damage;
     this.battleLogs.push(`+ ${user.name} uses Flame Strike on ${target.name} dealing ${damage}.`);
     // Implement additional effects for Flame Strike here
   }
@@ -242,7 +242,7 @@ class Ability {
   dragonClaw(user, target) {
     const power = 20
     const damage = calculateAbilityDamage(power);
-    target.physicalStats.hp -= damage;
+    target.stats.hp -= damage;
     this.battleLogs.push(`+ ${user.name} uses Dragon Claw on ${target.name} dealing ${damage}.`);
     // Implement additional effects for Dragon Claw here
   }
@@ -250,7 +250,7 @@ class Ability {
   aquaBlast(user, target) {
     const power = 20
     const damage = calculateAbilityDamage(power);
-    target.physicalStats.hp -= damage;
+    target.stats.hp -= damage;
     this.battleLogs.push(`+ ${user.name} uses Aqua Blast on ${target.name} dealing ${damage}.`);
     // Implement additional effects for Aqua Blast here
   }

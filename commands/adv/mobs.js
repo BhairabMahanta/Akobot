@@ -1,24 +1,24 @@
-const bosses = {
-  "Dragon Lord": {
-    name: 'Dragon Lord',
+const mobs = {
+  "monsterA": {
+    name: 'monsterA',
     stats: {
-      hp: 1000,
-      attack: 150,
-      defense: 100,
-      speed: 80,
+      hp: 100,
+      attack: 50,
+      defense: 400,
+      speed: 101,
       mana: 200,
       // Other magical stats
     },
     abilities: ["Fire Breath", "Tail Swipe"],
     attackPattern: ["Basic Attack", "Fire Breath", "Tail Swipe"]
   },
-  "Giant Spider": {
-    name: 'Giant Spider',
+  "monsterB": {
+    name: 'monsterB',
     stats: {
-      hp: 800,
-      attack: 120,
-      defense: 80,
-      speed: 120,
+      hp: 80,
+      attack: 70,
+      defense: 30,
+      speed: 110,
       mana: 100,
       // Other magical stats
     },
@@ -27,4 +27,4 @@ const bosses = {
   },
   // Add more NPC boss characters...
 };
-module.exports =  {bosses};
+module.exports =  {mobs};

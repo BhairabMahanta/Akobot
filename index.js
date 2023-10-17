@@ -1,5 +1,5 @@
   const config = require('./config.json');
-const { Client, IntentsBitField, EmbedBuilder, ButtonBuilder, ActionRowBuilder, SlashCommandBuilder, Events, ModalBuilder, Collection } = require('discord.js');
+const { Client, IntentsBitField, EmbedBuilder, ButtonBuilder, ActionRowBuilder, SlashCommandBuilder, Events, GatewayIntentBits, ModalBuilder, Collection, Partials } = require('discord.js');
 const path = require('path');
 const fs = require('fs');
 const { connectToDB} = require('./data/mongo/mongo.js')
@@ -10,8 +10,10 @@ const client = new Client({
   intents: [
     IntentsBitField.Flags.Guilds,
     IntentsBitField.Flags.GuildMessages,
-    IntentsBitField.Flags.MessageContent
-  ]
+    IntentsBitField.Flags.MessageContent,
+    GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, 
+  ],
+  partials: [Partials.Message, Partials.Channel, Partials.Reaction],
 
 });
 client.db = null;
@@ -59,6 +61,7 @@ const BOT_PREFIX = "a!";
 
 
 client.on('ready', async () => {
+  console.log('ee23232ee', client.listenerCount('messageReactionRemove'));
   console.log(`${client.user.tag} is ready!🚀`);
 const db = await connectToDB(); // Connect to MongoDB when the bot is ready
 
@@ -101,66 +104,118 @@ client.on('messageCreate', async (message, args) => {
     }, 1000); // delay for 1 second
   }
 
-//   if (message.channel && !message.author.bot && (goe === "who" || goe === "whoee") /*&& !botInfoSent*/) {
-//     console.log('who lmao')
-//     // Get the message ID from the command.
-//     console.log('messagecontent:', message.content)
-//     const messageID = '1159546181349802095'
 
-//     // Get the channel where the message is located.
-//     const channel = message.guild.channels.cache.get(message.channel.id);
- 
+});
+console.log('eeee', client.listenerCount('messageReactionRemove'));
 
-//     // Get the message object.
-//     const messageObject = await channel.messages.fetch(messageID);
-//     console.log('messageOBKECT:', messageObject)
-//     const fetchedLogs = await message.guild.fetchAuditLogs();
-// const firstEntry = fetchedLogs.entries.first();
-//     console.log('first:', firstEntry)
+client.on(Events.MessageReactionAdd, async (reaction, user) => {
+  console.log('Events:', Events)
+  console.log("reaction:", reaction)
+  console.log('mayaaaheeee', client.listenerCount());
+   if (reaction.message.id === '1161779655905382491') {
+    // Log the user who removed the reaction
+    console.log(`${user.tag} removed a reaction from the message.`);
+  }
+  if (reaction.partial) {
+		// If the message this reaction belongs to was removed, the fetching might result in an API error which should be handled
+		try {
+			await reaction.fetch();
+		} catch (error) {
+			console.error('Something went wrong when fetching the message:', error);
+			// Return as `reaction.message.author` may be undefined/null
+			return;
+		}
+	}
 
+	// Now the message has been cached and is fully available
+	console.log(`${reaction.message.author}'s message "${reaction.message.content}" gained a reaction!`);
+	// The reaction is now also fully available and the properties will be reflected accurately:
+	console.log(`${reaction.count} user(s) have given the same reaction to this message!`);
+});
+client.on(Events.MessageReactionRemove, async (reaction, user) => {
+	if (reaction.message.partial) {
+		try {
+			await reaction.message.fetch();
+		} catch (error) {
+			console.error('Something went wrong when fetching the message: ', error);
+		}
+	}
 
+	console.log(`${user.username} removed their "${reaction.emoji.name}" reaction.`);
+});
+client.on(Events.MessageReactionRemoveAll, async (reaction, user) => {
+    console.log('Reactions:', reaction)
+	if (reaction.message.partial) {
+   
+		try {
+			await reaction.message.fetch();
+		} catch (error) {
+			console.error('Something went wrong when fetching the message: ', error);
+		}
+	}
 
-//     // Get the audit logs for the message.
-//     const auditLogs = await message.guild.fetchAuditLogs({
-//       type: AuditLogEvent.MessageReactionRemove
-//     });
-//     console.log('auditlosgs:', auditLogs)
-      
+	console.log(`${user.username} removed all "${reaction.emoji.name}" reaction.`);
+});
+client.on(Events.MessageReactionRemoveEmoji, async (reaction, user) => {
+  console.log('Reactions:', reaction)
+  console.log('Reactions:', Discord.ReactionEmoji)
+  console.log('Reactions:', Discord.ReactionUserManager)
+	if (reaction.message.partial) {
+		try {
+			await reaction.message.fetch();
+		} catch (error) {
+			console.error('Something went wrong when fetching the message: ', error);
+		}
+	}
 
-//     // Get the audit log entry for the reaction removal.
-//     const auditLogEntry = auditLogs.entries.find(auditLogEntry => auditLogEntry.actionType === AuditLogEvent.MessageReactionRemove && auditLogEntry.messageID === messageID);
-//     console.log('enTry:', auditLogEntry)
-
-//     // If the audit log entry is not found, send a message to the channel.
-//     if (!auditLogEntry) {
-//       message.channel.send('Could not find an audit log entry for the reaction removal.');
-//       return;
-//     }
-
-//     // Get the user who removed the reaction.
-//     const user = await client.users.fetch(auditLogEntry.executorID);
-
-//     // Send a message to the channel with the user who removed the reaction.
-//     message.channel.send(`User ${user} removed a reaction from message ${messageID}.`);
-//   }
+	console.log(`${user} removed emoji wala "${reaction}" reaction.`);
 });
 
+client.on(Events.GuildAuditLogEntryCreate, async auditLog => {
+  // Check if the audit log entry is for a reaction removal
+  if (auditLog.actionType !== AuditLogEvent.MessageReactionRemove) {
+    return;
+  }
 
-client.on(Events.GuildAuditLogEntryCreate, async (auditLog)=> {
-  console.log('gae')
-  // Define your variables.
-  // The extra information here will be the message and the reaction.
-  const { action, extra: { channel, message, reaction }, executorId } = auditLog;
+  // Get the message ID and reaction from the audit log entry
+  const messageID = auditLog.targetID;
+  const reaction = auditLog.extra.reaction;
 
- // Check only for deleted messages.
-    if (action !== AuditLogEvent.MessageDelete) return;
+  // Get the message
+  const message = await auditLog.guild.channels.cache.get(auditLog.channelID).messages.fetch(messageID);
 
+  // Get the user who removed the reaction
+  const user = await client.users.fetch(auditLog.executorID);
 
-  // Ensure the executor is cached.
-  const executor = await client.users.fetch(executorId);
+  // Log the information to the console
+  console.log(`User ${user.tag} removed the ${reaction} reaction from message ${message.id}.`);
+});
+// whodid command
+client.on('messageCreate', async message => {
+  if (message.content === '!whodid') {
+    // Get the message ID from the command
+    const messageID = message.reference.messageID;
 
-  // Log the output.
-  console.log(`Reaction ${reaction} was removed from message ${message.id} by ${executor.tag} in ${channel}.`);
+    // Get the audit logs for the message
+    const auditLogs = await message.channel.messages.fetch(messageID).getAuditLogs({
+      type: AuditLogEvent.MessageReactionRemove
+    });
+
+    // Get the audit log entry for the reaction removal
+    const auditLogEntry = auditLogs.entries.find(auditLogEntry => auditLogEntry.actionType === AuditLogEvent.MessageReactionRemove && auditLogEntry.targetID === messageID);
+
+    // If the audit log entry is not found, send a message to the channel
+    if (!auditLogEntry) {
+      message.channel.send('Could not find an audit log entry for the reaction removal.');
+      return;
+    }
+
+    // Get the user who removed the reaction
+    const user = await client.users.fetch(auditLogEntry.executorID);
+
+    // Send a message to the channel with the user who removed the reaction
+    message.channel.send(`User ${user.tag} removed a reaction from message ${messageID}.`);
+  }
 });
 
 

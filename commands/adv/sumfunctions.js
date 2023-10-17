@@ -77,13 +77,19 @@ class GameImage {
         x: monster.position.x,
         y: monster.position.y,
         area: areaName, // Store the area name with the element
+        type: monster.type,
+        hasAllies: monster.hasAllies,
+        waves: monster.waves,
       });
       this.monsterArray.push({
         name: monster.name,
         x: monster.position.x,
         y: monster.position.y,
-        area: areaName, // Store the area name with the element
+        area: areaName, 
         amt: monster.amount,
+        type: monster.type,
+        hasAllies: monster.hasAllies,
+        waves: monster.waves,
       });
       monsterCount++;
     }
@@ -123,7 +129,21 @@ class GameImage {
  if (this.distanceToMonster <= attackRadius) {
    this.isTrue = true
    this.whichMon = element.name
+   if (!this.elementArray.includes(element)) {
    this.elementArray.push(element);
+// Sort the elementArray by shortest distanceToMonster
+      this.elementArray.sort((a, b) => {
+        const distA = Math.sqrt(
+          Math.pow(this.playerpos.x - a.x, 2) +
+          Math.pow(this.playerpos.y - a.y, 2)
+        );
+        const distB = Math.sqrt(
+          Math.pow(this.playerpos.x - b.x, 2) +
+          Math.pow(this.playerpos.y - b.y, 2)
+        );
+        return distA - distB;
+      });
+   }
    console.log('ELEMENT ARRAY BANJA PLS', this.elementArray)
    console.log('LOOP WALA:', this.whichMon)
    console.log('isTrue:', this.isTrue)
@@ -147,10 +167,8 @@ class GameImage {
         for (const element of this.elements) {
           const elementName = element.name
      name = `commands/adv/npcimg/${elementName}.png`
-    console.log('name:', name)
-          const filePath = path.join(name);
-          console.log('filepath:', filePath);
-
+             const filePath = path.join(name);
+         
 // Use fs.existsSync to check if the file exists
 if (fs.existsSync(name)) {
   // The file exists, you can now use it

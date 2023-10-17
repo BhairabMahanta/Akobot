@@ -6,14 +6,18 @@ const areas = {
       {
         name: "monsterA",
         position: { x: 100, y: 200 }, // Fixed position for MonsterA
-        amount: 5,
-        type: 'mob'
+        amount: 4,
+        type: 'mob',
+        hasAllies: ['none'],
+        waves: 2,
       }, 
       {
         name: "monsterB",
         position: { x: 100, y: 250 }, // Fixed position for MonsterB
-        amount: 5,
+        amount: 2,
         type: 'mob',
+        hasAllies: ['monsterA'],
+        waves: 2,
       },
       // Add more monsters with fixed positions
     ],
