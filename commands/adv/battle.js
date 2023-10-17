@@ -77,6 +77,7 @@ class Battle {
         this.initialMessage = initialMessage;
         this.aliveFam = [];
         this.aliveEnemies = [];
+        this.deadEnemies = [];
         this.battleEmbed = null;
         this.allEnemies = [];
         this.waves = this.enemyDetails.waves
@@ -338,6 +339,7 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
 
             if (i.customId === 'action_normal') {
                 try {
+                    if (this.pickedChoice){
                     this.performTurn(message);
                     await this.getNextTurn()
                     await this.performEnemyTurn(message);
@@ -348,7 +350,9 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
                         embeds: [updatedEmbed],
                         components: await this.getDuelActionRow()
                     });
-
+                } else {
+                    i.followUp({content: 'Please pick an enemy to hit using the Select Menu', ephemeral: true})
+                }
 
                     
                    
@@ -357,14 +361,20 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
                     console.error('Error on hit:', error);
                 }
             } else if (i.customId === 'action_select') {
-                        const targetIndex = parseInt(interaction.values[0]);
-                        this.enemyToHit = this.aliveEnemies[targetIndex];
+                        const targetIndex = i.values[0]
+                        console.log('TARGETTO:', targetIndex)
+                        console.log('alievEnemies:', this.aliveEnemies)
+                        const realTarget = targetIndex.replace('enemy_', '')
+                        console.log('reaLTARGET:', realTarget)
+                        this.enemyToHit = this.aliveEnemies[realTarget];
+                        console.log('TARGETTOHIT:', this.enemyToHit)
                         this.pickedChoice = true;
                         // Continue with your code logic after selecting an enemy
                       }
             else if (i.customId === 'starter') {
                 const selectedClassValue = i.values[0]; // Get the selected value // gae shit
                 console.log('selectedValues', selectedClassValue)
+                if (this.pickedChoice) {
                 if (selectedClassValue.startsWith('player_ability_')) {
                     try {
                         const abilityName = selectedClassValue.replace('player_ability_', '');
@@ -373,7 +383,7 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
                         console.log('abilityName:a', abilityNameCamel)
                         // Check if the abilityName exists as a method in the Ability class
                         if (typeof this.ability[abilityNameCamel] === 'function') {
-                            await this.ability[abilityNameCamel](this.player, this.boss);
+                            await this.ability[abilityNameCamel](this.player, this.enemyToHit);
                             await this.getNextTurn()
                             await this.performEnemyTurn(message);
                             console.log('currentTurn:', this.currentTurn);
@@ -402,7 +412,7 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
                             // Execute the ability by calling it using square brackets
                             for (const familiar of this.familiarInfo) {
                                 if (familiar.name === this.currentTurn) {
-                                    this.ability[abilityNameCamel](familiar, this.boss);
+                                    this.ability[abilityNameCamel](familiar, this.enemyToHit);
                                     await this.getNextTurn()
                                     await this.performEnemyTurn(message);
                                     console.log('currentTurn:', this.currentTurn);
@@ -423,7 +433,9 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
                         console.log('ErrorFamiliar:', error)
                     }
                 }
-
+            }  else {
+                i.followUp({content: 'Please pick an enemy to hit using the Select Menu', ephemeral: true})
+            }
             }
 
         });
@@ -498,11 +510,11 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
 
 
 
-        const stringMenuRow = new ActionRowBuilder().addComponents(stringMenu, await this.stringMenu);
+        const stringMenuRow = new ActionRowBuilder().addComponents(stringMenu);
 console.log('stringMENUROW:', stringMenuRow)
+const gaeRow = new ActionRowBuilder().addComponents(await this.selectMenu)
 
-
-        const rows = [buttonRow, stringMenuRow];
+        const rows = [buttonRow, stringMenuRow, gaeRow];
 
 
         return rows;
@@ -686,28 +698,28 @@ let filledBars;
         if (this.currentTurn === this.playerName) {
             // const move = attacker.chooseMove(); // Implement this method for the player
           
-            const target = this.boss.name 
-            const damage = calculateDamage(this.player.stats.attack, this.boss.stats.defense);
+            const target = this.enemyToHit.name 
+            const damage = calculateDamage(this.player.stats.attack, this.enemyToHit.stats.defense);
 
             // Update HP and battle logs
-            this.boss.stats.hp -= damage;
+            this.enemyToHit.stats.hp -= damage;
             this.battleLogs.push(`+ ${this.currentTurn} attacks ${target} for ${damage} damage using gayness`);
             console.log('loglength:', this.battleLogs.length)
             console.log(`${this.currentTurn} attacks ${target} for ${damage} damage using gayness`)
             // this.getNextTurn()
             // console.log('currentTurn:', this.currentTurn);
         } else if (this.playerFamiliar.includes(this.currentTurn)) {
-            const target = this.boss.name; // Implement target selection logic
+            const target = this.enemyToHit.name; // Implement target selection logic
             let damage = 0;
 
             // Loop through the familiars to find the attacking familiar
             for (const familiar of this.familiarInfo) {
                 if (familiar.name === this.currentTurn) {
                     // Calculate damage for the attacking familiar
-                    damage = calculateDamage(familiar.stats.attack, this.boss.stats.defense);
+                    damage = calculateDamage(familiar.stats.attack, this.enemyToHit.stats.defense);
 
                     // Update HP and battle logs
-                    this.boss.stats.hp -= damage;
+                    this.enemyToHit.stats.hp -= damage;
                     this.battleLogs.push(`+ ${this.currentTurn} attacks ${target} for ${damage} damage using an attack`);
                     console.log(`${this.currentTurn} attacks ${target} for ${damage} damage using an attack`);
                     break; // Exit the loop once the attacking familiar is found
@@ -724,7 +736,7 @@ let filledBars;
     async performEnemyTurn(message) {
       for (const enemies of this.allEnemies) {
         console.log('enemyname:', enemies.name)
-         if (enemies.name === this.currentTurn) {
+         if (enemies.name === this.currentTurn &&  !this.deadEnemies.includes(enemies.name)) {
            console.log('enemy:', enemies)
           console.log('OK BRO IT IS WORKINGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG')
           let isTargetingPlayer;
@@ -801,14 +813,27 @@ let filledBars;
    async printBattleResult() {
         // Implement code to display the battle result (victory, defeat, or draw)
                           // this.printBattleResult();
-                    if (this.boss.stats.hp < 0) {
+                          for (const character of this.allEnemies)  {
+                            if (character.stats.hp < 0 && !this.deadEnemies.includes(character.name)) {
+                                  this.battleLogs.push(`${character.name} died poggers`)
+                                  character.stats.speed = 0;
+                                  character.atkBar = 0;
+                                  character.stats.hp = 0;
+                                  this.deadEnemies.push(character.name)
+                                  console.log('ALIVEFAM:', this.aliveEnemies)
+                                  this.aliveEnemies.pop(character)
+                                  console.log('ALIVEFAM:', this.aliveEnemies)
+                                   break;
+                              }
+                          }
+                    if (this.aliveEnemies.length === 0) {
                         this.message.channel.send("You won the battle against the Monster, you can continue the journey where you left off (I lied  you can't)")
                     } else if (this.player.stats.hp < 0) {
                         this.message.channel.send("You lost, skill issue.")
                       this.player.stats.speed = 0;
                     }  for (const character of this.familiarInfo)  {
                       if (character.stats.hp < 0 && !this.aliveFam.includes(character.name)) {
-                            this.message.channel.send(`${character.name} died lol`)
+                            this.battleLogs.push(`${character.name} died lol`)
                             character.stats.speed = 0;
                             character.atkBar = 0;
                             character.stats.hp = 0;

@@ -3,6 +3,7 @@ const { checkResults, updateMovesOnCd, calculateAbilityDamage, getCardStats, get
 class Ability {
   constructor(that) {
     this.battleLogs = that.battleLogs;
+    this.enemyToHit = that.enemyToHit
     console.log('this and that worked?', this.battleLogs);
   
   }
