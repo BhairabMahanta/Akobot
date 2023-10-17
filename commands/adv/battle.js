@@ -339,17 +339,15 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
 
             if (i.customId === 'action_normal') {
                 try {
-                    if (this.pickedChoice){
+                    if (this.pickedChoice || this.aliveEnemies.length === 1){
+                    if (this.aliveEnemies.length === 1) {
+                        this.enemyToHit = this.aliveEnemies[0];
+                    }
                     this.performTurn(message);
                     await this.getNextTurn()
                     await this.performEnemyTurn(message);
                     console.log('currentTurn:', this.currentTurn);
                   this.printBattleResult();
-                    const updatedEmbed = await this.sendInitialEmbed(message);
-                    this.initialMessage.edit({
-                        embeds: [updatedEmbed],
-                        components: await this.getDuelActionRow()
-                    });
                 } else {
                     i.followUp({content: 'Please pick an enemy to hit using the Select Menu', ephemeral: true})
                 }
@@ -374,7 +372,10 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
             else if (i.customId === 'starter') {
                 const selectedClassValue = i.values[0]; // Get the selected value // gae shit
                 console.log('selectedValues', selectedClassValue)
-                if (this.pickedChoice) {
+                if (this.pickedChoice || this.aliveEnemies.length === 1) {
+                    if (this.aliveEnemies.length === 1) {
+                        this.enemyToHit = this.aliveEnemies[0];
+                    }
                 if (selectedClassValue.startsWith('player_ability_')) {
                     try {
                         const abilityName = selectedClassValue.replace('player_ability_', '');
@@ -389,10 +390,6 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
                             console.log('currentTurn:', this.currentTurn);
                           this.printBattleResult();
                             const updatedEmbed = await this.sendInitialEmbed(message);
-                            this.initialMessage.edit({
-                                embeds: [updatedEmbed],
-                                components: await this.getDuelActionRow()
-                            });
                         } else {
                             console.log(`Ability ${abilityName} not found.`);
                         }
@@ -417,12 +414,7 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
                                     await this.performEnemyTurn(message);
                                     console.log('currentTurn:', this.currentTurn);
                                   this.printBattleResult();
-                                    const updatedEmbed = await this.sendInitialEmbed(message);
-                                    this.initialMessage.edit({
-                                        embeds: [updatedEmbed],
-                                        components: await this.getDuelActionRow()
-                                    });
-                                  break;
+                                   break;
                                 }
                             }
                         } else {
@@ -813,6 +805,7 @@ let filledBars;
    async printBattleResult() {
         // Implement code to display the battle result (victory, defeat, or draw)
                           // this.printBattleResult();
+                          let updatedEmbed
                           for (const character of this.allEnemies)  {
                             if (character.stats.hp < 0 && !this.deadEnemies.includes(character.name)) {
                                   this.battleLogs.push(`${character.name} died poggers`)
@@ -826,12 +819,7 @@ let filledBars;
                                    break;
                               }
                           }
-                    if (this.aliveEnemies.length === 0) {
-                        this.message.channel.send("You won the battle against the Monster, you can continue the journey where you left off (I lied  you can't)")
-                    } else if (this.player.stats.hp < 0) {
-                        this.message.channel.send("You lost, skill issue.")
-                      this.player.stats.speed = 0;
-                    }  for (const character of this.familiarInfo)  {
+                     for (const character of this.familiarInfo)  {
                       if (character.stats.hp < 0 && !this.aliveFam.includes(character.name)) {
                             this.battleLogs.push(`${character.name} died lol`)
                             character.stats.speed = 0;
@@ -842,6 +830,28 @@ let filledBars;
                              break;
                         }
                     }
+                    if (this.aliveEnemies.length === 0) {
+                        this.message.channel.send("You won the battle against the Monster, you can continue the journey where you left off (I lied  you can't)")
+                        this.battleEmbed.setFields({
+                            name: `You've won the battle bravoo!!`,
+                            value: `What you lookin at, go away you filth.`,
+                            inline: true,
+                        })
+                        this.battleEmbed.setDescription(`GGs You've won`)
+                        this.initialMessage.edit({
+                            embeds: [this.battleEmbed],
+                            components: []
+                        });
+                    } else if (this.player.stats.hp < 0) {
+                        this.message.channel.send("You lost, skill issue.")
+                      this.player.stats.speed = 0;
+                    } else {
+                     updatedEmbed = await this.sendInitialEmbed(this.message);
+                     this.initialMessage.edit({
+                        embeds: [updatedEmbed],
+                        components: await this.getDuelActionRow()
+                    });
+                }
     }
 }
 
