@@ -1,6 +1,7 @@
 const players = require('../../data/players.json');
 const {mongoClient} = require('../../data/mongo/mongo.js')
-
+const db = mongoClient.db('Akaimnky');
+const collection = db.collection('akaillection');
 const {
     bosses
 } = require('./bosses.js');
@@ -151,18 +152,6 @@ class Battle {
   
     async startEmbed() {
       await this.initialiseStuff()
-      console.log('this.aliveEnemies:', this.aliveEnemies)
-      this.pickEnemyOptions = this.aliveEnemies.map((enemy, index) => ({
-        label: enemy.name,
-        description: `Attack ${enemy.name}`,
-        value: `enemy_${index}`
-      }));
-      console.log('This.pickEnemyOptions:', this.pickEnemyOptions)
-      this.selectMenu = new StringSelectMenuBuilder()
-        .setCustomId('action_select')
-        .setPlaceholder('Select the target')
-        .addOptions(this.pickEnemyOptions);
-      console.log('This.selectEmnu:', this.selectMenu)
       let selectedValue;
             // Create the embed for the adventure command
     this.battleEmbed = new EmbedBuilder()
@@ -340,6 +329,7 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
             if (i.customId === 'action_normal') {
                 try {
                     if (this.pickedChoice || this.aliveEnemies.length === 1){
+                        this.pickedChoice = false;
                     if (this.aliveEnemies.length === 1) {
                         this.enemyToHit = this.aliveEnemies[0];
                     }
@@ -360,12 +350,8 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
                 }
             } else if (i.customId === 'action_select') {
                         const targetIndex = i.values[0]
-                        console.log('TARGETTO:', targetIndex)
-                        console.log('alievEnemies:', this.aliveEnemies)
                         const realTarget = targetIndex.replace('enemy_', '')
-                        console.log('reaLTARGET:', realTarget)
                         this.enemyToHit = this.aliveEnemies[realTarget];
-                        console.log('TARGETTOHIT:', this.enemyToHit)
                         this.pickedChoice = true;
                         // Continue with your code logic after selecting an enemy
                       }
@@ -373,6 +359,7 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
                 const selectedClassValue = i.values[0]; // Get the selected value // gae shit
                 console.log('selectedValues', selectedClassValue)
                 if (this.pickedChoice || this.aliveEnemies.length === 1) {
+                    this.pickedChoice = false;
                     if (this.aliveEnemies.length === 1) {
                         this.enemyToHit = this.aliveEnemies[0];
                     }
@@ -492,6 +479,17 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
           this.performEnemyTurn(this.message);
             }
       }
+      this.pickEnemyOptions = this.aliveEnemies.map((enemy, index) => ({
+        label: enemy.name,
+        description: `Attack ${enemy.name}`,
+        value: `enemy_${index}`
+      }));
+      console.log('This.pickEnemyOptions:', this.pickEnemyOptions)
+      this.selectMenu = new StringSelectMenuBuilder()
+        .setCustomId('action_select')
+        .setPlaceholder('Select the target')
+        .addOptions(this.pickEnemyOptions);
+      console.log('This.selectEmnu:', this.selectMenu)
        
 
 
@@ -831,10 +829,11 @@ let filledBars;
                         }
                     }
                     if (this.aliveEnemies.length === 0) {
-                        this.message.channel.send("You won the battle against the Monster, you can continue the journey where you left off (I lied  you can't)")
+                        const rewards = this.enemyDetails.rewards
+                        console.log('rewards:', rewards)
                         this.battleEmbed.setFields({
-                            name: `You've won the battle bravoo!!`,
-                            value: `What you lookin at, go away you filth.`,
+                            name: `You won the battle against the Monster, you can continue the journey where you left off (I lied  you can't)!!`,
+                            value: `Rewards:\n Exp: ${rewards.experience}, Gold: ${rewards.gold}`,
                             inline: true,
                         })
                         this.battleEmbed.setDescription(`GGs You've won`)

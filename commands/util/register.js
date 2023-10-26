@@ -106,7 +106,7 @@ const randomCardData = getRandomCard();
       training: 0,
       defense: 1,
       speed: 1,
-      hitpoints: 10,
+      hitpoints: 20,
       intelligence: 1,
       wise: 1,
       luck: 1,

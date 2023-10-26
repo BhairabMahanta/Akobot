@@ -10,6 +10,11 @@ const areas = {
         type: 'mob',
         hasAllies: ['none'],
         waves: 2,
+        rewards: {
+          experience: 500,
+          gold: 100,
+          items: { Gold: 100},
+        },
       }, 
       {
         name: "monsterB",
@@ -18,6 +23,10 @@ const areas = {
         type: 'mob',
         hasAllies: ['monsterA'],
         waves: 2,
+        rewards: {
+          experience: 500,
+          items: { Gold: 100},
+        },
       },
       // Add more monsters with fixed positions
     ],

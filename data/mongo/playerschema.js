@@ -27,7 +27,7 @@ const playerSchema = new Schema({
     training: Number,
     defense: Number,
     speed: Number,
-    hitpoints: Number,
+    hp: Number,
     intelligence: Number,
     wise: Number,
     luck: Number,

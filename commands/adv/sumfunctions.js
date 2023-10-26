@@ -80,6 +80,7 @@ class GameImage {
         type: monster.type,
         hasAllies: monster.hasAllies,
         waves: monster.waves,
+        rewards: monster.rewards,
       });
       this.monsterArray.push({
         name: monster.name,
@@ -90,6 +91,7 @@ class GameImage {
         type: monster.type,
         hasAllies: monster.hasAllies,
         waves: monster.waves,
+        rewards: monster.rewards,
       });
       monsterCount++;
     }
