@@ -38,12 +38,17 @@ class QuestLogic {
       this.embed.setFooter({text:'You already started the quest, view your progress through a!myquests.'})
       this.embed.setTitle('Already Started!')
       this.embed.setDescription("### - You already started the quest, view your progress through a!myquests.")
+      this.embed.setFields({
+        name: `Quest Name:`,
+        value: this.quests[questId].title,
+        inline: true
+      })
       return this.sentMessage.edit({ embeds: [this.embed], components: [this.row, this.row2] });
     } 
 // Check if the player has the "gather_ingredients" quest
 if (!this.player.activeQuests[questId]) {
   const timeLeft = Math.floor((Date.now() / 1000) + 7*24*60*60);
-  this.player.activeQuests[questId] = {
+  const stuff = {
     objectives: [
       {
         id: `${this.quests[questId].objectives[0].id}`,
@@ -58,6 +63,7 @@ if (!this.player.activeQuests[questId]) {
     },
     questChannel: "newChannelId",
   };
+  this.player.activeQuests[questId].push(stuff)
 }
 console.log('this.player.activeQuests:', this.player.activeQuests)
  // Save the updated player's data to the database

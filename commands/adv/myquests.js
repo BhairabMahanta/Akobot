@@ -1,5 +1,5 @@
 const fs = require('fs');
-const { EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, ButtonBuilder, Options } = require('discord.js');
+const { EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, ButtonBuilder, Options, Embed } = require('discord.js');
 const { quests } = require('./quests'); // Assuming you have quests defined in a separate file
 const path = require('path');
 const playersFilePath = path.join(__dirname, '..', '..', 'data', 'players.json');
@@ -39,6 +39,9 @@ const options = {}
       { label: 'Finished Quests', value: 'klik_finished' }
     ]);
     const questList = dbData.quests;
+    console.log('activeqestlost:', questList)
+    const activeQuestList = dbData.activeQuests;
+    console.log('activeqestlost:', activeQuestList)
      embed = new EmbedBuilder()
       .setTitle('My Quests')
       .setDescription('### Select a quest from the list below to view details:')
@@ -50,7 +53,7 @@ const options = {}
        const questDetails = quests[questName];
       embed.addFields({ name: `${index + 1}.  ${questDetails.title}`, value: `>>> ${questDetails.description}`, inline: false });
     });
-
+    
     // Create a select menu with quest options
     const selectMenu = new StringSelectMenuBuilder()
       .setCustomId('select_quest')
@@ -61,6 +64,17 @@ const options = {}
           value: quest,
         }))
       );
+        
+      const activeSelectMenuOptions = Object.keys(activeQuestList).map((quest, index) => ({
+        label: `${index + 1}. ${quests[quest].title}`,
+        value: quest,
+      }));
+      
+      const activeSelectMenu = new StringSelectMenuBuilder()
+        .setCustomId('select_active')
+        .setPlaceholder('Select to view further details.')
+        .addOptions(activeSelectMenuOptions);
+      
 
      row = new ActionRowBuilder().addComponents(selectMainMenu);
 
@@ -72,55 +86,139 @@ const options = {}
     const collector = sentMessage.createMessageComponentCollector({filter, time: 300000});
 
     collector.on('collect', async (interaction) => {
-     
-     // console.log('GAEINTERNATION:', interaction.values[0])
-      if (interaction.isStringSelectMenu()) {
-        const selectedQuest = interaction.values[0];
-        var questDetails = quests[selectedQuest];
-        startingThisQuest = questDetails;
-        console.log('qwustDetails:', questDetails)
+      if (interaction.customId === 'select_menu') {
+        await interaction.deferUpdate();
+        const interactionValue = interaction.values[0];
+        const click = interactionValue.replace('klik_', '');
+        if (click === 'my') {
+          row = new ActionRowBuilder().addComponents(selectMenu);
+          afterButtonRow = new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+              .setStyle("Primary")
+              .setLabel("Go back")
+              .setCustomId("back"));
+              const row2 = afterButtonRow
+          sentMessage.edit({ embeds: [embed], components: [row, row2] });
 
-       embed.setFields(
+        } else if (click === 'active') {
+          const activeEmbed = new EmbedBuilder()
+            .setTitle('Active Quests')
+            .setDescription('These Are your active Quests!');
+          
+          // Populate the fields with the list of active quests
+          for (const activeQuestName in activeQuestList) {
+            if (activeQuestList.hasOwnProperty(activeQuestName)) {
+              const activeQuestDetails = quests[activeQuestName];
+              activeEmbed.addFields({
+                name: activeQuestDetails.title,
+                value: `>>> ${activeQuestDetails.description}`,
+                inline: false,
+              });
+            }
+          }         afterButtonRow = new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+              .setStyle("Primary")
+              .setLabel("Go back")
+              .setCustomId("back"));
+              const row2 = afterButtonRow
+    
+          row = new ActionRowBuilder().addComponents(activeSelectMenu);
+          sentMessage.edit({ embeds: [activeEmbed], components: [row, row2] });
+        }
+      }
+    
+      if (interaction.isStringSelectMenu() && interaction.customId === 'select_quest') {
+        const selectedQuest = interaction.values[0];
+        const questDetails = quests[selectedQuest];
+        startingThisQuest = questDetails;
+    
+        embed.setFields(
           {
             name: 'Quest Name:',
             value: questDetails.title,
-            inline: false
+            inline: false,
           },
           {
             name: 'Quest Objective:',
             value: questDetails.description,
-            inline: false
+            inline: false,
           },
           {
             name: 'Quest Time Limit:',
             value: `${questDetails.timeLimit} Days`,
-            inline: false
+            inline: false,
           }
           // Add more fields as needed
         );
-afterButtonRow = new ActionRowBuilder().addComponents(
-        // const options = [
+    
+         const afterButtonRow = new ActionRowBuilder().addComponents(
           new ButtonBuilder()
             .setStyle("Primary")
             .setLabel("Go back")
-            .setCustomId("cancel"),
+            .setCustomId("back"),
           new ButtonBuilder()
             .setStyle("Primary")
             .setLabel("Start Quest")
             .setCustomId("start_quest"),
-        // ];
-          );
-          row2 = afterButtonRow
+        );
+        row2 = afterButtonRow
+    
         await interaction.update({ embeds: [embed], components: [row, row2] });
+      } else if (interaction.isStringSelectMenu() && interaction.customId === 'select_active') {
+        const selectedQuest = interaction.values[0];
+        const questDetails = activeQuestList[selectedQuest];
+        const questDetails2 = quests[selectedQuest];
+    
+        const activeEmbed = new EmbedBuilder()
+          .setTitle('Active Quest Details')
+          .setDescription(`${quests[selectedQuest].title}'s Details`)
+          .addFields(
+            {
+              name: 'Quest Name:',
+              value: questDetails2.title,
+              inline: false,
+            },
+            {
+              name: 'Quest objectives:',
+              value: `${questDetails2.description}\n Objective target: ${questDetails.objectives[0].target}`,
+              inline: false,
+            },
+            {
+              name: 'Required vs current:',
+              value: `${questDetails.objectives[0].required}\n Objective target: ${questDetails.objectives[0].current}`,
+              inline: false,
+            },
+            {
+              name: 'Quest Time Limit vs time left:',
+              value: `Time limit: ${questDetails.timeLimit.totalDays} Days, Time left: <t:${questDetails.timeLimit.daysLeft}:R>`,
+              inline: false,
+            }
+            // Add more fields as needed
+          );
+          afterButtonRow = new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+              .setStyle("Primary")
+              .setLabel("Go back")
+              .setCustomId("back"));
+              const row2 = afterButtonRow
+        await interaction.update({ embeds: [activeEmbed], components:[row2]});
       }
+    
       if (interaction.customId === 'start_quest') {
-         await interaction.deferUpdate();
-         // console.log('questName lol?:', startingThisQuest)
-        console.log('questName lolv2:', startingThisQuest.id)
-        const startQuest = new QuestLogic(message, interaction, sentMessage, embed, row, row2, dbData, db)
-        startQuest.startQuest(startingThisQuest.id)
+        await interaction.deferUpdate();
+        const startQuest = new QuestLogic(message, interaction, sentMessage, embed, row, row2, dbData, db);
+        startQuest.startQuest(startingThisQuest.id);
+      } else if (interaction.customId === 'back') {
+        row = new ActionRowBuilder().addComponents(selectMainMenu);
+        interaction.update({
+    embeds:[datEmbed],
+    components:[row]
+      })
       }
     });
+    
+
+    
 
     collector.on('end', () => {
       // Remove the select menu after a minute
