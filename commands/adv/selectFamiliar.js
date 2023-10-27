@@ -1,4 +1,7 @@
-const { EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder } = require('discord.js');
+const { EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, time } = require('discord.js');
+const currentTimestamp = Math.floor(Date.now() / 1000); // Divide by 1000 to convert milliseconds to seconds
+console.log(currentTimestamp); // This will print the current Unix timestamp
+
 const players = require('../../data/players.json');
 const fs = require('fs');
 let selectMenu;
@@ -68,8 +71,9 @@ module.exports = {
 
     // Create an embed
     const embed = new EmbedBuilder()
-      .setTitle('Select up to 3 familiars:')
+      .setTitle(`Select up to 3 familiars:<t:${currentTimestamp}:R>`)
       .setDescription('Select up to 3 familiars to help you on your journey.')
+      .setFooter({text:`By you at `})
       .setColor('#00FFFF');
 
     // Send the embed with the SelectMenu

@@ -51,7 +51,7 @@ const playerSchema = new Schema({
     generatedRandomElements: Boolean,
     generatedRandomElements2: Boolean,
   },
-  playerpos: {
+    playerpos: {
     x: Number,
     y: Number,
   },

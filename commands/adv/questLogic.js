@@ -1,16 +1,15 @@
 // QuestLogic.js
-const players = require('../../data/players.json');
 const { quests } = require('./quests');
-const fs = require('fs');
-const path = require('path');
-// Define the path to 'players.json' file
-const playersFilePath = path.join(__dirname, '..', '..', 'data', 'players.json');
-const playerData = JSON.parse(fs.readFileSync(playersFilePath, 'utf8'));
+const {mongoClient} = require('../../data/mongo/mongo.js')
+const db = mongoClient.db('Akaimnky');
+const collection = db.collection('akaillection');
+const options = { upsert: true };
 
-
+   
 class QuestLogic {
-  constructor(message, interaction, sentMessage, embed, row, row2) {
-    this.player = players[message.author.id]
+  constructor(message, interaction, sentMessage, embed, row, row2, dbData, db) {
+    this.player = dbData;
+    this.db = db;
     this.quests = quests;
     this.message = message;
     this.embed = embed;
@@ -23,7 +22,8 @@ class QuestLogic {
   }
 
 
-  startQuest(questId) {
+
+  async startQuest(questId) {
     
     const quest = this.quests[questId];
     console.log('embed:', this.embed)
@@ -41,12 +41,9 @@ class QuestLogic {
       return this.sentMessage.edit({ embeds: [this.embed], components: [this.row, this.row2] });
     } 
 // Check if the player has the "gather_ingredients" quest
-if (!players[this.message.author.id].activeQuests[questId]) {
-  // Edit the "gather_ingredients" quest
-// players[this.message.author.id].activeQuests[questId] = questId
-    console.log('things get out of hand:',  players[this.message.author.id].activeQuests)
-  console.log('APNA TIME NAI AYEGA:', this.quests[questId])
-  players[this.message.author.id].activeQuests[questId] = {
+if (!this.player.activeQuests[questId]) {
+  const timeLeft = Math.floor((Date.now() / 1000) + 7*24*60*60);
+  this.player.activeQuests[questId] = {
     objectives: [
       {
         id: `${this.quests[questId].objectives[0].id}`,
@@ -57,19 +54,31 @@ if (!players[this.message.author.id].activeQuests[questId]) {
     ],
     timeLimit: {
       totalDays: `${this.quests[questId].timeLimit}`,
-      daysLeft:  `${this.quests[questId].timeLimit}`,
+      daysLeft:  `${timeLeft}`,
     },
     questChannel: "newChannelId",
   };
 }
-console.log('playerData:', players[this.message.author.id].activeQuests[questId])
-// Save the updated player's data back to players.json
-// fs.writeFileSync(playersFilePath, JSON.stringify(playerData, null, 2), 'utf8');
+console.log('this.player.activeQuests:', this.player.activeQuests)
+ // Save the updated player's data to the database
+ try {
+  // Retrieve the player's document
+  const filter = {_id: this.message.author.id}
+  const playerData2 = await collection.findOne(filter);
 
-    // this.savePlayerData();
-    return this.message.channel.send(`Started quest: ${quest.title}`);
+   if (playerData2) { 
+    // Update the player's document
+    await collection.updateOne(filter, { $set: this.player });
+
+    console.log('Player data updated:', this.player);
+  } else {
+    console.log('Player not found or updated.');
   }
 
+} catch (err) {
+  console.error('Error updating/adding gather_ingredients quest:', err);
+}
+  }
   completeQuest(questId) {
     const quest = this.quests[questId];
     if (!quest) return "Quest not found.";
@@ -117,29 +126,6 @@ console.log('playerData:', players[this.message.author.id].activeQuests[questId]
     return `Quest failed: ${quest.title}`;
   }
 
-  // Add functions to load and save player data
-  loadPlayerData() {
-    try {
-      const data = fs.readFileSync("player.json", "utf8");
-      const parsedData = JSON.parse(data);
-      this.player = parsedData;
-      console.log("Player data loaded.");
-    } catch (err) {
-      console.error("Error loading player data:", err);
-    }
   }
-
-  savePlayerData() {
-    try {
-      const data = JSON.stringify(this.player, null, 2);
-      fs.writeFileSync("player.json", data, "utf8");
-      console.log("Player data saved.");
-    } catch (err) {
-      console.error("Error saving player data:", err);
-    }
-  }
-
-  // Add other quest-related methods and logic according to summary
-}
 
 module.exports = { QuestLogic };

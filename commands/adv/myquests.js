@@ -1,5 +1,5 @@
 const fs = require('fs');
-const { EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, ButtonBuilder } = require('discord.js');
+const { EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, ButtonBuilder, Options } = require('discord.js');
 const { quests } = require('./quests'); // Assuming you have quests defined in a separate file
 const path = require('path');
 const playersFilePath = path.join(__dirname, '..', '..', 'data', 'players.json');
@@ -15,14 +15,30 @@ module.exports = {
   description: 'View your selected quests',
   aliases: ['mq', 'mqs'],
   async execute(client, message) {
+    const db = client.db
     const playerId = message.author.id;
-   
-
-    if (!playerData[playerId] || !playerData[playerId].quests) {
+    const collection = db.collection('akaillection');
+    const dbFilter = { _id: playerId };
+       const dbData = await collection.findOne(dbFilter);
+       console.log('dbDATA:', dbData)
+    if (!dbData || !dbData.quests) {
       return message.channel.send('You have no quests yet.');
     }
+const datEmbed = new EmbedBuilder().setTitle('Quest Menu')
+.setDescription('This is the mooltiverse of quests boi')
 
-    const questList = playerData[playerId].quests;
+    // Create a select menu with quest options
+const options = {}
+
+    const selectMainMenu = new StringSelectMenuBuilder().setCustomId('select_menu')
+    .setPlaceholder('Select An Option')
+    .addOptions([
+      { label: 'My Quests', value: 'klik_my' },
+      { label: 'Active Quests', value: 'klik_active' },
+      { label: 'Expired Quests', value: 'klik_expire' },
+      { label: 'Finished Quests', value: 'klik_finished' }
+    ]);
+    const questList = dbData.quests;
      embed = new EmbedBuilder()
       .setTitle('My Quests')
       .setDescription('### Select a quest from the list below to view details:')
@@ -41,20 +57,19 @@ module.exports = {
       .setPlaceholder('Select a Quest')
       .addOptions(
         questList.map((quest, index) => ({
-          
           label: `${index + 1}. ${quests[quest].title}`,
           value: quest,
         }))
       );
 
-     row = new ActionRowBuilder().addComponents(selectMenu);
+     row = new ActionRowBuilder().addComponents(selectMainMenu);
 
     // Send the initial embed with the select menu
-     sentMessage = await message.channel.send({ embeds: [embed], components: [row] });
+     sentMessage = await message.channel.send({ embeds: [datEmbed], components: [row] });
 
     // Create a collector for the select menu interaction
     const filter = i => (i.user.id === playerId) 
-    const collector = sentMessage.createMessageComponentCollector({ time: 300000 });
+    const collector = sentMessage.createMessageComponentCollector({filter, time: 300000});
 
     collector.on('collect', async (interaction) => {
      
@@ -96,14 +111,13 @@ afterButtonRow = new ActionRowBuilder().addComponents(
         // ];
           );
           row2 = afterButtonRow
-        console.log('isErrorHere?')
         await interaction.update({ embeds: [embed], components: [row, row2] });
       }
       if (interaction.customId === 'start_quest') {
          await interaction.deferUpdate();
          // console.log('questName lol?:', startingThisQuest)
         console.log('questName lolv2:', startingThisQuest.id)
-        const startQuest = new QuestLogic(message, interaction, sentMessage, embed, row, row2)
+        const startQuest = new QuestLogic(message, interaction, sentMessage, embed, row, row2, dbData, db)
         startQuest.startQuest(startingThisQuest.id)
       }
     });

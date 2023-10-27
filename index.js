@@ -16,6 +16,7 @@ const client = new Client({
   partials: [Partials.Message, Partials.Channel, Partials.Reaction],
 
 });
+
 client.db = null;
 
 
@@ -28,11 +29,11 @@ client.commands = new Collection();
 // Load all the commands
 loadCommands(client);
 
-
+const BOT_PREFIX = "a!";
 
 client.on('messageCreate', message => {
   try {
-  if (message.content.startsWith('a!')) {
+  if (message.content.startsWith(`${BOT_PREFIX}`)) {
     const args = message.content.slice(2).trim().split(/ +/);
     const commandName = args.shift().toLowerCase();
     console.log(`Received command: ${commandName}`);
@@ -57,7 +58,7 @@ client.on('messageCreate', message => {
   console.log('what the fuck:', error)
 }
 });
-const BOT_PREFIX = "a!";
+
 
 
 client.on('ready', async () => {
@@ -216,6 +217,7 @@ client.on('messageCreate', async message => {
     // Send a message to the channel with the user who removed the reaction
     message.channel.send(`User ${user.tag} removed a reaction from message ${messageID}.`);
   }
+  
 });
 
 
@@ -223,3 +225,4 @@ client.on('messageCreate', async message => {
 
 client.login(config.token);
                                                                                                                                   
+module.exports = {client};
