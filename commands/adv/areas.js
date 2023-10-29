@@ -11,7 +11,7 @@ const areas = {
         hasAllies: ['none'],
         waves: 2,
         rewards: {
-          experience: 500,
+          experience: 300,
           gold: 100,
           items: { Gold: 100},
         },
@@ -25,6 +25,7 @@ const areas = {
         waves: 2,
         rewards: {
           experience: 500,
+          gold: 100,
           items: { Gold: 100},
         },
       },

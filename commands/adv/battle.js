@@ -110,23 +110,7 @@ class Battle {
      this.mobs.push(this.enemyDetails.hasAllies.join(','))
     }
     console.log('this.mobs:', this.mobs)
-    this.mobs.forEach((mobName) => {
-        for (const questName in this.player.activeQuests) {
-          if (this.player.activeQuests.hasOwnProperty(questName)) {
-            const objectives = this.player.activeQuests[questName].objectives;
-            objectives.forEach((objective) => {
-                console.log('objectiveNameTargetnotMatch:', objective.target)
-              if (objective.target === mobName) {
-                console.log('objectiveNameTarget:', objective.target)
-                // Match found, increment objective.current by 1
-                objective.current = String(Number(objective.current) + 1);
-                console.log('thisisobjective.current:', objective.current)
-              }
-            });
-          }
-        }
-      });
-      
+        
     for (const mobName of this.mobs) {
     const mobData = this.mobSource[mobName];
       if (mobData) {
@@ -878,6 +862,25 @@ let filledBars;
                         } catch (error) {
                           console.error('Error updating player XP:', error);
                         }
+                        this.mobs.forEach((mobName) => {
+                            for (const questName in this.player.activeQuests) {
+                              if (this.player.activeQuests.hasOwnProperty(questName)) {
+                                const objectives = this.player.activeQuests[questName].objectives;
+                          
+                                // Iterate through all objective elements
+                                for (const objective of objectives) {
+                                  console.log('objectiveNameTargetnotMatch:', objective.target);
+                                  if (objective.target === mobName) {
+                                    console.log('objectiveNameTarget:', objective.target);
+                                    // Match found, increment objective.current by 1
+                                    objective.current = String(Number(objective.current) + 1);
+                                    console.log('thisisobjective.current:', objective.current);
+                                  }
+                                }
+                              }
+                            }
+                          });
+                          console.log('thisplayeractiveQuest:', this.player.activeQuests)
    
                         this.battleEmbed.setFields({
                             name: `You won the battle against the Monster, you can continue the journey where you left off (I lied  you can't)!!`,
