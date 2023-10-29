@@ -9,14 +9,14 @@ const quests = {
       {
         id: "goblin_defeat",
         description: "Defeat a Goblin",
-        target: "Goblin",
+        target: "monsterA",
         current: 0,
         required: 1,
       },
       {
         id: "wolf_defeat",
         description: "Defeat a Wolf",
-        target: "Wolf",
+        target: "monsterB",
         current: 0,
         required: 2,
       },

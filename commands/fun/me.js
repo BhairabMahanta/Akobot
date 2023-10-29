@@ -14,7 +14,7 @@ module.exports = {
     const charEmbed = new EmbedBuilder()
     .setColor(0x992e22)
     .setAuthor({
-                name: `${players[message.author.id].name}'s status window`,
+                name: `${player.name}'s status window`,
                 iconURL: 'https://i.imgur.com/AfFp7pu.png',
                 url: 'https://discord.js.org'
               })

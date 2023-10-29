@@ -47,23 +47,31 @@ class QuestLogic {
     } 
 // Check if the player has the "gather_ingredients" quest
 if (!this.player.activeQuests[questId]) {
-  const timeLeft = Math.floor((Date.now() / 1000) + 7*24*60*60);
+  const quest = this.quests[questId];
+  console.log('questTIMELEFT:', quest.timeLimit)
+  const timeLeft = Math.floor((Date.now() / 1000) + quest.timeLimit * 24 * 60 * 60);
+ console.log('timeLEFT: timeLeft', timeLeft)
   const stuff = {
-    objectives: [
-      {
-        id: `${this.quests[questId].objectives[0].id}`,
-        target: `${this.quests[questId].objectives[0].target}`,
-        current: `${this.quests[questId].objectives[0].current}`,
-        required: `${this.quests[questId].objectives[0].required}`,
-      },
-    ],
+    objectives: [],
     timeLimit: {
-      totalDays: `${this.quests[questId].timeLimit}`,
-      daysLeft:  `${timeLeft}`,
+      totalDays: `${quest.timeLimit}`,
+      daysLeft: `${timeLeft}`,
     },
     questChannel: "newChannelId",
   };
-  this.player.activeQuests[questId].push(stuff)
+
+  for (const objective of quest.objectives) {
+    const objectiveData = {
+      id: `${objective.id}`,
+      target: `${objective.target}`,
+      current: `${objective.current}`,
+      required: `${objective.required}`,
+    };
+
+    stuff.objectives.push(objectiveData);
+  }
+
+  this.player.activeQuests[questId] = stuff;
 }
 console.log('this.player.activeQuests:', this.player.activeQuests)
  // Save the updated player's data to the database
