@@ -847,12 +847,14 @@ let filledBars;
                         const playerData2 = await collection.findOne(filter)
                          if (playerData2) {
                             // Create an object with only the xp property to update
-                            const xpUpdate = { 'exp.xp':  rewards.experience };
+                            const updates = {
+                                $inc: { 'exp.xp': rewards.experience, 'balance.coins': rewards.gold },
+                                };
                         console.log('rewards.xpereince:', rewards.experience)
                             // Update the player's document with the xpUpdate object
-                            await collection.updateOne(filter, { $inc: xpUpdate });
+                            await collection.updateOne(filter, updates);
                         
-                            console.log('Player XP updated:', xpUpdate);
+                            console.log('Player XP updated:', updates);
                           } else {
                             console.log('Player not found or updated.');
                           }
