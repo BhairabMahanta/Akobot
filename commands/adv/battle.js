@@ -2,6 +2,7 @@ const players = require('../../data/players.json');
 const {mongoClient} = require('../../data/mongo/mongo.js')
 const db = mongoClient.db('Akaimnky');
 const collection = db.collection('akaillection');
+const { quests } = require('./quests');
 const {
     bosses
 } = require('./bosses.js');
@@ -768,7 +769,7 @@ let filledBars;
           let isTargetingPlayer;
             // If the current turn is the environment, let it make a move
             // const move = this.environment.makeMove();
-              isTargetingPlayer = Math.random() < 0.3; // 30% chance to target the player
+              isTargetingPlayer = Math.random() < 0.7; // 30% chance to target the player
           
           const aliveFamiliars = this.familiarInfo.filter(familiar => familiar.stats.hp > 0);
           console.log('length LMAOAWDOJAIHFIAJFOIAJDFFASIF: ', aliveFamiliars.length)
@@ -830,7 +831,19 @@ let filledBars;
                     }
                     if (this.aliveEnemies.length === 0) {
                         const rewards = this.enemyDetails.rewards
-                        console.log('rewards:', rewards)
+                        if (this.player.activeQuests) {
+                            for (const activeQuestName in this.player.activeQuests) {
+                                if (this.player.activeQuests.hasOwnProperty(activeQuestName)) {
+                                  const activeQuestDetails = quests[activeQuestName];
+                                  const activeQuestDetails2 = this.player.activeQuests[activeQuestName];
+                                  console.log(`stuffHere: ${activeQuestDetails.title}`)
+                                  console.log(`stuffHere: ${activeQuestDetails2.objectives[0]}`)
+                                  }
+                              } 
+                        }
+                         const filter = { _id: this.player._id };
+                        console.log(`This.player:`, this.player)
+                        console.log('from database collection: ', await collection.findOne(filter))
                         this.battleEmbed.setFields({
                             name: `You won the battle against the Monster, you can continue the journey where you left off (I lied  you can't)!!`,
                             value: `Rewards:\n Exp: ${rewards.experience}, Gold: ${rewards.gold}`,

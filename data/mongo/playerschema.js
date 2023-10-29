@@ -12,7 +12,8 @@
 
 
 const { Schema } = mongoose;
-const playerSchema = new Schema({
+const playerSchema = new Schema(
+  {
      _id: String,
   name: String,
   location: String,
@@ -55,7 +56,8 @@ const playerSchema = new Schema({
     x: Number,
     y: Number,
   },
-});
+},
+{strict: false});
 
 async function playerModel(db){
 return db.model('Player', playerSchema, 'akaillection')

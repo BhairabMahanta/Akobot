@@ -107,7 +107,7 @@ client.on('messageCreate', async (message, args) => {
 
 
 });
-console.log('eeee', client.listenerCount('messageReactionRemove'));
+/*console.log('eeee', client.listenerCount('messageReactionRemove'));
 
 client.on(Events.MessageReactionAdd, async (reaction, user) => {
   console.log('Events:', Events)
@@ -219,7 +219,7 @@ client.on('messageCreate', async message => {
   }
   
 });
-
+*/
 
 
 

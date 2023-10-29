@@ -1,6 +1,6 @@
 const fs = require('fs');
 const { EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, ButtonBuilder, Options, Embed } = require('discord.js');
-const { quests } = require('./quests'); // Assuming you have quests defined in a separate file
+const { quests } = require('./quests'); 
 const path = require('path');
 const playersFilePath = path.join(__dirname, '..', '..', 'data', 'players.json');
 const playerData = JSON.parse(fs.readFileSync(playersFilePath, 'utf8'));
@@ -60,7 +60,7 @@ const options = {}
       .setPlaceholder('Select a Quest')
       .addOptions(
         questList.map((quest, index) => ({
-          label: `${index + 1}. ${quests[quest].title}`,
+          label: `${index + 1}.  ${quests[quest].title}`,
           value: quest,
         }))
       );
@@ -106,14 +106,16 @@ const options = {}
             .setDescription('These Are your active Quests!');
           
           // Populate the fields with the list of active quests
+          let indhex = 1
           for (const activeQuestName in activeQuestList) {
             if (activeQuestList.hasOwnProperty(activeQuestName)) {
               const activeQuestDetails = quests[activeQuestName];
               activeEmbed.addFields({
-                name: activeQuestDetails.title,
+                name: `${indhex}.  ${activeQuestDetails.title}`,
                 value: `>>> ${activeQuestDetails.description}`,
                 inline: false,
               });
+              indhex ++
             }
           }         afterButtonRow = new ActionRowBuilder().addComponents(
             new ButtonBuilder()
@@ -180,12 +182,12 @@ const options = {}
             },
             {
               name: 'Quest objectives:',
-              value: `${questDetails2.description}\n Objective target: ${questDetails.objectives[0].target}`,
+              value: `${questDetails2.description}\n Objective Target: ${questDetails.objectives[0].target}`,
               inline: false,
             },
             {
               name: 'Required vs current:',
-              value: `${questDetails.objectives[0].required}\n Objective target: ${questDetails.objectives[0].current}`,
+              value: `Objective Required: ${questDetails.objectives[0].required}\n Objective Current: ${questDetails.objectives[0].current}`,
               inline: false,
             },
             {

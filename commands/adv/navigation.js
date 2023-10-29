@@ -1,7 +1,6 @@
 const { ActionRowBuilder, ButtonBuilder } = require('discord.js'); // Replace with your actual library
 const { EmbedBuilder } = require('discord.js');
 const {Location, Floor, floor1, floor2, allFloors} = require('./loc');
-const { generateUpdatedImage, elements, generateRandomElements, movePlayer, nearElement } = require('./functions');
 const { GameImage, Player, Element } = require('./sumfunctions');
 const players = require('../../data/players.json');
 const {  Battle, BossMonster, Environment } = require('./battle.js')
