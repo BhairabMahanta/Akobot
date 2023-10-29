@@ -3,15 +3,9 @@ const {mongoClient} = require('../../data/mongo/mongo.js')
 const db = mongoClient.db('Akaimnky');
 const collection = db.collection('akaillection');
 const { quests } = require('./quests');
-const {
-    bosses
-} = require('./bosses.js');
-const {
-    mobs
-} = require('./mobs.js');
-const {
-    cards
-} = require('../fun/cards.js'); // Import the cards data from 'cards.js'
+const {bosses} = require('./bosses.js');
+const {mobs} = require('./mobs.js');
+const {cards} = require('../fun/cards.js'); // Import the cards data from 'cards.js'
 const {
     checkResults,
     getCardStats,
@@ -46,7 +40,10 @@ const buttonRow = new ActionRowBuilder()
 
 class Battle {
     constructor(player, enemy, message ) {
-      this.enemyDetails = enemy
+        this.mobSource = JSON.parse(JSON.stringify(mobs));
+        this.bossSource  = JSON.parse(JSON.stringify(bosses));
+        this.famSource  = JSON.parse(JSON.stringify(cards));
+        this.enemyDetails = enemy
         this.message = message;
         this.player = player;
         this.mobs = [];
@@ -65,9 +62,9 @@ class Battle {
         this.playerClass = null;
         this.playerRace = null;
         if (this.enemyDetails.type === 'boss') {
-        this.boss = bosses[this.enemyDetails.name];
+        this.boss = this.bossSource[this.enemyDetails.name];
         } else {
-          this.boss = bosses['Dragon Lord']
+          this.boss = this.bossSource['Dragon Lord']
         }
         this.currentTurn = null;
         this.characters = [];
@@ -93,17 +90,18 @@ class Battle {
 
   
     async initialiseStuff()
-  {
+ {
+    try{
     for (const familiarName of this.playerFamiliar) {
-      const familiarData = cards[familiarName];
+      const familiarData = this.famSource[familiarName];
       if (familiarData) {
           this.familiarInfo.push(familiarData);
       } }
     if (this.enemyDetails.type === 'boss') {
-    this.boss = bosses[this.enemyDetails.name];
+    this.boss = this.bossSource[this.enemyDetails.name];
     this.allEnemies.push(this.boss)
     } else {
-    this.boss = bosses['Dragon Lord']
+    this.boss = this.bossSource['Dragon Lord']
     }
     if (this.enemyDetails.type === 'mob' && this.enemyDetails.hasAllies.includes('none')) {
     this.mobs.push(this.enemyDetails.name)
@@ -113,8 +111,9 @@ class Battle {
     }
     console.log('this.mobs:', this.mobs)
     for (const mobName of this.mobs) {
-    const mobData = mobs[mobName];
-    if (mobData) {
+    const mobData = this.mobSource[mobName];
+      if (mobData) {
+        console.log('MobDATAAAHTAHHA:', mobData)
       this.mobInfo.push(mobData);
     } }
     this.allEnemies.push(...this.mobInfo)
@@ -149,7 +148,10 @@ class Battle {
     }
     console.log('this.allEnemies:', this.allEnemies)
     this.aliveEnemies = this.allEnemies;
-  }    
+} catch (error) {
+        console.log('The error is here:', error)
+}
+  }     
   
     async startEmbed() {
       await this.initialiseStuff()
@@ -769,7 +771,7 @@ let filledBars;
           let isTargetingPlayer;
             // If the current turn is the environment, let it make a move
             // const move = this.environment.makeMove();
-              isTargetingPlayer = Math.random() < 0.7; // 30% chance to target the player
+              isTargetingPlayer = Math.random() < 0.3; // 30% chance to target the player
           
           const aliveFamiliars = this.familiarInfo.filter(familiar => familiar.stats.hp > 0);
           console.log('length LMAOAWDOJAIHFIAJFOIAJDFFASIF: ', aliveFamiliars.length)
@@ -840,10 +842,24 @@ let filledBars;
                                   console.log(`stuffHere: ${activeQuestDetails2.objectives[0]}`)
                                   }
                               } 
+                        } try {
+                            const filter = { _id: this.player._id };
+                        const playerData2 = await collection.findOne(filter)
+                         if (playerData2) {
+                            // Create an object with only the xp property to update
+                            const xpUpdate = { 'exp.xp':  rewards.experience };
+                        console.log('rewards.xpereince:', rewards.experience)
+                            // Update the player's document with the xpUpdate object
+                            await collection.updateOne(filter, { $inc: xpUpdate });
+                        
+                            console.log('Player XP updated:', xpUpdate);
+                          } else {
+                            console.log('Player not found or updated.');
+                          }
+                        } catch (error) {
+                          console.error('Error updating player XP:', error);
                         }
-                         const filter = { _id: this.player._id };
-                        console.log(`This.player:`, this.player)
-                        console.log('from database collection: ', await collection.findOne(filter))
+   
                         this.battleEmbed.setFields({
                             name: `You won the battle against the Monster, you can continue the journey where you left off (I lied  you can't)!!`,
                             value: `Rewards:\n Exp: ${rewards.experience}, Gold: ${rewards.gold}`,

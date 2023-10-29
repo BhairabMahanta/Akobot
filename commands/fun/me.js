@@ -1,12 +1,16 @@
 const { EmbedBuilder } = require('discord.js')
 const players = require('../../data/players.json')
-
+const {mongoClient} = require('../../data/mongo/mongo.js')
+const db = mongoClient.db('Akaimnky');
+const collection = db.collection('akaillection');
 module.exports = {
 	name: 'statuswindow',
 	description: 'shows status window of the player',
   aliases: ['sw', 'me', 'status'],
 	async execute(client, message, args) {
-		let player = players[message.author.id]
+    const filter = {_id: message.author.id}
+    const player = await collection.findOne(filter)
+		let playerData = players[message.author.id]
     const charEmbed = new EmbedBuilder()
     .setColor(0x992e22)
     .setAuthor({

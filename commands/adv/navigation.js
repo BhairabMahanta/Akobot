@@ -213,8 +213,8 @@ gameImage.generateRandomElements(0.55, 0.5, 10);
    console.log('THAT ARA ARAA:', thatArray)
           // Handle the attack logic here
        const battle = new Battle(playerData2, thatArray , message);
-   battle.startEmbed()
- //    // await  battle.isSelected();
+   await battle.startEmbed()
+
  //   if (battle.continue) {
  //  console.log('playerSElECTFAMILOIAR:', battle.player.selectedFamilar )
  // battle.startBattle(message);
