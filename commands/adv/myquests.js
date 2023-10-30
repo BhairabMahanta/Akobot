@@ -133,32 +133,146 @@ const options = {}
           sentMessage.edit({ embeds: [activeEmbed], components: [row, row2] });
         } else if (click === 'expire') {
           const activeEmbed = new EmbedBuilder()
-            .setTitle('Expired quests')
-            .setDescription('These Quests Expired Because Your Ass was too Lazy!');
-          
-          // Populate the fields with the list of active quests
-          let indhex = 1
-          for (const activeQuestName in completeList) {
-            if (activeQuestList.hasOwnProperty(activeQuestName)) {
-              const activeQuestDetails = completeList[activeQuestName];
-              if (activeQuestDetails.questStatus === 'timeout') 
-              activeEmbed.addFields({
-                name: `${indhex}.  ${activeQuestDetails.title}`,
-                value: `>>> ${activeQuestDetails.description}`,
-                inline: false,
-              });
-              indhex ++
-            }
-          }
+  .setTitle('Expired quests!!')
+  .setDescription('These Quests Expired Because Your Ass was too Lazy\n It will only show!');
+
+// Populate the fields with the list of active quests
+let indhex = 1;
+let noCompletedQuests = true;
+
+for (const activeQuestName in completeList) {
+  if (completeList.hasOwnProperty(activeQuestName)) {
+    const activeQuestDetails = completeList[activeQuestName];
+    const datQuestDetails = quests[activeQuestName]
+    
+    if (activeQuestDetails.questStatus === 'failed') {
+      activeEmbed.addFields({
+        name: `${indhex}.  ${datQuestDetails.title}`,
+        value: `>>> ${datQuestDetails.description}`,
+        inline: false,
+      });
+      indhex++;
+      noCompletedQuests = false; // At least one completed quest found
+    }
+  }
+}
+
+// If there are no completed quests, add a special message
+if (noCompletedQuests) {
+  activeEmbed.addFields({
+    name: 'No Completed Quests',
+    value: 'You haven\'t completed any quests yet.',
+    inline: true,
+  });
+}         afterButtonRow = new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+              .setStyle("Primary")
+              .setLabel("Go back")
+              .setCustomId("back"));
+              const row2 = afterButtonRow
+              try {
+              const failedMenuOptions = Object.keys(completeList).map((quest, index) => {
+                if (completeList[quest].questStatus === 'failed') {
+                  return {
+                    label: `${index + 1}. ${quests[quest].title}`,
+                    value: quest,
+                  };
+                }
+              }).filter((option) => option !== undefined);
+              
+              
+              const failedMenu = new StringSelectMenuBuilder()
+                .setCustomId('select_active')
+                .setPlaceholder('Select to view further details.')
+                if (failedMenuOptions.length > 0) {
+                  failedMenu.addOptions(failedMenuOptions);
+                } else {
+                  failedMenu.addOption({
+                    label: 'None',
+                    value: 'nonexistent',
+                  });
+                }
+    
+          row = new ActionRowBuilder().addComponents(failedMenu);
+          sentMessage.edit({ embeds: [activeEmbed], components: [ row2] });
+        } catch (error) {
+          console.log('errorHERE:', error)
+  }
+        }  else if (click === 'finished') {
+          const activeEmbed = new EmbedBuilder()
+  .setTitle('Finished quests')
+  .setDescription('These last few quests were completed By You!!');
+
+// Populate the fields with the list of active quests
+let indhex = 1;
+let noCompletedQuests = true;
+
+for (const activeQuestName in completeList) {
+  if (completeList.hasOwnProperty(activeQuestName)) {
+    const activeQuestDetails = completeList[activeQuestName];
+    const datQuestDetails = quests[activeQuestName]
+    
+    if (activeQuestDetails.questStatus === 'completed') {
+      activeEmbed.addFields({
+        name: `${indhex}.  ${datQuestDetails.title}`,
+        value: `>>> ${datQuestDetails.description}`,
+        inline: false,
+      });
+      indhex++;
+      noCompletedQuests = false; // At least one completed quest found
+    }
+  }
+}
+
+// If there are no completed quests, add a special message
+if (noCompletedQuests) {
+  activeEmbed.addFields({
+    name: 'No Completed Quests',
+    value: 'You haven\'t completed any quests yet.',
+    inline: true,
+  });
+
           }         afterButtonRow = new ActionRowBuilder().addComponents(
             new ButtonBuilder()
               .setStyle("Primary")
               .setLabel("Go back")
               .setCustomId("back"));
               const row2 = afterButtonRow
+              try {
+                
+              
+                const completedMenuOptions = Object.keys(completeList)
+                .map((quest, index) => {
+                  if (completeList[quest].questStatus === 'completed') {
+                    return {
+                      label: `  ${quests[quest].title}`,
+                      value: quest,
+                    };
+                  }
+                })
+                .filter((option) => option !== undefined);
+              
+              
+              
+              const completedMenu = new StringSelectMenuBuilder()
+                .setCustomId('select_active')
+                .setPlaceholder('Select to view further details.')
+                if (completedMenuOptions) {
+                  console.log('completedMenu:', completedMenuOptions)
+                  completedMenu.addOptions(completedMenuOptions);
+                } else {
+                  completedMenu.addOption({
+                    label: 'None',
+                    value: 'nonexistent',
+                  });
+                }
+                console.log('row:', completedMenu)
     
-          row = new ActionRowBuilder().addComponents(activeSelectMenu);
-          sentMessage.edit({ embeds: [activeEmbed], components: [row, row2] });
+          row = new ActionRowBuilder().addComponents(completedMenu);
+          sentMessage.edit({ embeds: [activeEmbed], components: [row2] });
+        } catch (error) {
+                console.log('errorHERE:', error)
+        }
         }
       }
     
