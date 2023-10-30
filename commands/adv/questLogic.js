@@ -58,6 +58,7 @@ if (!this.player.activeQuests[questId]) {
       daysLeft: `${timeLeft}`,
     },
     questChannel: "newChannelId",
+    questStatus: "incomplete",
   };
 
   for (const objective of quest.objectives) {

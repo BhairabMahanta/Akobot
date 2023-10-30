@@ -611,17 +611,12 @@ const gaeRow = new ActionRowBuilder().addComponents(await this.selectMenu)
         console.log('atkBar:', atkBar)
         atkBar = 113
       }
-        const filledBars = Math.floor(atkBar / 5);
-
-        emptyBars = Math.floor(21 - filledBars);
+        const filledBars = Math.floor(atkBar / 5); emptyBars = Math.floor(21 - filledBars);
 
         if (atkBar > 100) {
             emptyBars = Math.floor(22 - filledBars);
 
-        }
-
-
-        const attackBarString = `${emoji.repeat(filledBars)}${' '.repeat(emptyBars)}`;
+        } const attackBarString = `${emoji.repeat(filledBars)}${' '.repeat(emptyBars)}`;
         return `[${attackBarString}]`;
     } catch (error) {
         console.log('errorHere:', error)
