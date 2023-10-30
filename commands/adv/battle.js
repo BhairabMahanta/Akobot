@@ -109,12 +109,11 @@ class Battle {
      this.mobs.push(this.enemyDetails.name)
      this.mobs.push(this.enemyDetails.hasAllies.join(','))
     }
-    console.log('this.mobs:', this.mobs)
+
         
     for (const mobName of this.mobs) {
     const mobData = this.mobSource[mobName];
       if (mobData) {
-        console.log('MobDATAAAHTAHHA:', mobData)
       this.mobInfo.push(mobData);
     } }
     this.allEnemies.push(...this.mobInfo)
@@ -145,9 +144,9 @@ class Battle {
       character.atkBar = 0;
       character.attackBarEmoji = [];
       character.hpBarEmoji = [];
-      console.log(character.name, '-', character.attackBarEmoji), '-', character.hpBarEmoji;
+    //   console.log(character.name, '-', character.attackBarEmoji), '-', character.hpBarEmoji;
     }
-    console.log('this.allEnemies:', this.allEnemies)
+
     this.aliveEnemies = this.allEnemies;
 } catch (error) {
         console.log('The error is here:', error)
@@ -488,12 +487,12 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
         description: `Attack ${enemy.name}`,
         value: `enemy_${index}`
       }));
-      console.log('This.pickEnemyOptions:', this.pickEnemyOptions)
+      
       this.selectMenu = new StringSelectMenuBuilder()
         .setCustomId('action_select')
         .setPlaceholder('Select the target')
         .addOptions(this.pickEnemyOptions);
-      console.log('This.selectEmnu:', this.selectMenu)
+    //   console.log('This.selectEmnu:', this.selectMenu)
        
 
 
@@ -505,7 +504,7 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
 
 
         const stringMenuRow = new ActionRowBuilder().addComponents(stringMenu);
-console.log('stringMENUROW:', stringMenuRow)
+// console.log('stringMENUROW:', stringMenuRow)
 const gaeRow = new ActionRowBuilder().addComponents(await this.selectMenu)
 
         const rows = [buttonRow, stringMenuRow, gaeRow];
@@ -843,25 +842,8 @@ let filledBars;
                                   console.log(`stuffHere: ${activeQuestDetails2.objectives[0]}`)
                                   }
                               } 
-                        } try {
-                            const filter = { _id: this.player._id };
-                        const playerData2 = await collection.findOne(filter)
-                         if (playerData2) {
-                            // Create an object with only the xp property to update
-                            const updates = {
-                                $inc: { 'exp.xp': rewards.experience, 'balance.coins': rewards.gold },
-                                };
-                        console.log('rewards.xpereince:', rewards.experience)
-                            // Update the player's document with the xpUpdate object
-                            await collection.updateOne(filter, updates);
+                        } 
                         
-                            console.log('Player XP updated:', updates);
-                          } else {
-                            console.log('Player not found or updated.');
-                          }
-                        } catch (error) {
-                          console.error('Error updating player XP:', error);
-                        }
                         this.mobs.forEach((mobName) => {
                             for (const questName in this.player.activeQuests) {
                               if (this.player.activeQuests.hasOwnProperty(questName)) {
@@ -880,6 +862,26 @@ let filledBars;
                               }
                             }
                           });
+                          try {
+                            const filter = { _id: this.player._id };
+                        const playerData2 = await collection.findOne(filter)
+                         if (playerData2) {
+                            // Create an object with only the xp property to update
+                            const updates = {
+                                $inc: { 'exp.xp': rewards.experience, 'balance.coins': rewards.gold },
+                                $set: { activeQuests: this.player.activeQuests},
+                                };
+                        console.log('rewards.xpereince:', rewards.experience)
+                            // Update the player's document with the xpUpdate object
+                            await collection.updateOne(filter, updates);
+                        
+                            console.log('Player XP updated:', updates);
+                          } else {
+                            console.log('Player not found or updated.');
+                          }
+                        } catch (error) {
+                          console.error('Error updating player XP:', error);
+                        }
                           console.log('thisplayeractiveQuest:', this.player.activeQuests)
    
                         this.battleEmbed.setFields({
