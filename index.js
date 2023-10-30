@@ -131,7 +131,7 @@ async function checkQuestCompletion() {
       if (currentTime > timeLimit) {
         // Quest has failed
         questFailure = true
-        quest.questStatus = "failed";
+        quest.questStatus = "timeout";
         player.completedQuests[questId] = quest
         console.log(`Quest '${questId}' has failed for ${player.name}`);
         // Optionally, update the quest's result and other details

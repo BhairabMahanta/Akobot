@@ -41,6 +41,7 @@ const options = {}
     const questList = dbData.quests;
     console.log('activeqestlost:', questList)
     const activeQuestList = dbData.activeQuests;
+    const completeList = dbData.completedQuests
     console.log('activeqestlost:', activeQuestList)
 
     async function myQuestBuilder() {
@@ -121,6 +122,34 @@ const options = {}
               });
               indhex ++
             }
+          }         afterButtonRow = new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+              .setStyle("Primary")
+              .setLabel("Go back")
+              .setCustomId("back"));
+              const row2 = afterButtonRow
+    
+          row = new ActionRowBuilder().addComponents(activeSelectMenu);
+          sentMessage.edit({ embeds: [activeEmbed], components: [row, row2] });
+        } else if (click === 'expire') {
+          const activeEmbed = new EmbedBuilder()
+            .setTitle('Expired quests')
+            .setDescription('These Quests Expired Because Your Ass was too Lazy!');
+          
+          // Populate the fields with the list of active quests
+          let indhex = 1
+          for (const activeQuestName in completeList) {
+            if (activeQuestList.hasOwnProperty(activeQuestName)) {
+              const activeQuestDetails = completeList[activeQuestName];
+              if (activeQuestDetails.questStatus === 'timeout') 
+              activeEmbed.addFields({
+                name: `${indhex}.  ${activeQuestDetails.title}`,
+                value: `>>> ${activeQuestDetails.description}`,
+                inline: false,
+              });
+              indhex ++
+            }
+          }
           }         afterButtonRow = new ActionRowBuilder().addComponents(
             new ButtonBuilder()
               .setStyle("Primary")
