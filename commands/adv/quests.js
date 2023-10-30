@@ -8,14 +8,14 @@ const quests = {
     objectives: [
       {
         id: "goblin_defeat",
-        description: "Defeat a Goblin",
+        description: "Defeat a monsterA",
         target: "monsterA",
         current: 0,
         required: 1,
       },
       {
         id: "wolf_defeat",
-        description: "Defeat a Wolf",
+        description: "Defeat two monsterB",
         target: "monsterB",
         current: 0,
         required: 2,

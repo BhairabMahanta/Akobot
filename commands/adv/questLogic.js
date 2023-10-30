@@ -64,6 +64,7 @@ if (!this.player.activeQuests[questId]) {
     const objectiveData = {
       id: `${objective.id}`,
       target: `${objective.target}`,
+      description: `${objective.description}`,
       current: `${objective.current}`,
       required: `${objective.required}`,
     };

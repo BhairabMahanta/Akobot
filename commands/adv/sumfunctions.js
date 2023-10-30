@@ -7,7 +7,6 @@ const path = require('path');
 
 class GameImage {
   constructor(imgH, imgW, player, message) {
-    console.log('playername', player.name)
     this.message = message;
     this.imgH = imgH;
     this.imgW = imgW;
@@ -146,9 +145,9 @@ class GameImage {
         return distA - distB;
       });
    }
-   console.log('ELEMENT ARRAY BANJA PLS', this.elementArray)
-   console.log('LOOP WALA:', this.whichMon)
-   console.log('isTrue:', this.isTrue)
+  //  console.log('ELEMENT ARRAY BANJA PLS', this.elementArray)
+  //  console.log('LOOP WALA:', this.whichMon)
+  //  console.log('isTrue:', this.isTrue)
    break;
  } 
     }
@@ -175,7 +174,7 @@ class GameImage {
 if (fs.existsSync(name)) {
   // The file exists, you can now use it
   inputImagePath = name;
-  console.log(`The file ${filePath} exists.`);
+  // console.log(`The file ${filePath} exists.`);
 } else {
            inputImagePath = element.name.startsWith('monster')
             ? 'commands/adv/npcimg/monster.png'
@@ -187,14 +186,14 @@ if (fs.existsSync(name)) {
               .composite([{ input: inputImagePath, left: element.x, top: element.y }])
               .png()
               .toBuffer();
-            console.log(`${element.name} placed at x: ${element.x}, y: ${element.y}`);
-          } else {
+          //   console.log(`${element.name} placed at x: ${element.x}, y: ${element.y}`);
+           } else {
             // For the rest of the elements, apply the composite to the updatedImage
             this.image = await sharp(this.image)
               .composite([{ input: inputImagePath, left: element.x, top: element.y }])
               .png()
               .toBuffer();
-            console.log(`${element.name} placed at x: ${element.x}, y: ${element.y}`);
+            // console.log(`${element.name} placed at x: ${element.x}, y: ${element.y}`);
           }
         }
       }
@@ -236,8 +235,8 @@ let restartForLoop = true;
         Math.pow(this.playerpos.x - element.x, 2) +
         Math.pow(this.playerpos.y - element.y, 2)
       );
- console.log('elementname:', element.name);
-      console.log('Distance to monster:', this.distanceToMonster);
+//  console.log('elementname:', element.name);
+//       console.log('Distance to monster:', this.distanceToMonster);
      
 
       if (
@@ -284,8 +283,8 @@ let restartForLoop = true;
         Math.pow(this.playerpos.x - element.x, 2) +
         Math.pow(this.playerpos.y - element.y, 2)
       );
- console.log('elementname:', element.name);
-      console.log('Distance to monster:', this.distanceToNpc);
+//  console.log('elementname:', element.name);
+//       console.log('Distance to monster:', this.distanceToNpc);
      
 
       if (

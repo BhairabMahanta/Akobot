@@ -113,9 +113,6 @@ async function handleNavigation(allFloors, message, adventureEmbed, initialMessa
   const selectedFloor = allFloors[playerFloorIndex];
   const selectedLocation = selectedFloor.locations[playerLocationIndex];
 
- 
-  // Send the initial message with buttons
-  console.log('player:', player.name)
   
      // Create instances of the classes
 const gameImage = new GameImage(600, 600, player, message);
@@ -158,10 +155,10 @@ gameImage.generateRandomElements(0.55, 0.5, 10);
   component.components.some(subComponent => subComponent.customId === 'talk_npc')
 );
     
-       console.log('click1test:',  hasAttackButton)
+
     
  if (i.customId === 'north' && i.user.id === message.user.id) {
-    console.log('click1test :  button')
+   
    playerpos.y -= 50;
            
    console.log('click1test :', playerpos)
@@ -210,7 +207,7 @@ gameImage.generateRandomElements(0.55, 0.5, 10);
  else if (i.customId === 'attack_monster' && i.user.id === message.user.id)  {
    initialMessage.edit({components: []});
    const thatArray = gameImage.elementArray[0]
-   console.log('THAT ARA ARAA:', thatArray)
+   // console.log('THAT ARA ARAA:', thatArray)
           // Handle the attack logic here
        const battle = new Battle(playerData2, thatArray , message);
    await battle.startEmbed()

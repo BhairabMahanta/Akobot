@@ -6,9 +6,7 @@ class NPC {
   constructor(player, name, message) {
     this.player = player
     this.playerId = message.user.id;
-    console.log('playerID:', this.playerId)
     this.name = name;
-    console.log('name:', this.name)
     this.affection = 0;
     this.dialogueIndex = 0;
     this.embed = null;

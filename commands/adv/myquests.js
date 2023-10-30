@@ -33,7 +33,7 @@ const options = {}
     const selectMainMenu = new StringSelectMenuBuilder().setCustomId('select_menu')
     .setPlaceholder('Select An Option')
     .addOptions([
-      { label: 'My Quests', value: 'klik_my' },
+      { label: 'Available Quests', value: 'klik_my' },
       { label: 'Active Quests', value: 'klik_active' },
       { label: 'Expired Quests', value: 'klik_expire' },
       { label: 'Finished Quests', value: 'klik_finished' }
@@ -42,17 +42,20 @@ const options = {}
     console.log('activeqestlost:', questList)
     const activeQuestList = dbData.activeQuests;
     console.log('activeqestlost:', activeQuestList)
-     embed = new EmbedBuilder()
+
+    async function myQuestBuilder() {
+      embed = new EmbedBuilder()
       .setTitle('My Quests')
       .setDescription('### Select a quest from the list below to view details:')
       
 
     // Populate the fields with the list of quests
     questList.forEach((questName, index) => {
-      console.log('questName:', questName)
+      // console.log('questName:', questName)
        const questDetails = quests[questName];
       embed.addFields({ name: `${index + 1}.  ${questDetails.title}`, value: `>>> ${questDetails.description}`, inline: false });
     });
+  }
     
     // Create a select menu with quest options
     const selectMenu = new StringSelectMenuBuilder()
@@ -91,6 +94,7 @@ const options = {}
         const interactionValue = interaction.values[0];
         const click = interactionValue.replace('klik_', '');
         if (click === 'my') {
+          await myQuestBuilder()
           row = new ActionRowBuilder().addComponents(selectMenu);
           afterButtonRow = new ActionRowBuilder().addComponents(
             new ButtonBuilder()
@@ -172,31 +176,33 @@ const options = {}
         const questDetails2 = quests[selectedQuest];
     
         const activeEmbed = new EmbedBuilder()
-          .setTitle('Active Quest Details')
-          .setDescription(`${quests[selectedQuest].title}'s Details`)
-          .addFields(
-            {
-              name: 'Quest Name:',
-              value: questDetails2.title,
-              inline: false,
-            },
-            {
-              name: 'Quest objectives:',
-              value: `${questDetails2.description}\n Objective Target: ${questDetails.objectives[0].target}`,
-              inline: false,
-            },
-            {
-              name: 'Required vs current:',
-              value: `Objective Required: ${questDetails.objectives[0].required}\n Objective Current: ${questDetails.objectives[0].current}`,
-              inline: false,
-            },
-            {
-              name: 'Quest Time Limit vs time left:',
-              value: `Time limit: ${questDetails.timeLimit.totalDays} Days, Time left: <t:${questDetails.timeLimit.daysLeft}:R>`,
-              inline: false,
-            }
-            // Add more fields as needed
-          );
+  .setTitle('Active Quest Details')
+  .setDescription(`### ${quests[selectedQuest].title}'s Details`);
+
+// Iterate through questDetails.objectives and add fields for each objective
+questDetails.objectives.forEach((objective, index) => {
+  console.log(objective)
+  activeEmbed.addFields({
+    name: `Objective ${index + 1}:`,
+    value: `>>> Objective Description:\n **${objective.description}**\nObjective Target - **${objective.target}**\nObjective Required: **${objective.required}**\nObjective Current: **${objective.current}**`,
+    inline: true
+});
+});
+
+activeEmbed.addFields(
+  {
+    name: 'Quest Name:',
+    value: `>>> ${questDetails2.title}`,
+    inline: false,
+  },
+  {
+    name: 'Quest Time Limit vs time left:',
+    value: `>>> Time limit: ${questDetails.timeLimit.totalDays} Days\n Time left: <t:${questDetails.timeLimit.daysLeft}:R>`,
+    inline: false,
+  }
+  // Add more fields as needed
+);
+
           afterButtonRow = new ActionRowBuilder().addComponents(
             new ButtonBuilder()
               .setStyle("Primary")
@@ -208,6 +214,9 @@ const options = {}
     
       if (interaction.customId === 'start_quest') {
         await interaction.deferUpdate();
+        embed.setTitle('Started Quest!')
+        embed.setDescription(`### You can view quest details and real time information through "a!myquest" `)
+        sentMessage.edit({embeds: [ embed]})
         const startQuest = new QuestLogic(message, interaction, sentMessage, embed, row, row2, dbData, db);
         startQuest.startQuest(startingThisQuest.id);
       } else if (interaction.customId === 'back') {
