@@ -224,7 +224,7 @@ if (fs.existsSync(name)) {
    
   }
   
-  async nearElement(hasAttackButton, message, initialMessage, navigationRow, attackRow, talktRow, bothButton, hasTalkButton, nowBattling) {
+  async nearElement(hasAttackButton, message, initialMessage, navigationRow, attackRow, talktRow, bothButton, hasTalkButton, nowBattling, interactRow) {
     const attackRadius = 40; // Adjust the radius as needed
 let restartForLoop = true;
     // while (restartForLoop) {

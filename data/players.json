@@ -47,8 +47,8 @@
             "generatedRandomElements2": false
         },
         "playerpos": {
-            "x": 100,
-            "y": 200
+            "x": 200,
+            "y": 300
         },
         "maxHp": 1000,
         "atkBar": 70.00000000000001,
@@ -755,6 +755,51 @@
         "playerpos": {
             "x": 100,
             "y": 250
+        }
+    },
+    "516896190416289802": {
+        "name": "gojojo",
+        "location": "Krizzland",
+        "inventory": {
+            "active": [],
+            "backpack": []
+        },
+        "stats": {
+            "attack": 1,
+            "tactics": 0,
+            "magic": 1,
+            "training": 0,
+            "defense": 1,
+            "speed": 1,
+            "hitpoints": 10,
+            "intelligence": 1,
+            "wise": 1,
+            "luck": 1,
+            "devotion": 0,
+            "potential": 1
+        },
+        "balance": {
+            "coins": 0,
+            "gems": 0
+        },
+        "exp": {
+            "xp": 0,
+            "level": 0
+        },
+        "cards": {
+            "name": [
+                "Water Nymph"
+            ]
+        },
+        "class": null,
+        "race": null,
+        "stuff": {
+            "generatedRandomElements": false,
+            "generatedRandomElements2": false
+        },
+        "playerpos": {
+            "x": 100,
+            "y": 50
         }
     }
 }

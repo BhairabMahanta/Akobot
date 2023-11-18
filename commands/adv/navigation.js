@@ -75,7 +75,23 @@ const navigationRowAttack = new ActionRowBuilder()
           .setLabel('Attack')
           .setStyle('Primary')
       );
- 
+      const navigationRowInteract = new ActionRowBuilder()
+       .addComponents(
+       new ButtonBuilder()
+        .setCustomId('Empty')
+        .setLabel('☠️ ded')
+        .setStyle('Secondary')
+        .setDisabled(true),
+         new ButtonBuilder()
+        .setCustomId('north')
+        .setLabel('↑ North')
+        .setStyle('Danger'),
+           new ButtonBuilder()
+          .setCustomId('interact_collect')
+          .setLabel('Grab!')
+          .setStyle('Primary')
+      );
+      const interactRow = [navigationRowInteract, navigationRowMid]
 const navigationRow = [navigationRowUp, navigationRowMid]
 const talktRow = [navigationRowTalk, navigationRowMid]
 const attackRow = [navigationRowAttack, navigationRowMid]
@@ -228,7 +244,7 @@ gameImage.generateRandomElements(0.55, 0.5, 10);
     }
   
     
-    gameImage.nearElement(hasAttackButton, message, initialMessage, navigationRow, attackRow, talktRow, bothButton, hasTalkButton, nowBattling) 
+    gameImage.nearElement(hasAttackButton, message, initialMessage, navigationRow, attackRow, talktRow, bothButton, hasTalkButton, nowBattling, interactRow)  
     
 
   });
