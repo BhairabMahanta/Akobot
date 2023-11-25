@@ -51,15 +51,15 @@ const Player  = await playerModel(db)
         // Check if the user exists in the database
 const userExists = await Player.exists({ _id: message.author.id });
 
-// If the user exists, send a message
-if (userExists) {
-//   const tutorial = new Tutorial(players, 'My Tutorial', message);
-// tutorial.initiateTutorial();
-return message.channel.send('chillax, you dont needa register more than once (using database)');
-}
-    if (players[message.author.id]) {
-      return message.channel.send('chillax, you dont needa register more than once');
-    }
+  // If the user exists, send a message
+  if (userExists) {
+  //   const tutorial = new Tutorial(players, 'My Tutorial', message);
+  // tutorial.initiateTutorial();
+  return message.channel.send('chillax, you dont needa register more than once (using database)');
+  }
+      // if (players[message.author.id]) {
+      //   return message.channel.send('chillax, you dont needa register more than once');
+      // }
 
 
     function getRandomCard() {

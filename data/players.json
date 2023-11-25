@@ -307,7 +307,7 @@
                 "Fire Dragon"
             ]
         },
-        "class": null,
+        "class": "Swashbuckler",
         "race": null,
         "stuff": {
             "generatedRandomElements": false,
@@ -315,7 +315,7 @@
         },
         "playerpos": {
             "x": 100,
-            "y": 50
+            "y": 200
         }
     },
     "562668850097946694": {

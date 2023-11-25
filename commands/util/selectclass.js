@@ -30,13 +30,14 @@ module.exports = {
         try {
           const {db} = client;
             const userId = message.author.id;
-          
+
          async function updateClass(playerId, className) {
   const PlayerModel = await playerModel(db);
 
 
   // Find the document with the _id `playerId`
-  const player = await PlayerModel.findByIdAndUpdate(`${playerId}`, { class: `${className}` });
+  const player = await PlayerModel.findByIdAndUpdate(`${playerId}`, { class: `${className}` }, { upsert: true, new: true, setDefaultsOnInsert: true }
+  );
 
 console.log('AFTERCLASS:', player)
   // Save the document
@@ -150,12 +151,13 @@ console.log('AFTERCLASS:', player)
 
         // Update user data with selected race
         userData[userId].class = className;
-        fs.writeFileSync('./data/players.json', JSON.stringify(userData, null, 4));
+        // fs.writeFileSync('./data/players.json', JSON.stringify(userData, null, 4));
+        console.log('userID:', userId, 'class', className)
       await updateClass(userId, className)
 
 
         // Prepare and send reply
-        await message.channel.send(`You've selected the race: ${className}`);
+        await message.channel.send(`You've selected the class: ${className}`);
       sentMessage.edit({ components: [] });
      }
                         }

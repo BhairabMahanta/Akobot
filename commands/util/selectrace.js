@@ -34,7 +34,8 @@ module.exports = {
 
 
   // Find the document with the _id `playerId`
-  const player = await PlayerModel.findByIdAndUpdate(`${playerId}`, { race: `${className}` });
+  const player = await PlayerModel.findByIdAndUpdate(`${playerId}`, { race: `${className}` },{ upsert: true, new: true, setDefaultsOnInsert: true }
+  );
 
 console.log('AFTERCLASS:', player)
   // Save the document
