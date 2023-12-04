@@ -87,9 +87,6 @@ async function getPlayerData(playerName) {
       return null;
     }
 
-    // Convert the player name to the original case
-    player.name = playerName;
-
     return player;
   } catch (error) {
     console.error('Error fetching player data from MongoDB:', error);
