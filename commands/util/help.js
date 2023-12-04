@@ -104,7 +104,7 @@ module.exports = {
 
     const sentMessage = await message.channel.send({ embeds: [helpEmbed], components: messageComponents });
     const collector = sentMessage.createMessageComponentCollector({
-      filter: (interaction) => interaction.customId === 'previous' || interaction.customId === 'next',
+      filter: (interaction) => interaction.customId === 'previous' || interaction.customId === 'compact' || interaction.customId === 'next',
       time: 300000, // 300 seconds
       dispose: true,
     });
@@ -113,17 +113,44 @@ module.exports = {
       // Handle button clicks here
       if (interaction.customId === 'previous') {
         page = Math.max(page - 1, 1);
-      } else if (interaction.customId === 'next') {
-        page = Math.min(page + 1, totalPages);
-      }  else if (interaction.customId === 'compact') {
-        page = Math.min(page + 1, totalPages);
-      }
-
-      const updatedFields = await getFieldsForPage(commands, page, perPage);
+        const updatedFields = await getFieldsForPage(commands, page, perPage);
         console.log('updatedfieldszsszz:', updatedFields)
 
       helpEmbed.setDescription(updatedFields.join(''));
       interaction.update({ embeds: [helpEmbed] });
+      } else if (interaction.customId === 'next') {
+        page = Math.min(page + 1, totalPages);
+        const updatedFields = await getFieldsForPage(commands, page, perPage);
+        console.log('updatedfieldszsszz:', updatedFields)
+
+      helpEmbed.setDescription(updatedFields.join(''));
+      interaction.update({ embeds: [helpEmbed] });
+      }  else if (interaction.customId === 'compact') {
+        const fields = [];
+  fields.push('### Here is a compact list of available command names:\n');
+  
+  const commandsArray = Array.from(client.commands.values());
+  
+  commandsArray.forEach((command, index) => {
+    console.log('Looping for command:', command.name);
+    console.log('index:', index)
+    
+      console.log('Adding field for command:', command.name);
+      const field = {
+        name: `**${command.name}**`,
+        value: command.description || 'No description provided',
+        inline: false, 
+      };
+  
+      fields.push(`${field.name}, `);
+    });
+    console.log('fields:', fields);
+      helpEmbed.setDescription(fields.join(''));
+      interaction.update({ embeds: [helpEmbed] });
+
+} 
+ 
+      
     });
   } catch (error) {
     console.error('An error occurred:', error);
