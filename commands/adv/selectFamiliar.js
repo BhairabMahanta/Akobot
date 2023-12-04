@@ -15,10 +15,10 @@ module.exports = {
     
 async function updateClass(playerIdee, className) {
   const PlayerModel = await playerModel(db);
-  
-  
+  const selektFam = {name: [className]}
+  console.log('selectfam:', selektFam)
   // Find the document with the _id `playerId`
-  const player = await PlayerModel.findByIdAndUpdate(`${playerIdee}`, { 'selectedFamiliars.name': `${className}` }, { upsert: true, new: true, setDefaultsOnInsert: true }
+  const player = await PlayerModel.findByIdAndUpdate(`${playerIdee}`, { 'selectedFamiliars': `${selektFam}` }, { upsert: true, new: true, setDefaultsOnInsert: true }
   );
   
   
@@ -118,10 +118,13 @@ async function updateClass(playerIdee, className) {
         })
       );
 console.log('selectedFamiliars:', selectedFamiliars)
+const selectedFamiliarsArray = []
+selectedFamiliarsArray.push(selectedFamiliars)
+console.log('sfArray:', selectedFamiliarsArray)
       // Update the embed
       embed.setDescription('You have selected the following familiars:\n' + selectedFamiliars.join('\n'));
             // players[playerId].selectedFamiliars.name = selectedFamiliars;
-await updateClass(playerId, selectedFamiliars);
+await updateClass(playerId, selectedFamiliarsArray);
       // Save the updated data back to the file
       // fs.writeFile('./data/players.json', JSON.stringify(players, null, 2), 'utf8', (writeErr) => {
       //   if (writeErr) {

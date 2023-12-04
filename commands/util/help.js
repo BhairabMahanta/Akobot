@@ -5,10 +5,13 @@ module.exports = {
   description: 'Displays a list of available commands and their descriptions.',
   aliases: ['commands', 'cmds'], // Add aliases here
   async execute(client, message, args) {
+    try {
+      
+   
     const { commands } = client;
     console.log('commands:', commands)
-     const perPage = 10; // Number of commands to display per page
-    const page = args[0] || 1; // Get the requested page from arguments
+     let perPage = 10; // Number of commands to display per page
+    let page = args[0] || 1; // Get the requested page from arguments
 
     console.log('Total commands:', commands.size);
     console.log('Requested page:', page);
@@ -21,8 +24,8 @@ module.exports = {
       return message.reply('Invalid page number. Please provide a valid page number.');
     }
 
-    const startIndex = (page - 1) * perPage;
-    const endIndex = startIndex + perPage;
+    let startIndex;
+    let endIndex;
     const startIndexTwo = endIndex + 1;
     const endIndexTwp = endIndex + perPage;
 
@@ -30,39 +33,52 @@ module.exports = {
     console.log('End index:', endIndex);
 
     const helpEmbed = new EmbedBuilder()
-      .setColor(0x0099ff)
-      .setTitle('Command List')
-      .setDescription('Here is a list of available commands and their descriptions:')
-      .setTimestamp();
+    .setColor(0x0099ff)
+    .setTitle('Command List')
+    .setDescription('Here is a list of available commands and their descriptions:')
+    .setTimestamp();
+    async function getFieldsForPage(commands, page, perPage) {
+      console.log('page:L', page)
+      console.log('perpage:', perPage)
+      startIndex = (page - 1) * perPage;
+      endIndex = startIndex + perPage;
+  const fields = [];
+  fields.push('### Here is a list of available commands their descriptions, and Aliases:\n');
+  
+  const commandsArray = Array.from(client.commands.values());
+  
+  commandsArray.forEach((command, index) => {
+    console.log('Looping for command:', command.name);
+    console.log('index:', index)
+    if (index >= startIndex && index < endIndex) {
+      console.log('Adding field for command:', command.name);
+      const field = {
+        name: `### ${index + 1}.) **${command.name}**`,
+        value: command.description || 'No description provided',
+        inline: false,
+      };
+  
+      fields.push(`${field.name}\n- **Description: ${field.value}**\n`);
+  
+      console.log('fields:', field);
+  
+      if (command.aliases && Array.isArray(command.aliases) && command.aliases.length > 0) {
+        console.log('Adding aliases for command:', command.name);
+        // Adding aliases to the description as well
+        fields.push(`- **Aliases**: **${command.aliases.join(', ')}**\n`);
+      }
+    } 
+  });
+  // console.log('fieldssssss no z', fields)
+  return fields;
+} const fieldz = await getFieldsForPage(commands, page, perPage)
+  // console.log('fieldszsszz:', fieldz)
+  helpEmbed.setDescription(fieldz.join(''));
+  
 
-    const fields = [];
+  
 
-        const commandsArray = Array.from(client.commands.values());
-
-   commandsArray.forEach((command, index) => {
-  console.log('Looping for command:', command.name);
-     console.log('index:', index)
-  if (index >= startIndex && index < endIndex) {
-    console.log('Adding field for command:', command.name);
-    const field = {
-      name: `:green_circle: **${command.name}**`,
-      value: command.description || 'No description provided',
-      inline: false,
-    };
-
-    fields.push(field);
-    console.log('fields:', field);  
-
-    if (command.aliases && Array.isArray(command.aliases) && command.aliases.length > 0) {
-      console.log('Adding aliases for command:', command.name);
-      fields.push({ name: 'Aliases', value: command.aliases.join(', '), inline: false });
-    }
-  } 
-   
-   });
-
-
-    helpEmbed.addFields(...fields);
+  
 
     
 
@@ -74,30 +90,45 @@ module.exports = {
       new ButtonBuilder()
         .setCustomId('next')
         .setLabel('Next')
-        .setStyle('Primary')
+        .setStyle('Primary'),
+        new ButtonBuilder()
+          .setCustomId('compact')
+          .setLabel('All Commands')
+          .setStyle('Primary')
     );
 
     const messageComponents = [row];
 
-    // if (page !== 1) {
-    //   messageComponents.push(
-    //     new ButtonBuilder()
-    //       .setCustomId('first')
-    //       .setLabel('First')
-    //       .setStyle('Primary')
-    //   );
-    // }
 
-    // if (page !== totalPages) {
-    //   messageComponents.push(
-    //     new ButtonBuilder()
-    //       .setCustomId('last')
-    //       .setLabel('Last')
-    //       .setStyle('Primary')
-    //   );
-    //  } 
     console.log('Message components:', messageComponents);
 
-    message.channel.send({ embeds: [helpEmbed], components: messageComponents });
-  },
+    const sentMessage = await message.channel.send({ embeds: [helpEmbed], components: messageComponents });
+    const collector = sentMessage.createMessageComponentCollector({
+      filter: (interaction) => interaction.customId === 'previous' || interaction.customId === 'next',
+      time: 300000, // 300 seconds
+      dispose: true,
+    });
+
+    collector.on('collect', async (interaction) => {
+      // Handle button clicks here
+      if (interaction.customId === 'previous') {
+        page = Math.max(page - 1, 1);
+      } else if (interaction.customId === 'next') {
+        page = Math.min(page + 1, totalPages);
+      }  else if (interaction.customId === 'compact') {
+        page = Math.min(page + 1, totalPages);
+      }
+
+      const updatedFields = await getFieldsForPage(commands, page, perPage);
+        console.log('updatedfieldszsszz:', updatedFields)
+
+      helpEmbed.setDescription(updatedFields.join(''));
+      interaction.update({ embeds: [helpEmbed] });
+    });
+  } catch (error) {
+    console.error('An error occurred:', error);
+
+  }
+  }
+  ,
 };

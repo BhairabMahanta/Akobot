@@ -13,6 +13,7 @@
 const { GameImage, Player, Element } = require('./sumfunctions');
     const fs = require('fs');
   let selectedValue = [];
+  const {mongoClient} = require('../../data/mongo/mongo.js')
   
   
   const areaImage = 'commands/adv/area2.png'; 
@@ -25,8 +26,12 @@ const { GameImage, Player, Element } = require('./sumfunctions');
     description: 'Start an adventure!',
      aliases: ['tp'],
     async execute(client, message, args, interaction) {
-  
-      let player = players[message.author.id];
+      const db = mongoClient.db('Akaimnky');
+      const collection = db.collection('akaillection');
+// Define the filter based on the _id
+  const dbFilter = { _id: message.author.id };
+      const player = await collection.findOne(dbFilter);
+      let player2 = players[message.author.id];
       if (!player) {
         return message.channel.send('You have to register first!')
       }
