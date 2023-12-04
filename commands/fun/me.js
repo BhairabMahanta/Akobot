@@ -13,9 +13,10 @@ module.exports = {
 		let playerData = players[message.author.id]
     const charEmbed = new EmbedBuilder()
     .setColor(0x992e22)
+    .setThumbnail(message.author.displayAvatarURL({ dynamic: true }))
     .setAuthor({
                 name: `${player.name}'s status window`,
-                iconURL: 'https://i.imgur.com/AfFp7pu.png',
+                // iconURL: 'https://i.imgur.com/AfFp7pu.png',
                 url: 'https://discord.js.org'
               })
    .setDescription(
