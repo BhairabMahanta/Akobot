@@ -5,12 +5,15 @@ const { quests } = require('./quests');
 const fs = require('fs');
 const path = require('path');
 const playersFilePath = path.join(__dirname, '..', '..', 'data', 'players.json');
-const playerData = JSON.parse(fs.readFileSync(playersFilePath, 'utf8'));
-
+const playerData2 = JSON.parse(fs.readFileSync(playersFilePath, 'utf8'));
+const {mongoClient} = require('../../data/mongo/mongo.js')
+const db = mongoClient.db('Akaimnky');
+const collection = db.collection('akaillection');
 class Quest {
   constructor(that) {
     this.player = that.player;
-    this.playerId = that.playerId
+    this.playerId = that._id
+    this.filter = { _id: that.player._id };
     this.questName = that.questName;
     this.questDetails = null;
     this.questLogic = new QuestLogic(this.player);
@@ -70,22 +73,23 @@ questDetails.rewards.forEach((reward) => {
   }
 
   async acceptQuest() {
+    const playerData = await collection.findOne(this.filter)
      this.editFields()
     this.embed.setDescription(`### - You have accepted the quest ${this.questDetails.title}.\n- Objective: ${this.questDetails.objective}\n- You can view your selected quests by typing a!myquests`)
-    
+    console.log('shit stuff:', playerData._id)
     // Check if the player has a quest array
-if (!playerData[this.playerId].quests) {
+if (!playerData.this.playerId.quests) {
   // If the quest array doesn't exist, create it as an empty array
-  playerData[this.playerId].quests = [];
-}if (playerData[this.playerId].quests) {
+  playerData.this.playerId.quests = [];
+}if (playerData.this.playerId.quests) {
  // Check if the quest title already exists in the quest array
-if (playerData[this.playerId].quests.includes(this.questDetails.title)) {
+if (playerData.this.playerId.quests.includes(this.questDetails.title)) {
   // If it exists, send a message indicating that the quest is already pending
   this.embed.setDescription('### - You already have that quest pending, clear it first dumbass.');
 } else {
   // If it doesn't exist, push the quest title to the quest array
-  playerData[this.playerId].quests.push(this.questDetails.title);
-
+  playerDatathis.playerId.quests.push(this.questDetails.title);
+  await collection.updateOne(filter, playerData);
   // Write the updated player data back to the JSON file
   fs.writeFileSync(playersFilePath, JSON.stringify(playerData, null, 2), 'utf8');
 
