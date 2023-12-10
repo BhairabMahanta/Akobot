@@ -6,7 +6,7 @@ class Ability {
     this.enemyToHit = that.enemyToHit
 }
 
- //PLAYER ABILOITIES
+ //PLAYER ABILOITIES AKAI THIS WORKS BLUD
   
   shieldBash(user, target) {
     const damage = calculateDamage(user.stats.attack, target.stats.defense);
