@@ -76,7 +76,8 @@ questDetails.rewards.forEach((reward) => {
     const playerData = await collection.findOne(this.filter)
      this.editFields()
     this.embed.setDescription(`### - You have accepted the quest ${this.questDetails.title}.\n- Objective: ${this.questDetails.objective}\n- You can view your selected quests by typing a!myquests`)
-    console.log('shit stuff:', playerData._id)
+    
+    console.log('shit stuff:', playerData)
     // Check if the player has a quest array
 if (!playerData.this.playerId.quests) {
   // If the quest array doesn't exist, create it as an empty array
@@ -88,7 +89,7 @@ if (playerData.this.playerId.quests.includes(this.questDetails.title)) {
   this.embed.setDescription('### - You already have that quest pending, clear it first dumbass.');
 } else {
   // If it doesn't exist, push the quest title to the quest array
-  playerDatathis.playerId.quests.push(this.questDetails.title);
+  playerData.this.playerId.quests.push(this.questDetails.title);
   await collection.updateOne(filter, playerData);
   // Write the updated player data back to the JSON file
   fs.writeFileSync(playersFilePath, JSON.stringify(playerData, null, 2), 'utf8');
