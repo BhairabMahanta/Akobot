@@ -12,7 +12,7 @@ const collection = db.collection('akaillection');
 class Quest {
   constructor(that) {
     this.player = that.player;
-    this.playerId = that._id
+		this.playerId = that._id
     this.filter = { _id: that.player._id };
     this.questName = that.questName;
     this.questDetails = null;
@@ -33,20 +33,20 @@ class Quest {
   async showQuestDetails() {
     const questDetails = quests[this.questName]
     this.questDetails = questDetails;
-    console.log('questDetails:', questDetails)
+    console.log("questDetails:", questDetails)
       await this.editFields();
     this.embed.setDescription(`### - Description: ${questDetails.description}`);
 
     const rewardFields = [];
 questDetails.rewards.forEach((reward) => {
-  console.log('xp:', reward.experience)
+  console.log("xp:", reward.experience);
 
     rewardFields.push({
       name: `- **Rewards:** `, // Combine index and answer text
       value: `- **Experience: ${reward.experience}** \n\n **Items: ${reward.items}**`, // Empty value for alternating
       inline: false,
     });
-  console.log('rewardsFields:',rewardFields);
+  console.log("rewardsFields:", rewardFields);
   
 });
      this.embed.addFields(...rewardFields);
@@ -62,7 +62,7 @@ questDetails.rewards.forEach((reward) => {
             .setCustomId("Decline"),
         // ];
           );
-            this.row = [acceptCancel]
+            this.row = [acceptCancel];
      // this.row =  await this.yesNoButton
 
     // Send the question embed
@@ -73,37 +73,41 @@ questDetails.rewards.forEach((reward) => {
   }
 
   async acceptQuest() {
-    const playerData = await collection.findOne(this.filter)
-     this.editFields()
+    const playerData = await collection.findOne(this.filter);
+     this.editFields();
     this.embed.setDescription(`### - You have accepted the quest ${this.questDetails.title}.\n- Objective: ${this.questDetails.objective}\n- You can view your selected quests by typing a!myquests`)
+    console.log("Shit Stuff:");
+    try{
+    console.log(JSON.stringify(playerData, null, 2));
     
-    console.log('shit stuff:', playerData)
     // Check if the player has a quest array
-if (!playerData.this.playerId.quests) {
+if (!playerData.quests) {
   // If the quest array doesn't exist, create it as an empty array
-  playerData.this.playerId.quests = [];
-}if (playerData.this.playerId.quests) {
+  playerData.quests = [];
+}if (playerData.quests) {
  // Check if the quest title already exists in the quest array
-if (playerData.this.playerId.quests.includes(this.questDetails.title)) {
+if (playerData.quests.includes(this.questDetails.title)) {
   // If it exists, send a message indicating that the quest is already pending
-  this.embed.setDescription('### - You already have that quest pending, clear it first dumbass.');
+  this.embed.setDescription("### - You already have that quest pending, clear it first dumbass.");
 } else {
   // If it doesn't exist, push the quest title to the quest array
-  playerData.this.playerId.quests.push(this.questDetails.title);
-  await collection.updateOne(filter, playerData);
+  playerData.quests.push(this.questDetails.title);
+  await collection.updateOne(this.filter, { $set: { quests: playerData.quests } });
   // Write the updated player data back to the JSON file
-  fs.writeFileSync(playersFilePath, JSON.stringify(playerData, null, 2), 'utf8');
+  fs.writeFileSync(playersFilePath, JSON.stringify(playerData, null, 2), "utf8");
 
   
 }
     await this.collectorMessage.edit({ embeds: [this.embed], components: [] });
     // Implement logic to accept the quest
     // await this.questLogic.startQuest(this.player, this.questName);
-  }
+  }} catch (error) {
+    console.error("You fucked up:", error);
+  }// console.log("shit stuff:", playerData);
   }
 
   async declineQuest() {
-     this.editFields()
+     this.editFields();
     this.embed.setDescription(`### - You have declined the quest ${this.questDetails.title}.\n- Objective: ${this.questDetails.objective}\n- You can view your selected quests by typing a!myquests`)
     await this.collectorMessage.edit({ embeds: [this.embed], components: [] });
 
@@ -111,4 +115,5 @@ if (playerData.this.playerId.quests.includes(this.questDetails.title)) {
   }
 }
 
+// eslint-disable-next-line no-undef
 module.exports = {Quest};
