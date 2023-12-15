@@ -4,9 +4,15 @@ const {areas} = require('./areas.js');
 const sharp = require('sharp');
 const fs = require('fs');
 const path = require('path');
+const {mongoClient} = require('../../data/mongo/mongo.js')
+const db = mongoClient.db('Akaimnky');
+const collection = db.collection('akaillection');
+
 
 class GameImage {
   constructor(imgH, imgW, player, message) {
+    this.filter = { _id: player._id };
+    this.playerData = collection.findOne(this.filter);
     this.message = message;
     this.imgH = imgH;
     this.imgW = imgW;
@@ -21,7 +27,7 @@ class GameImage {
     this.distanceToNpc = 0;
     this.distanceToMonster = 0;
     this.whichMon = null;
-    this.playerpos = player.playerpos
+    this.playerpos = player.playerpos;
     this.isTrue = false;
     this.elementArray = [];
   }
@@ -33,7 +39,7 @@ class GameImage {
   async generateRandomElements(monsterProbability, npcProbability, maxElements) {
     let monsterCount = 0;
     let npcCount = 0;
-    console.log('imagew,h:', this.imgW, this.imgH)
+    console.log("imagew,h:", this.imgW, this.imgH);
 
     for (let i = this.elements.length; i < maxElements; i++) {
       const row = Math.floor(Math.random() * (this.imgH - 50)) + 50;
@@ -61,7 +67,7 @@ class GameImage {
   // Initialize counts for monsters and NPCs
   let monsterCount = 0;
   let npcCount = 0;
-   const maxElements = 10
+   const maxElements = 10;
 
   // Loop through the area data and generate elements
   for (let i = this.elements.length; i < maxElements; i++) {
@@ -128,8 +134,8 @@ class GameImage {
         Math.pow(this.playerpos.y - element.y, 2)
       );
  if (this.distanceToMonster <= attackRadius) {
-   this.isTrue = true
-   this.whichMon = element.name
+   this.isTrue = true;
+   this.whichMon = element.name;
    if (!this.elementArray.includes(element)) {
    this.elementArray.push(element);
 // Sort the elementArray by shortest distanceToMonster
@@ -205,38 +211,41 @@ if (fs.existsSync(name)) {
 
       return new AttachmentBuilder(this.gaeImage, { name: 'updatedMap.png' });
     } catch (error) {
-      console.error('An error occurred:', error);
+      console.error("An error occurred:", error);
       // Send an error message back to the channel
-      message.channel.send('An error occurred while generating the updated map.');
+      message.channel.send("An error occurred while generating the updated map.");
     }
   }
   async movePlayer(player) {
     // Load the base image
-   
+    
   // Other properties of the player...
     const updatedImageBuffer = await sharp(this.image)
-      .composite([{ input: 'commands/adv/Old_man.png', left: this.playerpos.x, top: this.playerpos.y }])
+      .composite([{ input: "commands/adv/Old_man.png", left: this.playerpos.x, top: this.playerpos.y }])
       .png()
       .toBuffer();
+    // player.playerpos = 
+    //  fs.writeFileSync('./data/players.json', JSON.stringify(players, null, 4));
     player.playerpos = { "x": this.playerpos.x, "y":  this.playerpos.y };
-     fs.writeFileSync('./data/players.json', JSON.stringify(players, null, 4));
-    return new AttachmentBuilder(updatedImageBuffer, { name: 'updatedMap.png' });
+    await collection.updateOne(this.filter, { $set: { playerpos: player.playerpos } });
+    return new AttachmentBuilder(updatedImageBuffer, { name: "updatedMap.png" });
    
   }
   
   async nearElement(hasAttackButton, message, initialMessage, navigationRow, attackRow, talktRow, bothButton, hasTalkButton, nowBattling, interactRow) {
     const attackRadius = 40; // Adjust the radius as needed
+    console.log("NearElement");
 let restartForLoop = true;
     // while (restartForLoop) {
     for (const element of this.monsterArray) {
-      await this.forLoop()
+      await this.forLoop();
       
       this.distanceToMonster = Math.sqrt(
         Math.pow(this.playerpos.x - element.x, 2) +
         Math.pow(this.playerpos.y - element.y, 2)
       );
-//  console.log('elementname:', element.name);
-//       console.log('Distance to monster:', this.distanceToMonster);
+  console.log('elementname:', element.name);
+       console.log('Distance to monster:', this.distanceToMonster);
      
 
       if (
@@ -245,10 +254,10 @@ let restartForLoop = true;
         !hasAttackButton
       ) {
         nowBattling.setFooter({text:
-          'You are in the monster field radius, click the attack button to attack.'}
+          "You are in the monster field radius, click the attack button to attack."}
         );
         this.whichMon = element.name;
-        console.log('whichMon:', this.whichMon);
+        console.log("whichMon:", this.whichMon);
         initialMessage.edit({
           embeds: [nowBattling],
           components: [...attackRow],
@@ -261,9 +270,9 @@ let restartForLoop = true;
         element.name === this.whichMon &&
         hasAttackButton && this.isTrue
       ) {
-        console.log('whichMon2:', this.whichMon);
-        console.log('element:', element.name);
-        nowBattling.setFooter({text:'You moved out of attack range.'});
+        console.log("whichMon2:", this.whichMon);
+        console.log("element:", element.name);
+        nowBattling.setFooter({text:"You moved out of attack range."});
         initialMessage.edit({
           embeds: [nowBattling],
           components: [...navigationRow],
@@ -289,14 +298,14 @@ let restartForLoop = true;
 
       if (
         this.distanceToNpc <= attackRadius &&
-        element.name.startsWith('npc') &&
+        element.name.startsWith("npc") &&
         !hasTalkButton
       ) {
         nowBattling.setFooter({text:
-          'You see an NPC, click the \'Talk\' button to interact.'}
+          "You see an NPC, click the \'Talk\' button to interact."}
         );
         this.whichMon = element.name;
-        console.log('whichMonNpcOne:', this.whichMon);
+        console.log("whichMonNpcOne:", this.whichMon);
         initialMessage.edit({
           embeds: [nowBattling],
           components: [...talktRow],
@@ -307,9 +316,9 @@ let restartForLoop = true;
         element.name === this.whichMon &&
         hasTalkButton
       ) {
-        console.log('whichMonNpcTwo:', this.whichMon);
-        console.log('element2:', element.name);
-         nowBattling.setFooter({text:'You moved out of NPC\'s range.'});
+        console.log("whichMonNpcTwo:", this.whichMon);
+        console.log("element2:", element.name);
+         nowBattling.setFooter({text:"You moved out of NPC\'s range."});
         initialMessage.edit({
           embeds: [nowBattling],
           components: [...navigationRow],

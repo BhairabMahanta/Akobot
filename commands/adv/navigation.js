@@ -95,7 +95,7 @@ const navigationRowAttack = new ActionRowBuilder()
 const navigationRow = [navigationRowUp, navigationRowMid]
 const talktRow = [navigationRowTalk, navigationRowMid]
 const attackRow = [navigationRowAttack, navigationRowMid]
- bothButton = new ActionRowBuilder().addComponents(
+ const bothButton = new ActionRowBuilder().addComponents(
            new ButtonBuilder()
           .setCustomId('talk_npc')
           .setLabel(' 🗣️ Talk')
@@ -138,8 +138,8 @@ const gameImage = new GameImage(600, 600, player, message);
 // const element = new Element('Monster', 200, 300); // Replace with actual element details
 
 // Call methods on the instances
-   gameImage.generateAreaElements("Forest Clearing") 
-gameImage.generateRandomElements(0.55, 0.5, 10);
+   await gameImage.generateAreaElements("Forest Clearing"); 
+   await gameImage.generateRandomElements(0.55, 0.5, 10);
   
  // Generate the updated image with the player's position
   updatedImageBuffer = await gameImage.generateUpdatedImage(areaImage, playerpos) 
@@ -158,7 +158,9 @@ gameImage.generateRandomElements(0.55, 0.5, 10);
    // const filter = i => (['attack_monster', 'cancel_adventure'].includes(i.customId)) && i.user.id === message.author.id || (i.customId === 'option_select') || (i.customId === 'go_in') || i.customId.match(/^(north|south|west|east)$/i);
   const collector = initialMessage.createMessageComponentCollector({ filter, time: 600000 });
  
-
+  await gameImage.nearElement(hasAttackButton, message, initialMessage, navigationRow, attackRow, talktRow, bothButton, hasTalkButton, nowBattling, interactRow)  
+  // initialMessage.edit({ files: [updatedImageBuffer] });
+  console.log('click1test :', playerpos);
 
 
   // Handle button interactions
@@ -170,26 +172,26 @@ gameImage.generateRandomElements(0.55, 0.5, 10);
     hasTalkButton = initialMessage.components.some(component =>
   component.components.some(subComponent => subComponent.customId === 'talk_npc')
 );
-    
+
 
     
  if (i.customId === 'north' && i.user.id === message.user.id) {
    
    playerpos.y -= 50;
            
-   console.log('click1test :', playerpos)
+   console.log('click1test :', playerpos);
    updatedImageBuffer = await gameImage.movePlayer(player);
-           console.log('i should work:')
+           console.log('i should work:');
     
-           initialMessage.edit({ files: [updatedImageBuffer] })
+           initialMessage.edit({ files: [updatedImageBuffer] });
     // ...
     } 
  
  else if (i.customId === 'east' && i.user.id === message.user.id) {
-    console.log('click1test :  button')
+    console.log('click1test :  button');
    playerpos.x += 50;
             
-   console.log('click1test :', playerpos)
+   console.log('click1test :', playerpos);
     updatedImageBuffer = await gameImage.movePlayer(player);
           
            initialMessage.edit({ files: [updatedImageBuffer] })
@@ -197,32 +199,32 @@ gameImage.generateRandomElements(0.55, 0.5, 10);
     } 
 
  else if (i.customId === 'west' && i.user.id === message.user.id) {
-    console.log('click1test :  button')
+    console.log('click1test :  button');
    playerpos.x -= 50;
              
    console.log('click1test :', playerpos)
     updatedImageBuffer  = await gameImage.movePlayer(player);
            
-           initialMessage.edit({ files: [updatedImageBuffer] })
+           initialMessage.edit({ files: [updatedImageBuffer] });
 
     // ...
     } 
 
  else if (i.customId === 'south' && i.user.id === message.user.id) {
-    console.log('click1test :  button')
+    console.log('click1test :  button');
    playerpos.y += 50;
    
-   console.log('click1test :', playerpos)
+   console.log('click1test :', playerpos);
    updatedImageBuffer = await gameImage.movePlayer(player);
     
           
-           initialMessage.edit({ files: [updatedImageBuffer] })
+           initialMessage.edit({ files: [updatedImageBuffer] });
 
                 // ...
     } 
  else if (i.customId === 'attack_monster' && i.user.id === message.user.id)  {
    initialMessage.edit({components: []});
-   const thatArray = gameImage.elementArray[0]
+   const thatArray = gameImage.elementArray[0];
    // console.log('THAT ARA ARAA:', thatArray)
           // Handle the attack logic here
        const battle = new Battle(playerData2, thatArray , message);

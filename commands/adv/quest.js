@@ -12,7 +12,7 @@ const collection = db.collection('akaillection');
 class Quest {
   constructor(that) {
     this.player = that.player;
-		this.playerId = that._id
+		this.playerId = that._id;
     this.filter = { _id: that.player._id };
     this.questName = that.questName;
     this.questDetails = null;
