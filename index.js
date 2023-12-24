@@ -55,7 +55,7 @@ client.on('messageCreate', message => {
     }
   }
     } catch (error) {
-  console.log('what the fuck:', error)
+  console.log('what the fuck:', error);
 }
 });
 

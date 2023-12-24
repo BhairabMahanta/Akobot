@@ -194,7 +194,7 @@ const gameImage = new GameImage(600, 600, player, message);
    console.log('click1test :', playerpos);
     updatedImageBuffer = await gameImage.movePlayer(player);
           
-           initialMessage.edit({ files: [updatedImageBuffer] })
+           initialMessage.edit({ files: [updatedImageBuffer] });
       // ...
     } 
 
@@ -202,7 +202,7 @@ const gameImage = new GameImage(600, 600, player, message);
     console.log('click1test :  button');
    playerpos.x -= 50;
              
-   console.log('click1test :', playerpos)
+   console.log('click1test :', playerpos);
     updatedImageBuffer  = await gameImage.movePlayer(player);
            
            initialMessage.edit({ files: [updatedImageBuffer] });
@@ -228,7 +228,8 @@ const gameImage = new GameImage(600, 600, player, message);
    // console.log('THAT ARA ARAA:', thatArray)
           // Handle the attack logic here
        const battle = new Battle(playerData2, thatArray , message);
-   await battle.startEmbed()
+       console.log('worked Here beta')
+   await battle.startEmbed();
 
  //   if (battle.continue) {
  //  console.log('playerSElECTFAMILOIAR:', battle.player.selectedFamilar )

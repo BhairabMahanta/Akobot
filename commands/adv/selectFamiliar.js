@@ -1,7 +1,9 @@
 const { EmbedBuilder, ActionRowBuilder, StringSelectMenuBuilder, time } = require('discord.js');
 
 const {playerModel} = require('../../data/mongo/playerschema.js'); // Adjust the path to match your schema file location
-
+const {mongoClient} = require('../../data/mongo/mongo.js')
+const db = mongoClient.db('Akaimnky');
+const collection = db.collection('akaillection');
 
 const players = require('../../data/players.json');
 const fs = require('fs');
@@ -11,21 +13,39 @@ module.exports = {
   description: 'Select up to 3 familiars!',
   aliases: ['sf'],
   async execute(client, message, args, interaction) {
-    const {db} = client
+    const {db} = client;
     
-async function updateClass(playerIdee, className) {
-  const PlayerModel = await playerModel(db);
-  const selektFam = {name: [className]}
-  console.log('selectfam:', selektFam)
-  // Find the document with the _id `playerId`
-  const player = await PlayerModel.findByIdAndUpdate(`${playerIdee}`, { 'selectedFamiliars': `${selektFam}` }, { upsert: true, new: true, setDefaultsOnInsert: true }
-  );
-  
-  
-  console.log('AFTERCLASS:', player)
-  // Save the document
-  await player.save();
-  }
+    async function updateClass(playerIdee, className) {
+      const PlayerModel = await playerModel(db);
+      const selektFam = className;
+      console.log('selectfam:', selektFam);
+      // Find the document with the _id `playerId`
+  try {
+    const filter = { _id: message.author.id};
+    const playerData = await collection.findOne(filter);
+    
+    if (!playerData.selectedFamiliars) {
+  // If the quest array doesn't exist, create it as an empty array
+  playerData.selectedFamiliars = { name: selektFam.flat() };
+} else if (playerData.selectedFamiliars.name) {
+playerData.selectedFamiliars.name = selektFam.flat();
+}
+      const player = await PlayerModel.findByIdAndUpdate(
+        `${playerIdee}`, 
+        { 
+          $set: { 'selectedFamiliars': playerData.selectedFamiliars }
+        }, 
+        { upsert: true, new: true, setDefaultsOnInsert: true }
+      );
+      
+      console.log('AFTERCLASS:', player);
+      await player.save();
+      // Save the document
+      } catch (err) { 
+        console.error('Error updating player data:', err);
+      }
+      
+    }
     // Check if the player exists in the data
     const playerId = message.author.id;
     if (!players[playerId]) {
@@ -46,11 +66,11 @@ async function updateClass(playerIdee, className) {
         // ability.execute(this.currentTurn, this.boss.name)
        console.log('execuTE:', familiar); 
         return {
-         label: familiar, value: familiar }
+         label: familiar, value: familiar };
       }
      }
        );
-    console.log('Options:', options)
+    console.log('Options:', options);
   
     if (familiars.length < 2) {
     // Create a SelectMenu with all of the familiars
@@ -58,16 +78,16 @@ async function updateClass(playerIdee, className) {
       .setCustomId('select_familiars')
       .setMinValues(1)
       .setPlaceholder('Select up to 3 familiars')
-      .addOptions(options)
-    console.log('selectMenu:', selectMenu)
+      .addOptions(options);
+    console.log('selectMenu:', selectMenu);
     } else if (familiars.length < 3 && familiars.length >1) {// Create a SelectMenu with all of the familiars
      selectMenu = new StringSelectMenuBuilder()
       .setCustomId('select_familiars')
       .setMinValues(1)
       .setMaxValues(2)
       .setPlaceholder('Select up to 3 familiars')
-      .addOptions(options)
-    console.log('selectMenu:', selectMenu)
+      .addOptions(options);
+    console.log('selectMenu:', selectMenu);
     }
     else {
       // Create a SelectMenu with all of the familiars
@@ -76,13 +96,13 @@ async function updateClass(playerIdee, className) {
       .setMinValues(1)
       .setMaxValues(3)
       .setPlaceholder('Select up to 3 familiars')
-      .addOptions(options)
-    console.log('selectMenu:', selectMenu)
+      .addOptions(options);
+    console.log('selectMenu:', selectMenu);
     }
 
     // Create a row for the SelectMenu
     const row = new ActionRowBuilder().addComponents(selectMenu);
-    console.log('row:', row)
+    console.log('row:', row);
 
     // Create an embed
     const embed = new EmbedBuilder()
@@ -113,14 +133,14 @@ async function updateClass(playerIdee, className) {
       // Update the SelectMenu options
       selectMenu.setOptions(
         familiars.map((familiar, i) => {
-          const isSelected = selectedValues.includes(familiar);
+          const isSelected = selectedValues.includes(familiar); 
           return { label: familiar, value: familiar, default: false };
         })
       );
-console.log('selectedFamiliars:', selectedFamiliars)
-const selectedFamiliarsArray = []
-selectedFamiliarsArray.push(selectedFamiliars)
-console.log('sfArray:', selectedFamiliarsArray)
+console.log('selectedFamiliars:', selectedFamiliars);
+const selectedFamiliarsArray = [];
+selectedFamiliarsArray.push(selectedFamiliars);
+console.log('sfArray:', selectedFamiliarsArray);
       // Update the embed
       embed.setDescription('You have selected the following familiars:\n' + selectedFamiliars.join('\n'));
             // players[playerId].selectedFamiliars.name = selectedFamiliars;

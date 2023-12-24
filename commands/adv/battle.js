@@ -43,15 +43,20 @@ class Battle {
         this.mobSource = JSON.parse(JSON.stringify(mobs));
         this.bossSource  = JSON.parse(JSON.stringify(bosses));
         this.famSource  = JSON.parse(JSON.stringify(cards));
-        this.enemyDetails = enemy
+        this.enemyDetails = enemy;
         this.message = message;
+        this.continue = true; 
         this.player = player;
         this.mobs = [];
         this.abilityOptions = [];
-        try {if (this.player.selectedFamiliars) {
-               this.playerFamiliar = this.player.selectedFamiliars.name;
-                 } else if (!this.player.selectedFamiliars) {
-                console.log('gay')
+        this.playerFamiliar =[];
+        console.log('yes');
+        console.log(player.selectedFamiliars.name);
+        try {
+            if (player.selectedFamiliars) {
+               this.playerFamiliar = player.selectedFamiliars.name;
+                 } else if (!   player.selectedFamiliars) {
+                console.log('gay');
                 this.playerFamiliar = ["Fire Dragon"];
                 this.message.channel.send('You have to select your familiar first using a!selectFamiliar')
                 return this.continue = false;
@@ -64,7 +69,7 @@ class Battle {
         if (this.enemyDetails.type === 'boss') {
         this.boss = this.bossSource[this.enemyDetails.name];
         } else {
-          this.boss = this.bossSource['Dragon Lord']
+          this.boss = this.bossSource['Dragon Lord'];
         }
         this.currentTurn = null;
         this.characters = [];
@@ -79,65 +84,71 @@ class Battle {
         this.deadEnemies = [];
         this.battleEmbed = null;
         this.allEnemies = [];
-        this.waves = this.enemyDetails.waves
+        this.waves = this.enemyDetails.waves;
         this.enemyFirst = false;
         this.pickEnemyOptions = null;
         this.selectMenu = null;
-        this.pickedChoice = false
+        this.pickedChoice = false;
         this.enemyToHit = null;
+          
 
     }
 
   
     async initialiseStuff()
  {
+    console.log('initialised');
     try{
+        console.log('familiarName:', this.playerFamiliar);
     for (const familiarName of this.playerFamiliar) {
+        console.log('familiarName:', this.playerFamiliar);
       const familiarData = this.famSource[familiarName];
       if (familiarData) {
           this.familiarInfo.push(familiarData);
       } }
     if (this.enemyDetails.type === 'boss') {
     this.boss = this.bossSource[this.enemyDetails.name];
-    this.allEnemies.push(this.boss)
+    this.allEnemies.push(this.boss);
     } else {
-    this.boss = this.bossSource['Dragon Lord']
+    this.boss = this.bossSource['Dragon Lord'];
     }
     if (this.enemyDetails.type === 'mob' && this.enemyDetails.hasAllies.includes('none')) {
-    this.mobs.push(this.enemyDetails.name)
+    this.mobs.push(this.enemyDetails.name);
     } else if (this.enemyDetails.type === 'mob' && !this.enemyDetails.hasAllies.includes('none')) {
-     this.mobs.push(this.enemyDetails.name)
-     this.mobs.push(this.enemyDetails.hasAllies.join(','))
+     this.mobs.push(this.enemyDetails.name);
+     this.mobs.push(this.enemyDetails.hasAllies.join(','));
     }
-
+console.log('familiars:', this.familiarInfo);
         
     for (const mobName of this.mobs) {
     const mobData = this.mobSource[mobName];
       if (mobData) {
       this.mobInfo.push(mobData);
     } }
-    this.allEnemies.push(...this.mobInfo)
+    this.allEnemies.push(...this.mobInfo);
     if (this.enemyDetails.type === 'boss') {
     this.characters = [this.player, ...this.familiarInfo, this.boss];
 
     } else {
     this.characters = [this.player, ...this.familiarInfo, ...this.mobInfo];
     }
+    console.log('characters:', this.characters);
     if (this.player.class != null) {
-      this.playerClass = this.player.class
+      this.playerClass = this.player.class;
       this.continue = true;
     } else if (this.player.class === null) {
       this.message.channel.send('You have to select a class first, use a!selectclass');
+      console.log('You have to select a class first, use a!selectclass');
       return this.continue = false;
     }
     if (this.player.race != null) {
-      this.playerRace = this.player.race
+      this.playerRace = this.player.race;
     } else if (this.player.class === null) {
       this.message.channel.send('You have to select a race first, use a!selectrace');
     }
     for (const character of this.characters) {
      try {
-      character.maxHp = character.stats.hp
+      character.maxHp = character.stats.hp;
     } catch (error) {
       console.log('fillBarError:', error);
     }
@@ -149,12 +160,13 @@ class Battle {
 
     this.aliveEnemies = this.allEnemies;
 } catch (error) {
-        console.log('The error is here:', error)
+        console.log('The error is here:', error);
 }
   }     
   
     async startEmbed() {
-      await this.initialiseStuff()
+        console.log('initialising');
+      await this.initialiseStuff();
       let selectedValue;
             // Create the embed for the adventure command
     this.battleEmbed = new EmbedBuilder()
@@ -184,7 +196,7 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
                         console.log('bro clicked fr??:', selectedValue);
                          const selectedValueName = selectedValue.replace('klik_', '');
                          if (selectedValueName === 'fight') {
-                           gaeMessage.delete()
+                           gaeMessage.delete();
    if (this.continue) {
  this.startBattle(this.message);
    }
