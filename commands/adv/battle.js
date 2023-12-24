@@ -874,14 +874,14 @@ let filledBars;
                           });
                           try {
                             const filter = { _id: this.player._id };
-                        const playerData2 = await collection.findOne(filter)
+                        const playerData2 = await collection.findOne(filter);
                          if (playerData2) {
                             // Create an object with only the xp property to update
                             const updates = {
                                 $inc: { 'exp.xp': rewards.experience, 'balance.coins': rewards.gold },
                                 $set: { activeQuests: this.player.activeQuests},
                                 };
-                        console.log('rewards.xpereince:', rewards.experience)
+                        console.log('rewards.xpereince:', rewards.experience);
                             // Update the player's document with the xpUpdate object
                             await collection.updateOne(filter, updates);
                         

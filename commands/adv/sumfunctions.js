@@ -135,6 +135,7 @@ class GameImage {
       );
  if (this.distanceToMonster <= attackRadius) {
    this.isTrue = true;
+   console.log('it orked');
    this.whichMon = element.name;
    if (!this.elementArray.includes(element)) {
    this.elementArray.push(element);
@@ -157,7 +158,7 @@ class GameImage {
    break;
  } 
     }
-    return this.isTrue
+    return this.isTrue;
   }
 
 
@@ -172,8 +173,8 @@ class GameImage {
         // Add elements to the image
         this.generatedRandomElements2 = true;
         for (const element of this.elements) {
-          const elementName = element.name
-     name = `commands/adv/npcimg/${elementName}.png`
+          const elementName = element.name;
+     name = `commands/adv/npcimg/${elementName}.png`;
              const filePath = path.join(name);
          
 // Use fs.existsSync to check if the file exists
@@ -213,7 +214,7 @@ if (fs.existsSync(name)) {
     } catch (error) {
       console.error("An error occurred:", error);
       // Send an error message back to the channel
-      message.channel.send("An error occurred while generating the updated map.");
+      this.message.channel.send("An error occurred while generating the updated map.");
     }
   }
   async movePlayer(player) {
@@ -235,7 +236,7 @@ if (fs.existsSync(name)) {
   async nearElement(hasAttackButton, message, initialMessage, navigationRow, attackRow, talktRow, bothButton, hasTalkButton, nowBattling, interactRow) {
     const attackRadius = 40; // Adjust the radius as needed
     console.log("NearElement");
-let restartForLoop = true;
+
     // while (restartForLoop) {
     for (const element of this.monsterArray) {
       await this.forLoop();
@@ -262,7 +263,8 @@ let restartForLoop = true;
           embeds: [nowBattling],
           components: [...attackRow],
         });
-        restartForLoop = false;
+        console.log('should break');
+
         break;
       } 
       else if (
@@ -282,7 +284,7 @@ let restartForLoop = true;
         
       }
   }
-      console.log('BROCHANGED ELEMENTS WTFFF')
+      console.log('BROCHANGED ELEMENTS WTFFF');
     
     //}
 
@@ -302,7 +304,7 @@ let restartForLoop = true;
         !hasTalkButton
       ) {
         nowBattling.setFooter({text:
-          "You see an NPC, click the \'Talk\' button to interact."}
+          "You see an NPC, click the 'Talk' button to interact."}
         );
         this.whichMon = element.name;
         console.log("whichMonNpcOne:", this.whichMon);
@@ -318,7 +320,7 @@ let restartForLoop = true;
       ) {
         console.log("whichMonNpcTwo:", this.whichMon);
         console.log("element2:", element.name);
-         nowBattling.setFooter({text:"You moved out of NPC\'s range."});
+         nowBattling.setFooter({text:"You moved out of NPC's range."});
         initialMessage.edit({
           embeds: [nowBattling],
           components: [...navigationRow],

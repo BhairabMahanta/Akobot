@@ -32,7 +32,7 @@ const navigationRowMid = new ActionRowBuilder()
 .addComponents(
       new ButtonBuilder()
          .setCustomId('west')
-         .setLabel('←  West')
+         .setLabel('←←West')
          .setStyle('Success'),
         new ButtonBuilder()
         .setCustomId('south')
@@ -40,7 +40,7 @@ const navigationRowMid = new ActionRowBuilder()
         .setStyle('Danger'),
          new ButtonBuilder()
         .setCustomId('east')
-        .setLabel('→  East')
+        .setLabel('→→East')
         .setStyle('Success')
     );
  const navigationRowTalk = new ActionRowBuilder()
@@ -72,7 +72,7 @@ const navigationRowAttack = new ActionRowBuilder()
         .setStyle('Danger'),
            new ButtonBuilder()
           .setCustomId('attack_monster')
-          .setLabel('Attack')
+          .setLabel('⚔️ Attack')
           .setStyle('Primary')
       );
       const navigationRowInteract = new ActionRowBuilder()
@@ -132,8 +132,8 @@ async function handleNavigation(allFloors, message, adventureEmbed, initialMessa
   
      // Create instances of the classes
 const gameImage = new GameImage(600, 600, player, message);
-  const newNpc = new NPC(playerData2, 'npc1', message)
-  const playerpos = gameImage.playerpos
+  const newNpc = new NPC(playerData2, 'npc1', message);
+  const playerpos = gameImage.playerpos;
 // const player = new Player('PlayerName', 100); // Replace with actual player name and health
 // const element = new Element('Monster', 200, 300); // Replace with actual element details
 
@@ -142,7 +142,7 @@ const gameImage = new GameImage(600, 600, player, message);
    await gameImage.generateRandomElements(0.55, 0.5, 10);
   
  // Generate the updated image with the player's position
-  updatedImageBuffer = await gameImage.generateUpdatedImage(areaImage, playerpos) 
+  updatedImageBuffer = await gameImage.generateUpdatedImage(areaImage, playerpos); 
   nowBattling.setImage(`attachment://updatedMap.png`);
    // Now you can use initialMessage to edit it or perform other actions
   initialMessage.edit({
@@ -228,7 +228,7 @@ const gameImage = new GameImage(600, 600, player, message);
    // console.log('THAT ARA ARAA:', thatArray)
           // Handle the attack logic here
        const battle = new Battle(playerData2, thatArray , message);
-       console.log('worked Here beta')
+       console.log('worked Here beta');
    await battle.startEmbed();
 
  //   if (battle.continue) {
