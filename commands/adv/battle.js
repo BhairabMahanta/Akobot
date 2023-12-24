@@ -99,9 +99,9 @@ class Battle {
  {
     console.log('initialised');
     try{
-        console.log('familiarName:', this.playerFamiliar);
+        
     for (const familiarName of this.playerFamiliar) {
-        console.log('familiarName:', this.playerFamiliar);
+        // console.log('familiarName:', this.playerFamiliar);
       const familiarData = this.famSource[familiarName];
       if (familiarData) {
           this.familiarInfo.push(familiarData);
@@ -118,7 +118,7 @@ class Battle {
      this.mobs.push(this.enemyDetails.name);
      this.mobs.push(this.enemyDetails.hasAllies.join(','));
     }
-console.log('familiars:', this.familiarInfo);
+// console.log('familiars:', this.familiarInfo);
         
     for (const mobName of this.mobs) {
     const mobData = this.mobSource[mobName];
@@ -158,7 +158,7 @@ console.log('familiars:', this.familiarInfo);
     //   console.log(character.name, '-', character.attackBarEmoji), '-', character.hpBarEmoji;
     }
 
-    this.aliveEnemies = this.allEnemies;
+    this.aliveEnemies = this.allEnemies.flat();
 } catch (error) {
         console.log('The error is here:', error);
 }
@@ -315,7 +315,7 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
 
     async startBattle(message) {
 
-        await this.getNextTurn()
+        await this.getNextTurn();
 
         this.initialMessage = await this.sendInitialEmbed(message);
         this.initialMessage = await message.channel.send({
@@ -339,17 +339,19 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
         // Handle button interactions
         collector.on('collect', async (i) => {
             await i.deferUpdate();
-            console.log('customid:', i.customId)
+            console.log('customid:', i.customId);
 
             if (i.customId === 'action_normal') {
                 try {
+                    console.log('aliveEnemiesearlY:', this.aliveEnemies);
                     if (this.pickedChoice || this.aliveEnemies.length === 1){
                         this.pickedChoice = false;
                     if (this.aliveEnemies.length === 1) {
+                        console.log('aliveEnemies:', this.aliveEnemies);
                         this.enemyToHit = this.aliveEnemies[0];
                     }
                     this.performTurn(message);
-                    await this.getNextTurn()
+                    await this.getNextTurn();
                     await this.performEnemyTurn(message);
                     console.log('currentTurn:', this.currentTurn);
                   this.printBattleResult();
@@ -364,15 +366,15 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
                     console.error('Error on hit:', error);
                 }
             } else if (i.customId === 'action_select') {
-                        const targetIndex = i.values[0]
-                        const realTarget = targetIndex.replace('enemy_', '')
+                        const targetIndex = i.values[0];
+                        const realTarget = targetIndex.replace('enemy_', '');
                         this.enemyToHit = this.aliveEnemies[realTarget];
                         this.pickedChoice = true;
                         // Continue with your code logic after selecting an enemy
                       }
             else if (i.customId === 'starter') {
                 const selectedClassValue = i.values[0]; // Get the selected value // gae shit
-                console.log('selectedValues', selectedClassValue)
+                console.log('selectedValues', selectedClassValue);
                 if (this.pickedChoice || this.aliveEnemies.length === 1) {
                     this.pickedChoice = false;
                     if (this.aliveEnemies.length === 1) {
@@ -381,13 +383,13 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
                 if (selectedClassValue.startsWith('player_ability_')) {
                     try {
                         const abilityName = selectedClassValue.replace('player_ability_', '');
-                        console.log('abilityName:a', abilityName)
+                        console.log('abilityName:a', abilityName);
                         const abilityNameCamel = await this.toCamelCase(abilityName);
-                        console.log('abilityName:a', abilityNameCamel)
+                        console.log('abilityName:a', abilityNameCamel);
                         // Check if the abilityName exists as a method in the Ability class
                         if (typeof this.ability[abilityNameCamel] === 'function') {
                             await this.ability[abilityNameCamel](this.player, this.enemyToHit);
-                            await this.getNextTurn()
+                            await this.getNextTurn();
                             await this.performEnemyTurn(message);
                             console.log('currentTurn:', this.currentTurn);
                           this.printBattleResult();
@@ -404,15 +406,15 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
                 } else if (selectedClassValue.startsWith('fam-')) {
                     try {
                         const abilityName = selectedClassValue.replace('fam-', '');
-                        console.log('abilityName:a', abilityName)
+                        console.log('abilityName:a', abilityName);
                         const abilityNameCamel = await this.toCamelCase(abilityName);
-                        console.log('abilityName:a', abilityNameCamel)
+                        console.log('abilityName:a', abilityNameCamel);
                         if (typeof this.ability[abilityNameCamel] === 'function') {
                             // Execute the ability by calling it using square brackets
                             for (const familiar of this.familiarInfo) {
                                 if (familiar.name === this.currentTurn) {
                                     this.ability[abilityNameCamel](familiar, this.enemyToHit);
-                                    await this.getNextTurn()
+                                    await this.getNextTurn();
                                     await this.performEnemyTurn(message);
                                     console.log('currentTurn:', this.currentTurn);
                                   this.printBattleResult();
@@ -424,7 +426,7 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
                         }
                         
                     } catch (error) {
-                        console.log('ErrorFamiliar:', error)
+                        console.log('ErrorFamiliar:', error);
                     }
                 }
             }  else {
@@ -490,7 +492,7 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
                       label: 'namename',
                       description: 'whatever',
                       value: `uh oh`,
-                  }]
+                  }];
           this.performEnemyTurn(this.message);
             }
       }
@@ -620,8 +622,8 @@ const gaeRow = new ActionRowBuilder().addComponents(await this.selectMenu)
         const emoji = '■';
         let emptyBars = 0;
       if (atkBar > 113) {
-        console.log('atkBar:', atkBar)
-        atkBar = 113
+        console.log('atkBar:', atkBar);
+        atkBar = 113;
       }
         const filledBars = Math.floor(atkBar / 5); emptyBars = Math.floor(21 - filledBars);
 
@@ -640,7 +642,7 @@ const gaeRow = new ActionRowBuilder().addComponents(await this.selectMenu)
 let filledBars;
          filledBars = Math.floor((currentHP / maxHP) * 21); 
             if (currentHP < 0)  {
-              filledBars = 0
+              filledBars = 0;
       }
         const emptyBars = Math.floor(21 - filledBars);
 
@@ -686,19 +688,19 @@ let filledBars;
                 break; // Exit the loop
             }
         }
-        await this.fillHpBars()
+        await this.fillHpBars();
         return nextTurn;
     }
 
     async performTurn(message) {
         // const attacker = this.currentTurn;
         // this.getNextTurn()
-        console.log('currentTurn:', this.currentTurn)
+        console.log('currentTurn:', this.currentTurn);
         // If the current turn is the player, let the player choose a move
         if (this.currentTurn === this.playerName) {
             // const move = attacker.chooseMove(); // Implement this method for the player
           
-            const target = this.enemyToHit.name 
+            const target = this.enemyToHit.name ;
             const damage = calculateDamage(this.player.stats.attack, this.enemyToHit.stats.defense);
 
             // Update HP and battle logs
@@ -772,8 +774,8 @@ let filledBars;
         }
       }
         if (this.currentTurn != this.boss.name) {
-            console.log('notmy turn bitches')
-            return
+            console.log('notmy turn bitches');
+            return;
         } else if (this.currentTurn === this.boss.name) {
           let isTargetingPlayer;
             // If the current turn is the environment, let it make a move
@@ -781,24 +783,24 @@ let filledBars;
               isTargetingPlayer = Math.random() < 0.3; // 30% chance to target the player
           
           const aliveFamiliars = this.familiarInfo.filter(familiar => familiar.stats.hp > 0);
-          console.log('length LMAOAWDOJAIHFIAJFOIAJDFFASIF: ', aliveFamiliars.length)
+          console.log('length LMAOAWDOJAIHFIAJFOIAJDFFASIF: ', aliveFamiliars.length);
           if (aliveFamiliars.length < 1) {
             isTargetingPlayer = true;
           }
     const targetInfo = isTargetingPlayer ? this.player : aliveFamiliars[Math.floor(Math.random() * aliveFamiliars.length)];
 
             const target = targetInfo.name;
-            console.log('TARGETNAME:', target)   
+            console.log('TARGETNAME:', target)  ; 
             const damage = calculateDamage(this.boss.stats.attack, targetInfo.stats.defense);
 
             // Update HP and battle logs
             targetInfo.stats.hp -= damage;
-            console.log('My turn now bitches')
+            console.log('My turn now bitches');
             this.battleLogs.push(`- ${this.currentTurn} attacks ${target} for ${damage} damage using cum!\n ============================================`);
             // message.channel.send(`\`\`\`${logsString}\`\`\``);
             console.log('loglength:', this.battleLogs.length)
             console.log(`${this.currentTurn} attacks ${target} for ${damage} damage using cum!`)
-            await this.getNextTurn()
+            await this.getNextTurn();
             console.log('currentTurnForDragonafter;', this.currentTurn)
             //  const updatedEmbed = await this.sendInitialEmbed(message);
             // this.initialMessage.edit({ embeds: [updatedEmbed], components: await this.getDuelActionRow() });
@@ -813,40 +815,41 @@ let filledBars;
    async printBattleResult() {
         // Implement code to display the battle result (victory, defeat, or draw)
                           // this.printBattleResult();
-                          let updatedEmbed
+                          let updatedEmbed;
                           for (const character of this.allEnemies)  {
                             if (character.stats.hp < 0 && !this.deadEnemies.includes(character.name)) {
-                                  this.battleLogs.push(`${character.name} died poggers`)
+                                  this.battleLogs.push(`${character.name} died poggers`);
                                   character.stats.speed = 0;
                                   character.atkBar = 0;
                                   character.stats.hp = 0;
-                                  this.deadEnemies.push(character.name)
-                                  console.log('ALIVEFAM:', this.aliveEnemies)
-                                  this.aliveEnemies.pop(character)
-                                  console.log('ALIVEFAM:', this.aliveEnemies)
+                                  this.deadEnemies.push(character.name);
+                                  console.log('adeadenem:', this.deadEnemies);
+                                  console.log('ALIVEFAM:', this.aliveEnemies);
+                                  this.aliveEnemies = this.aliveEnemies.filter(enemy => enemy !== character);
+                                  console.log('ALIVEFAM:', this.aliveEnemies);
                                    break;
                               }
                           }
                      for (const character of this.familiarInfo)  {
                       if (character.stats.hp < 0 && !this.aliveFam.includes(character.name)) {
-                            this.battleLogs.push(`${character.name} died lol`)
+                            this.battleLogs.push(`${character.name} died lol`);
                             character.stats.speed = 0;
                             character.atkBar = 0;
                             character.stats.hp = 0;
-                            this.aliveFam.push(character.name)
-                            console.log('ALIVEFAM:', this.aliveFam)
+                            this.aliveFam.push(character.name);
+                            console.log('ALIVEFAM:', this.aliveFam);
                              break;
                         }
                     }
                     if (this.aliveEnemies.length === 0) {
-                        const rewards = this.enemyDetails.rewards
+                        const rewards = this.enemyDetails.rewards;
                         if (this.player.activeQuests) {
                             for (const activeQuestName in this.player.activeQuests) {
                                 if (this.player.activeQuests.hasOwnProperty(activeQuestName)) {
                                   const activeQuestDetails = quests[activeQuestName];
                                   const activeQuestDetails2 = this.player.activeQuests[activeQuestName];
-                                  console.log(`stuffHere: ${activeQuestDetails.title}`)
-                                  console.log(`stuffHere: ${activeQuestDetails2.objectives[0]}`)
+                                  console.log(`stuffHere: ${activeQuestDetails.title}`);
+                                  console.log(`stuffHere: ${activeQuestDetails2.objectives[0]}`);
                                   }
                               } 
                         } 
@@ -889,20 +892,20 @@ let filledBars;
                         } catch (error) {
                           console.error('Error updating player XP:', error);
                         }
-                          console.log('thisplayeractiveQuest:', this.player.activeQuests)
+                          console.log('thisplayeractiveQuest:', this.player.activeQuests);
    
                         this.battleEmbed.setFields({
                             name: `You won the battle against the Monster, you can continue the journey where you left off (I lied  you can't)!!`,
                             value: `Rewards:\n Exp: ${rewards.experience}, Gold: ${rewards.gold}`,
                             inline: true,
                         })
-                        this.battleEmbed.setDescription(`GGs You've won`)
+                        this.battleEmbed.setDescription(`GGs You've won`);
                         this.initialMessage.edit({
                             embeds: [this.battleEmbed],
                             components: []
                         });
                     } else if (this.player.stats.hp < 0) {
-                        this.message.channel.send("You lost, skill issue.")
+                        this.message.channel.send("You lost, skill issue.");
                       this.player.stats.speed = 0;
                     } else {
                      updatedEmbed = await this.sendInitialEmbed(this.message);

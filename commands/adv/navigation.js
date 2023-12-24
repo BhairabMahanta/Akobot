@@ -32,7 +32,7 @@ const navigationRowMid = new ActionRowBuilder()
 .addComponents(
       new ButtonBuilder()
          .setCustomId('west')
-         .setLabel('← West')
+         .setLabel('←  West')
          .setStyle('Success'),
         new ButtonBuilder()
         .setCustomId('south')
@@ -40,7 +40,7 @@ const navigationRowMid = new ActionRowBuilder()
         .setStyle('Danger'),
          new ButtonBuilder()
         .setCustomId('east')
-        .setLabel('→ East')
+        .setLabel('→  East')
         .setStyle('Success')
     );
  const navigationRowTalk = new ActionRowBuilder()
