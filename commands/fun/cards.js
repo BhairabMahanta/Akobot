@@ -17,12 +17,14 @@ const cards = {
         name: 'Flame Strike',
         description: 'Attack with a fiery strike',
         power: 20,
+        cooldown: 3,
       },
       {
         id: 2,
         name: 'Dragon Claw',
         description: 'Slash with powerful dragon claws',
         power: 15,
+        cooldown: 2,
       },
       // Add more moves as needed
     ],
@@ -45,12 +47,14 @@ const cards = {
         name: 'Aqua Blast',
         description: 'Blast your opponent with water',
         power: 20,
+        cooldown: 3,
       },
       {
         id: 4,
         name: 'Healing Wave',
         description: 'Heal yourself with water energy',
         power: -25, // healing ig
+        cooldown: 3,
       },
       //  more moves sexy    ],
 ]

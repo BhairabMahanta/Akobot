@@ -1,22 +1,31 @@
 const { checkResults, updateMovesOnCd, calculateAbilityDamage, getCardStats, getCardMoves,
   calculateDamage, getPlayerMoves } = require('../util/glogic.js');
+  const abilities = require('../../data/abilities.js');
 class Ability {
   constructor(that) {
     this.battleLogs = that.battleLogs;
-    this.enemyToHit = that.enemyToHit
+    this.enemyToHit = that.enemyToHit;
+    this.cooldowns = that.cooldowns;
 }
-
+  cooldownFinder(ability) {
+    const abilityCooldown = abilities[ability].cooldown;
+    return abilityCooldown;
+  }
  //PLAYER ABILOITIES AKAI THIS WORKS BLUD
   
   shieldBash(user, target) {
     const damage = calculateDamage(user.stats.attack, target.stats.defense);
-    console.log('bossHp:', target.stats.hp)
+    console.log('bossHp:', target.stats.hp);
     target.stats.hp -= damage;
-    console.log('bossHpafter:', target.stats.hp)
+    target.stats.speed -= 10;
+    console.log('bossHpafter:', target.stats.hp);
     this.battleLogs.push(`+ ${user.name} uses Shield Bash on ${target.name} dealing ${damage}. ${target.name} is slowed!`);
-    console.log(this.battleLogs.length)
+    console.log(this.battleLogs.length);
     console.log(`${user.name} uses Shield Bash on ${target.name}. ${target.name} is slowed!`);
-    // Implement slow effect on the target here
+    this.cooldowns.push({name: `Shield Bash`, cooldown: this.cooldownFinder('Shield Bash')});
+    console.log('cooldowns: ', this.cooldowns);
+   
+    // updateMovesOnCd(this.cooldowns, this.cooldownFinder('shieldBash'));
   }
 
  defend(user) {
@@ -255,15 +264,73 @@ class Ability {
   }
 
   healingWave(user) {
-    const power = 20
+    const power = 20;
     const healingAmount = calculateAbilityDamage(power);
     user.stats.hp += healingAmount;
     this.battleLogs.push(`+ ${user.name} uses Healing Wave and heals for ${healingAmount}.`);
     // Implement additional effects for Healing Wave here
   }
 
-}
+  lightningBolt(user, target) {   
+    const power = 20;
+    const damage = calculateAbilityDamage(power);
+    target.stats.hp -= damage;
+    this.battleLogs.push(`+ ${user.name} uses Lightning Bolt on ${target.name} dealing ${damage}.`);
+    // Implement additional effects for Lightning Bolt here
+  }
 
+
+//boss abilities
+  basicAttack(user, target) {
+    const damage = calculateDamage(user.stats.attack, target.stats.defense);
+    target.stats.hp -= damage;
+    this.battleLogs.push(`+ ${user.name} uses Shield Bash on ${target.name} dealing ${damage}. ${target.name} is slowed!`);
+    console.log(this.battleLogs.length);
+    console.log(`${user.name} uses Shield Bash on ${target.name}. ${target.name} is slowed!`);
+    // Implement slow effect on the target here
+  }
+
+  bossAbility2(user) {
+    user.stats.defense += 10; // Example: Increase defense by 10
+    this.battleLogs.push(`+ ${user.name} uses Defend. Their defense is increased.`);
+  }
+
+  bossAbility3(user) {
+    user.stats.attackSpeed += 20; // Example: Increase attack speed by 20
+    user.stats.attack += 15; // Example: Increase attack damage by 15
+    this.battleLogs.push(`${user.name} activates Bloodlust. Attack speed and damage increase.`);
+  }
+
+  bossAbility4(user, target) {
+    const damage = calculateDamage(user.stats.attack * 2, target.stats.defense);
+    target.stats.hp -= damage;
+    this.battleLogs.push(`${user.name} unleashes a wild Raging Strike on ${target.name}. It deals massive damage!`);
+  }
+
+  bossAbility5(user, targets) {
+    targets.forEach((target) => {
+      const damage = calculateDamage(user.stats.attack, target.stats.defense);
+      target.stats.hp -= damage;
+    });
+    this.battleLogs.push(`${user.name} performs an Arena Spin, hitting multiple opponents.`);
+  }
+
+  bossAbility6(user, target) {
+    target.focus = user;
+    this.battleLogs.push(`${user.name} taunts ${target.name}. ${target.name} is now focused on ${user.name}.`);
+  }
+
+  bossAbility7(user, target) {
+    const criticalDamage = calculateDamage(user.stats.attack * 1.5, target.stats.defense);
+    target.stats.hp -= criticalDamage;
+    this.battleLogs.push(`${user.name} executes a precise Precision Strike on ${target.name}. It's a critical hit!`);
+  }
+
+  bossAbility8(user) {
+    user.statusEffects.resistance += 20; // Example: Increase status effect resistance by 20%
+    this.battleLogs.push(`${user.name} enters Honor's Resolve, gaining increased resistance to status effects.`);
+  }
+} 
 
 module.exports = {
   Ability

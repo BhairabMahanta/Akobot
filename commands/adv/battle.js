@@ -17,6 +17,7 @@ const classes = require('../../data/classes/allclasses');
 const abilities = require('../../data/abilities.js');
 const {
     Ability
+// eslint-disable-next-line no-undef
 } = require('./AbilitiesFunction.js');
 let initialMessage = null;
 const {
@@ -90,6 +91,7 @@ class Battle {
         this.selectMenu = null;
         this.pickedChoice = false;
         this.enemyToHit = null;
+        this.cooldowns = [];
           
 
     }
@@ -222,7 +224,7 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
                 .setFooter({
                     text: 'You can run if you want lol no issues'
                 })
-              .setColor(0x0099FF)
+              .setColor(0x0099FF);
               if (this.enemyDetails.type === 'boss') {
                 this.battleEmbed.addFields({
                     name: `Enemies Info:`,
@@ -265,14 +267,14 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
             if (this.battleLogs.length > 6 && this.battleLogs.length <= 7) {
                 this.battleLogs.shift();
             } else if (this.battleLogs.length > 7 && this.battleLogs.length <= 8) {
-                this.battleLogs.shift()
+                this.battleLogs.shift();
                 this.battleLogs.shift();
             } else if (this.battleLogs.length > 8) {
                 this.battleLogs.shift();
                 this.battleLogs.shift();
                 this.battleLogs.shift();
             }
-            console.log('battleLogsLengthAfterr:', this.battleLogs.length)
+            console.log('battleLogsLengthAfterr:', this.battleLogs.length);
 
             if (this.battleLogs.length > 0) {
 
@@ -288,7 +290,7 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
                     inline: false
                 });
             }
-            return this.battleEmbed
+            return this.battleEmbed;
             // return await message.channel.send({ embeds: [initialEmbed], components: [buttonRow] });
         } catch (error) {
             console.error('Error on hit:', error);
@@ -460,7 +462,7 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
                 familiarArray = [];
                 // console.log('abilityOptions:', this.abilityOptions)
             } catch (error) {
-                console.log('moveOptionsError:', error)
+                console.log('moveOptionsError:', error);
             }
         }
        else if (this.currentTurn === this.player.name) {
@@ -692,7 +694,7 @@ let filledBars;
         return nextTurn;
     }
 
-    async performTurn(message) {
+    async performTurn() {
         // const attacker = this.currentTurn;
         // this.getNextTurn()
         console.log('currentTurn:', this.currentTurn);
@@ -707,7 +709,7 @@ let filledBars;
             this.enemyToHit.stats.hp -= damage;
             this.battleLogs.push(`+ ${this.currentTurn} attacks ${target} for ${damage} damage using gayness`);
             console.log('loglength:', this.battleLogs.length)
-            console.log(`${this.currentTurn} attacks ${target} for ${damage} damage using gayness`)
+            console.log(`${this.currentTurn} attacks ${target} for ${damage} damage using gayness`);
             // this.getNextTurn()
             // console.log('currentTurn:', this.currentTurn);
         } else if (this.playerFamiliar.includes(this.currentTurn)) {
@@ -737,35 +739,35 @@ let filledBars;
 
     async performEnemyTurn(message) {
       for (const enemies of this.allEnemies) {
-        console.log('enemyname:', enemies.name)
+        console.log('enemyname:', enemies.name);
          if (enemies.name === this.currentTurn &&  !this.deadEnemies.includes(enemies.name)) {
-           console.log('enemy:', enemies)
-          console.log('OK BRO IT IS WORKINGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG')
+           console.log('enemy:', enemies);
+          console.log('OK BRO IT IS WORKINGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG');
           let isTargetingPlayer;
             // If the current turn is the environment, let it make a move
             // const move = this.environment.makeMove();
               isTargetingPlayer = Math.random() < 0.3; // 30% chance to target the player
 
           const aliveFamiliars = this.familiarInfo.filter(familiar => familiar.stats.hp > 0);
-          console.log('length LMAOAWDOJAIHFIAJFOIAJDFFASIF: ', aliveFamiliars.length)
+          console.log('length LMAOAWDOJAIHFIAJFOIAJDFFASIF: ', aliveFamiliars.length);
           if (aliveFamiliars.length < 1) {
             isTargetingPlayer = true;
           }
         const targetInfo = isTargetingPlayer ? this.player : aliveFamiliars[Math.floor(Math.random() * aliveFamiliars.length)];
 
             const target = targetInfo.name;
-            console.log('TARGETNAME:', target)   
+            console.log('TARGETNAME:', target);   
             const damage = calculateDamage(this.boss.stats.attack, targetInfo.stats.defense);
 
             // Update HP and battle logs
             targetInfo.stats.hp -= damage;
-            console.log('My turn now bitches')
+            console.log('My turn now bitches');
             this.battleLogs.push(`- ${this.currentTurn} attacks ${target} for ${damage} damage using cum!\n ============================================`);
             // message.channel.send(`\`\`\`${logsString}\`\`\``);
-            console.log('loglength:', this.battleLogs.length)
-            console.log(`${this.currentTurn} attacks ${target} for ${damage} damage using cum!`)
-            await this.getNextTurn()
-            console.log('currentTurnForDragonafter;', this.currentTurn)
+            console.log('loglength:', this.battleLogs.length);
+            console.log(`${this.currentTurn} attacks ${target} for ${damage} damage using cum!`);
+            await this.getNextTurn();
+            console.log('currentTurnForDragonafter;', this.currentTurn);
             
             //  const updatedEmbed = await this.sendInitialEmbed(message);
             // this.initialMessage.edit({ embeds: [updatedEmbed], components: await this.getDuelActionRow() });
@@ -798,10 +800,10 @@ let filledBars;
             console.log('My turn now bitches');
             this.battleLogs.push(`- ${this.currentTurn} attacks ${target} for ${damage} damage using cum!\n ============================================`);
             // message.channel.send(`\`\`\`${logsString}\`\`\``);
-            console.log('loglength:', this.battleLogs.length)
-            console.log(`${this.currentTurn} attacks ${target} for ${damage} damage using cum!`)
+            console.log('loglength:', this.battleLogs.length);
+            console.log(`${this.currentTurn} attacks ${target} for ${damage} damage using cum!`);
             await this.getNextTurn();
-            console.log('currentTurnForDragonafter;', this.currentTurn)
+            console.log('currentTurnForDragonafter;', this.currentTurn);
             //  const updatedEmbed = await this.sendInitialEmbed(message);
             // this.initialMessage.edit({ embeds: [updatedEmbed], components: await this.getDuelActionRow() });
 

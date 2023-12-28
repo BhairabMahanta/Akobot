@@ -7,7 +7,8 @@ const path = require('path');
 const {mongoClient} = require('../../data/mongo/mongo.js')
 const db = mongoClient.db('Akaimnky');
 const collection = db.collection('akaillection');
-
+const {cards} = require('../fun/cards.js'); // Import the cards data from 'cards.js'
+const abilities = require('../../data/abilities.js');
 
 class GameImage {
   constructor(imgH, imgW, player, message) {
@@ -398,7 +399,37 @@ class Player {
 }
 
 
+async function cycleCooldowns(array, moveType, moveName) {
+  // Loop through each move and decrease its cooldown by 1
+  let move;
+  switch (moveType) {
+    case 'ability':
+      move = abilities[moveName].cooldown;
+      break;
+    // case 'card':
+    //   move = cards[moveName];
+    //   break;
+    // Add case for the third file
+    // case 'thirdType':
+    //   move = thirdFile[moveName];
+    //   break;
+    default:
+      console.log('Invalid move type');
+      return;
+  }
 
+  if (!move) {
+    console.log('Move not found');
+    return;
+  }
+
+  
+  array.forEach(item => {
+    if (item.name === moveName && item.cooldown > 0) {
+      item.cooldown--;
+    }
+  });
+}
 
 
 
