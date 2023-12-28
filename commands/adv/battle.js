@@ -455,9 +455,6 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
 
             try {
                 this.abilityOptions = moveFinder[0].map((ability) => {
-                    console.log('ability:', ability);
-console.log('ability.id:', ability && ability.id);
-console.log('this.cooldowns:', this.cooldowns);
                   if (ability && ability.id && !this.cooldowns.some(cooldown => cooldown.name === ability.name)) {
                         return {
                             label: ability.name,
@@ -487,7 +484,7 @@ if (this.abilityOptions.length === 0) {
                 const moveFinder = playerAbility.map(cardName => getPlayerMoves(cardName));
                 // console.log('moveFinder:', moveFinder)
                 this.abilityOptions = moveFinder.map((ability, index) => {
-                    if (ability && ability.description) {
+                    if (ability && ability.ability.description && !this.cooldowns.some(cooldown => cooldown.name === ability.name)) {
                         // ability.execute(this.currentTurn, this.boss.name)
                         // console.log('execuTE:', ability.execute); 
                         return {
@@ -496,7 +493,15 @@ if (this.abilityOptions.length === 0) {
                             value: `player_ability_${ability.name}`,
                         };
                     }
-                });
+                }).filter(Boolean); // Remove undefined items
+                // If there are no abilities available, add a failsafe option
+if (this.abilityOptions.length === 0) {
+    this.abilityOptions.push({
+      label: 'Cooldown',
+      description: 'Your abilities are on cooldown',
+      value: 'cooldown',
+    });
+  }
                 // console.log('abilityOptions:', this.abilityOptions)
             } catch (error) {
                 console.log('moveOptionsError:', error)
