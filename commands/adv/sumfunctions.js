@@ -399,36 +399,48 @@ class Player {
 }
 
 
-async function cycleCooldowns(array, moveType, moveName) {
+async function cycleCooldowns(array) {
   // Loop through each move and decrease its cooldown by 1
-  let move;
-  switch (moveType) {
-    case 'ability':
-      move = abilities[moveName].cooldown;
-      break;
-    // case 'card':
-    //   move = cards[moveName];
-    //   break;
-    // Add case for the third file
-    // case 'thirdType':
-    //   move = thirdFile[moveName];
-    //   break;
-    default:
-      console.log('Invalid move type');
+
+  // switch (moveType) {
+  //   case 'ability':
+  //     move = abilities[moveName].cooldown;
+  //     break;
+  //   // case 'card':
+  //   //   move = cards[moveName];
+  //   //   break;
+  //   // Add case for the third file
+  //   // case 'thirdType':
+  //   //   move = thirdFile[moveName];
+  //   //   break;
+  //   default:
+  //     console.log('Invalid move type');
+  //     return;
+  // }
+
+  // if (!move) {
+  //   console.log('Move not found');
+  //   return;
+  // }
+
+  try {
+    if (array.length === 0) {
+      console.log('No moves on cooldown');
       return;
-  }
-
-  if (!move) {
-    console.log('Move not found');
-    return;
-  }
-
-  
+    }
   array.forEach(item => {
-    if (item.name === moveName && item.cooldown > 0) {
+    if (item.cooldown > 0) {
       item.cooldown--;
+      if (item.cooldown === 0) {
+        console.log(`${item.name} is no longer on cooldown.`);
+        array.splice(array.indexOf(item), 1);
+        console.log('array:', array);
+      }
     }
   });
+  } catch (error) {
+    console.error('There isnt any moves on cooldown', error);
+  }
 }
 
 
@@ -439,5 +451,6 @@ async function cycleCooldowns(array, moveType, moveName) {
 module.exports = {
   GameImage,
   Player,
+  cycleCooldowns,
   
 };

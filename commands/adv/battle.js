@@ -3,6 +3,7 @@ const {mongoClient} = require('../../data/mongo/mongo.js')
 const db = mongoClient.db('Akaimnky');
 const collection = db.collection('akaillection');
 const { quests } = require('./quests');
+const { cycleCooldowns } = require('./sumfunctions');
 const {bosses} = require('./bosses.js');
 const {mobs} = require('./mobs.js');
 const {cards} = require('../fun/cards.js'); // Import the cards data from 'cards.js'
@@ -78,7 +79,7 @@ class Battle {
         this.currentTurnIndex = 0; // Index of the character whose turn it is
         this.turnCounter = 0; // Counter to track overall turns
         this.battleLogs = [];
-        this.ability = new Ability(this);
+        this.cooldowns = [];
         this.initialMessage = initialMessage;
         this.aliveFam = [];
         this.aliveEnemies = [];
@@ -91,7 +92,7 @@ class Battle {
         this.selectMenu = null;
         this.pickedChoice = false;
         this.enemyToHit = null;
-        this.cooldowns = [];
+        this.ability = new Ability(this);
           
 
     }
@@ -353,6 +354,7 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
                         this.enemyToHit = this.aliveEnemies[0];
                     }
                     this.performTurn(message);
+                    await cycleCooldowns(this.cooldowns);
                     await this.getNextTurn();
                     await this.performEnemyTurn(message);
                     console.log('currentTurn:', this.currentTurn);
@@ -391,6 +393,7 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
                         // Check if the abilityName exists as a method in the Ability class
                         if (typeof this.ability[abilityNameCamel] === 'function') {
                             await this.ability[abilityNameCamel](this.player, this.enemyToHit);
+                            await cycleCooldowns(this.cooldowns);
                             await this.getNextTurn();
                             await this.performEnemyTurn(message);
                             console.log('currentTurn:', this.currentTurn);
@@ -416,6 +419,7 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
                             for (const familiar of this.familiarInfo) {
                                 if (familiar.name === this.currentTurn) {
                                     this.ability[abilityNameCamel](familiar, this.enemyToHit);
+                                    await cycleCooldowns(this.cooldowns);
                                     await this.getNextTurn();
                                     await this.performEnemyTurn(message);
                                     console.log('currentTurn:', this.currentTurn);
@@ -451,14 +455,25 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
 
             try {
                 this.abilityOptions = moveFinder[0].map((ability) => {
-                    if (ability && ability.id) {
+                    console.log('ability:', ability);
+console.log('ability.id:', ability && ability.id);
+console.log('this.cooldowns:', this.cooldowns);
+                  if (ability && ability.id && !this.cooldowns.some(cooldown => cooldown.name === ability.name)) {
                         return {
                             label: ability.name,
                             description: ability.description,
                             value: `fam-${ability.name}`,
                         };
                     }
-                });
+                }).filter(Boolean); // Remove undefined items
+                // If there are no abilities available, add a failsafe option
+if (this.abilityOptions.length === 0) {
+    this.abilityOptions.push({
+      label: 'Cooldown',
+      description: 'Your abilities are on cooldown',
+      value: 'cooldown',
+    });
+  }
                 familiarArray = [];
                 // console.log('abilityOptions:', this.abilityOptions)
             } catch (error) {
@@ -503,14 +518,12 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
         description: `Attack ${enemy.name}`,
         value: `enemy_${index}`
       }));
-      
+      try {
       this.selectMenu = new StringSelectMenuBuilder()
         .setCustomId('action_select')
         .setPlaceholder('Select the target')
         .addOptions(this.pickEnemyOptions);
     //   console.log('This.selectEmnu:', this.selectMenu)
-       
-
 
         const stringMenu = new StringSelectMenuBuilder()
             .setCustomId('starter')
@@ -523,10 +536,13 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
 // console.log('stringMENUROW:', stringMenuRow)
 const gaeRow = new ActionRowBuilder().addComponents(await this.selectMenu)
 
-        const rows = [buttonRow, stringMenuRow, gaeRow];
+        var rows = [buttonRow, stringMenuRow, gaeRow];
 
-
+      } catch (error) {
+    console.log('error:', error);
+}
         return rows;
+        
     }
 
     async calculateOverallSpeed(character) {

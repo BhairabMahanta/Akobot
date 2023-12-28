@@ -342,6 +342,31 @@ const abilities = {
             // Implement gadget creation and usage logic here
         }
     },
+    'Flame Strike': {
+          name: 'Flame Strike',
+          description: 'Attack with a fiery strike',
+          power: 20,
+          cooldown: 3
+        },
+        'Dragon Claw': {
+            name: 'Dragon Claw',
+          description: 'Slash with powerful dragon claws',
+          power: 15,
+          cooldown: 2,
+        },
+        'Aqua Blast': {
+        name: 'Aqua Blast',
+        description: 'Blast your opponent with water',
+        power: 20,
+        cooldown: 3,
+      },
+      'Healing Wave':  {
+        name: 'Healing Wave',
+        description: 'Heal yourself with water energy',
+        power: -25, // healing ig
+        cooldown: 4,
+      },
+      
 };
 
 module.exports = abilities;

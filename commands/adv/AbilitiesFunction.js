@@ -19,11 +19,11 @@ class Ability {
     target.stats.hp -= damage;
     target.stats.speed -= 10;
     console.log('bossHpafter:', target.stats.hp);
-    this.battleLogs.push(`+ ${user.name} uses Shield Bash on ${target.name} dealing ${damage}. ${target.name} is slowed!`);
+    this.battleLogs.push(`+ ${user.name} uses Shield Bash on ${target.name} dealing ${damage}. ${target.name} now has ${target.stats.speed} speed for 3 turns!`);
     console.log(this.battleLogs.length);
     console.log(`${user.name} uses Shield Bash on ${target.name}. ${target.name} is slowed!`);
     this.cooldowns.push({name: `Shield Bash`, cooldown: this.cooldownFinder('Shield Bash')});
-    console.log('cooldowns: ', this.cooldowns);
+
    
     // updateMovesOnCd(this.cooldowns, this.cooldownFinder('shieldBash'));
   }
@@ -31,18 +31,21 @@ class Ability {
  defend(user) {
     user.stats.defense += 10; // Example: Increase defense by 10
     this.battleLogs.push(`+ ${user.name} uses Defend. Their defense is increased.`);
+    this.cooldowns.push({name: `Defend`, cooldown: this.cooldownFinder('Defend')});
   }
 
   bloodlust(user) {
     user.stats.attackSpeed += 20; // Example: Increase attack speed by 20
     user.stats.attack += 15; // Example: Increase attack damage by 15
     this.battleLogs.push(`${user.name} activates Bloodlust. Attack speed and damage increase.`);
+    this.cooldowns.push({name: `Bloodlust`, cooldown: this.cooldownFinder('Bloodlust')});
   }
 
   ragingStrike(user, target) {
     const damage = calculateDamage(user.stats.attack * 2, target.stats.defense);
     target.stats.hp -= damage;
     this.battleLogs.push(`${user.name} unleashes a wild Raging Strike on ${target.name}. It deals massive damage!`);
+    this.cooldowns.push({name: `Raging Strike`, cooldown: this.cooldownFinder('Raging Strike')});
   }
 
   arenaSpin(user, targets) {
@@ -51,33 +54,40 @@ class Ability {
       target.stats.hp -= damage;
     });
     this.battleLogs.push(`${user.name} performs an Arena Spin, hitting multiple opponents.`);
+    this.cooldowns.push({name: `Arena Spin`, cooldown: this.cooldownFinder('Arena Spin')});
   }
 
   crowdControl(user, target) {
     target.focus = user;
     this.battleLogs.push(`${user.name} taunts ${target.name}. ${target.name} is now focused on ${user.name}.`);
+    this.cooldowns.push({name: `Crowd Control`, cooldown: this.cooldownFinder('Crowd Control')});
   }
 
   precisionStrike(user, target) {
     const criticalDamage = calculateDamage(user.stats.attack * 1.5, target.stats.defense);
     target.stats.hp -= criticalDamage;
     this.battleLogs.push(`${user.name} executes a precise Precision Strike on ${target.name}. It's a critical hit!`);
+    this.cooldowns.push({name: `Precision Strike`, cooldown: this.cooldownFinder('Precision Strike')});
   }
 
   honorsResolve(user) {
     user.statusEffects.resistance += 20; // Example: Increase status effect resistance by 20%
     this.battleLogs.push(`${user.name} enters Honor's Resolve, gaining increased resistance to status effects.`);
+    this.cooldowns.push({name: `Honor's Resolve`, cooldown: this.cooldownFinder(`Honor's Resolve`)});
   }
 
   fireball(user, target) {
     const damageOverTime = calculateAbilityDamage(user.stats.magic, target.stats.defense, 3);
     target.stats.hp -= damageOverTime;
     this.battleLogs.push(`${user.name} hurls a Fireball at ${target.name}. ${target.name} takes damage over time.`);
+    this.cooldowns.push({name: `Fireball`, cooldown: this.cooldownFinder('Fireball')});
   }
 
   arcaneShield(user) {
     user.statusEffects.shield = true; // Example: Apply a shield status effect
     this.battleLogs.push(`${user.name} creates an Arcane Shield, absorbing incoming magic attacks.`);
+    this.cooldowns.push({name: `Arcane Shield`, cooldown: this.cooldownFinder('Arcane Shield')});
+
   }
 
   frostNova(user, targets) {
@@ -85,6 +95,7 @@ class Ability {
       target.statusEffects.frozen = true; // Example: Freeze the target
     });
     this.battleLogs.push(`${user.name} casts Frost Nova, freezing enemies in a radius.`);
+    this.cooldowns.push({name: `Frost Nova`, cooldown: this.cooldownFinder('Frost Nova')});
   }
 
  thunderstorm(user, targets) {
@@ -94,11 +105,13 @@ class Ability {
       target.magicalStats.hp -= damage;
     });
     this.battleLogs.push(`${user.name} calls forth a Thunderstorm, damaging multiple opponents.`);
+    this.cooldowns.push({name: `Thunderstorm`, cooldown: this.cooldownFinder('Thunderstorm')});
   }
 
   raiseDead(user) {
     // Implement logic for summoning a skeletal minion here
     this.battleLogs.push(`${user.name} summons a skeletal minion to aid in battle.`);
+    this.cooldowns.push({name: `Raise Dead`, cooldown: this.cooldownFinder('Raise Dead')}); 
   }
 
   drainLife(user, target) {
@@ -106,42 +119,50 @@ class Ability {
     target.stats.hp -= drainAmount;
     user.stats.hp += drainAmount;
     this.battleLogs.push(`${user.name} drains the life force from ${target.name}. ${user.name} is healed.`);
+    this.cooldowns.push({name: `Drain Life`, cooldown: this.cooldownFinder('Drain Life')});
   }
 
   mirrorImage(user) {
     // Implement logic for creating illusory copies here
     this.battleLogs.push(`${user.name} creates multiple illusory copies to confuse opponents.`);
+    this.cooldowns.push({name: `Mirror Image`, cooldown: this.cooldownFinder('Mirror Image')});
   }
 
   mindTrick(user, target) {
     // Implement logic for disorienting the target here
     this.battleLogs.push(`${user.name} uses a Mind Trick on ${target.name}. ${target.name} is disoriented.`);
+    this.cooldowns.push({name: `Mind Trick`, cooldown: this.cooldownFinder('Mind Trick')});
   }
 
   backstab(user, target) {
     const backstabDamage = calculateDamage(user.stats.attack * 2, target.stats.defense); // Example: Backstab deals double damage
     target.stats.hp -= backstabDamage;
     this.battleLogs.push(`${user.name} strikes ${target.name} from behind. It's a backstab!`);
+    this.cooldowns.push({name: `Backstab`, cooldown: this.cooldownFinder('Backstab')});
   }
 
   shadowStep(user, target) {
     // Implement logic for teleporting behind the target here
     this.battleLogs.push(`${user.name} teleports behind ${target.name}, gaining a positional advantage.`);
+    this.cooldowns.push({name: `Shadow Step`, cooldown: this.cooldownFinder('Shadow Step')});
   }
 
   dualWield(user) {
     user.stats.attackSpeed += 20; // Example: Dual Wield increases attack speed by 20
     this.battleLogs.push(`${user.name} wields two weapons simultaneously, increasing attack speed.`);
+    this.cooldowns.push({name: `Dual Wield`, cooldown: this.cooldownFinder('Dual Wield')});
   }
 
   evasion(user) {
     user.statusEffects.evasion = true; // Example: Apply an evasion status effect
     this.battleLogs.push(`${user.name} evades incoming attacks, reducing damage taken for a short period.`);
+    this.cooldowns.push({name: `Evasion`, cooldown: this.cooldownFinder('Evasion')});
   }
 
   smokeBomb(user) {
     // Implement logic for creating a smoke cloud here
     this.battleLogs.push(`${user.name} throws a Smoke Bomb, creating a cloud of smoke.`);
+    this.cooldowns.push({name: `Smoke Bomb`, cooldown: this.cooldownFinder('Smoke Bomb')});
   }
 
   shurikenBarrage(user, targets) {
@@ -150,27 +171,32 @@ class Ability {
       target.stats.hp -= shurikenDamage;
     });
     this.battleLogs.push(`${user.name} throws a flurry of shurikens, hitting multiple targets.`);
+    this.cooldowns.push({name: `Shuriken Barrage`, cooldown: this.cooldownFinder('Shuriken Barrage')});
   }
 
   charmingPresence(user, target) {
     // Implement logic for charming the target here
     this.battleLogs.push(`${user.name} uses Charming Presence. ${target.name} is charmed and becomes passive.`);
+    this.cooldowns.push({name: `Charming Presence`, cooldown: this.cooldownFinder('Charming Presence')});
   }
 
   acrobaticFlourish(user) {
     user.statusEffects.evasion += 30; // Example: Acrobatic Flourish increases evasion by 30%
     this.battleLogs.push(`${user.name} performs an Acrobatic Flourish, increasing evasion.`);
+    this.cooldowns.push({name: `Acrobatic Flourish`, cooldown: this.cooldownFinder('Acrobatic Flourish')});
   }
 
   healingLight(user, target) {
     const healingAmount = calculateAbilityDamage(user.stats.magic, 30); // Example: Healing Light heals for 30 HP
     target.stats.hp += healingAmount;
     this.battleLogs.push(`${user.name} uses Healing Light on ${target.name}. ${target.name} is healed.`);
+    this.cooldowns.push({name: `Healing Light`, cooldown: this.cooldownFinder('Healing Light')});
   }
 
   divineProtection(user) {
     // Implement logic for providing a shield of protection here
     this.battleLogs.push(`${user.name} provides a shield of Divine Protection, absorbing incoming damage.`);
+    this.cooldowns.push({name: `Divine Protection`, cooldown: this.cooldownFinder('Divine Protection')});
   }
 
 
@@ -240,26 +266,29 @@ class Ability {
   
 // FAMILIAR ABILITIES MAFAKA
  flameStrike(user, target) {
-    const power = 20
+    const power = 20;
     const damage = calculateAbilityDamage(power);
     target.stats.hp -= damage;
     this.battleLogs.push(`+ ${user.name} uses Flame Strike on ${target.name} dealing ${damage}.`);
+    this.cooldowns.push({name: `Flame Strike`, cooldown: this.cooldownFinder('Flame Strike')});
     // Implement additional effects for Flame Strike here
   }
 
   dragonClaw(user, target) {
-    const power = 20
+    const power = 20;
     const damage = calculateAbilityDamage(power);
     target.stats.hp -= damage;
     this.battleLogs.push(`+ ${user.name} uses Dragon Claw on ${target.name} dealing ${damage}.`);
+    this.cooldowns.push({name: `Dragon Claw`, cooldown: this.cooldownFinder('Dragon Claw')});
     // Implement additional effects for Dragon Claw here
   }
 
   aquaBlast(user, target) {
-    const power = 20
+    const power = 20;
     const damage = calculateAbilityDamage(power);
     target.stats.hp -= damage;
     this.battleLogs.push(`+ ${user.name} uses Aqua Blast on ${target.name} dealing ${damage}.`);
+    this.cooldowns.push({name: `Aqua Blast`, cooldown: this.cooldownFinder('Aqua Blast')});
     // Implement additional effects for Aqua Blast here
   }
 
@@ -268,6 +297,7 @@ class Ability {
     const healingAmount = calculateAbilityDamage(power);
     user.stats.hp += healingAmount;
     this.battleLogs.push(`+ ${user.name} uses Healing Wave and heals for ${healingAmount}.`);
+    this.cooldowns.push({name: `Healing Wave`, cooldown: this.cooldownFinder('Healing Wave')});
     // Implement additional effects for Healing Wave here
   }
 
@@ -276,6 +306,7 @@ class Ability {
     const damage = calculateAbilityDamage(power);
     target.stats.hp -= damage;
     this.battleLogs.push(`+ ${user.name} uses Lightning Bolt on ${target.name} dealing ${damage}.`);
+    this.cooldowns.push({name: `Lightning Bolt`, cooldown: this.cooldownFinder('Lightning Bolt')});
     // Implement additional effects for Lightning Bolt here
   }
 
@@ -287,6 +318,7 @@ class Ability {
     this.battleLogs.push(`+ ${user.name} uses Shield Bash on ${target.name} dealing ${damage}. ${target.name} is slowed!`);
     console.log(this.battleLogs.length);
     console.log(`${user.name} uses Shield Bash on ${target.name}. ${target.name} is slowed!`);
+
     // Implement slow effect on the target here
   }
 
