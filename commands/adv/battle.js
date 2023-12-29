@@ -7,6 +7,8 @@ const { cycleCooldowns } = require('./sumfunctions');
 const {bosses} = require('./bosses.js');
 const {mobs} = require('./mobs.js');
 const {cards} = require('../fun/cards.js'); // Import the cards data from 'cards.js'
+const BossAI = require('./bossStuff.js');
+const MobAI = require('./mobStuff.js');
 const {
     checkResults,
     getCardStats,
@@ -49,6 +51,8 @@ class Battle {
         this.message = message;
         this.continue = true; 
         this.player = player;
+        this.bossAIClass = null;
+        this.mobAIClass = null;
         this.mobs = [];
         this.abilityOptions = [];
         this.playerFamiliar =[];
@@ -111,14 +115,17 @@ class Battle {
       } }
     if (this.enemyDetails.type === 'boss') {
     this.boss = this.bossSource[this.enemyDetails.name];
+    this.bossAIClass = new BossAI(this, this.enemyDetails.name);
     this.allEnemies.push(this.boss);
     } else {
     this.boss = this.bossSource['Dragon Lord'];
     }
     if (this.enemyDetails.type === 'mob' && this.enemyDetails.hasAllies.includes('none')) {
     this.mobs.push(this.enemyDetails.name);
+    this.mobAIClass = new MobAI(this, this.enemyDetails.name);
     } else if (this.enemyDetails.type === 'mob' && !this.enemyDetails.hasAllies.includes('none')) {
      this.mobs.push(this.enemyDetails.name);
+     this.mobAIClass = new MobAI(this, this.enemyDetails.name);
      this.mobs.push(this.enemyDetails.hasAllies.join(','));
     }
 // console.log('familiars:', this.familiarInfo);
@@ -504,7 +511,7 @@ if (this.abilityOptions.length === 0) {
   }
                 // console.log('abilityOptions:', this.abilityOptions)
             } catch (error) {
-                console.log('moveOptionsError:', error)
+                console.log('moveOptionsError:', error);
             }
         }
       for (const enemy of this.allEnemies) {
@@ -539,7 +546,7 @@ if (this.abilityOptions.length === 0) {
 
         const stringMenuRow = new ActionRowBuilder().addComponents(stringMenu);
 // console.log('stringMENUROW:', stringMenuRow)
-const gaeRow = new ActionRowBuilder().addComponents(await this.selectMenu)
+const gaeRow = new ActionRowBuilder().addComponents(await this.selectMenu);
 
         var rows = [buttonRow, stringMenuRow, gaeRow];
 
@@ -760,17 +767,17 @@ let filledBars;
 
     async performEnemyTurn(message) {
       for (const enemies of this.allEnemies) {
-        console.log('enemyname:', enemies.name);
+        // console.log('enemyname:', enemies.name);
          if (enemies.name === this.currentTurn &&  !this.deadEnemies.includes(enemies.name)) {
-           console.log('enemy:', enemies);
-          console.log('OK BRO IT IS WORKINGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG');
+        //    console.log('enemy:', enemies);
+          
           let isTargetingPlayer;
             // If the current turn is the environment, let it make a move
             // const move = this.environment.makeMove();
               isTargetingPlayer = Math.random() < 0.3; // 30% chance to target the player
 
           const aliveFamiliars = this.familiarInfo.filter(familiar => familiar.stats.hp > 0);
-          console.log('length LMAOAWDOJAIHFIAJFOIAJDFFASIF: ', aliveFamiliars.length);
+          
           if (aliveFamiliars.length < 1) {
             isTargetingPlayer = true;
           }
@@ -778,7 +785,8 @@ let filledBars;
 
             const target = targetInfo.name;
             console.log('TARGETNAME:', target);   
-            const damage = calculateDamage(this.boss.stats.attack, targetInfo.stats.defense);
+            const damage = this.bossAIClass.calculateDamage(this.boss, targetInfo);
+            // const damage = calculateDamage(this.boss.stats.attack, targetInfo.stats.defense);
 
             // Update HP and battle logs
             targetInfo.stats.hp -= damage;

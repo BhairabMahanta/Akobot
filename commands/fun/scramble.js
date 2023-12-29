@@ -87,7 +87,7 @@ console.log('Collector message ID (before):', collector.messageId)
  if (sentMessage === null) {
   clearInterval(interval);
   sendResults = true;
-   collector.stop()
+   collector.stop();
   return;
 }
 collector.messageId = sentMessage.id;

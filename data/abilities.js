@@ -311,7 +311,7 @@ const abilities = {
         name:'Sneaky Tricks',
         cooldown: 3,
         execute: (user) => {
-            console.log(`${user} employs Sneaky Tricks, improving chances of stealing or evading detection.`);
+            console.log(`${user} employs Sneaky Tricks, improving chances of stealing or evading detection.`)
             // Implement sneaky behavior logic here
         }
     },
