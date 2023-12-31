@@ -12,7 +12,7 @@ function getMax(a, b, c) {
     return 3;
   }
 }
-         function calculateDamage(authorAttack, opponentDefense) {
+         async function calculateDamage(authorAttack, opponentDefense) {
          return Math.floor(15 + authorAttack / 1.5 - opponentDefense / 1.5);
       }
          function calculateAbilityDamage(abilityPower) {

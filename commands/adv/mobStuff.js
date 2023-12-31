@@ -1,9 +1,11 @@
 const {mobs} = require('./mobs.js');
-const abilities = require('./abilities.js');
+const abilities = require('../../data/abilities.js');
 const { calculateDamage } = require('../util/glogic.js');
 class MobAI {
     constructor(that, mob) {
         this.name = mob.name;
+        this.enemyDetails = mob;
+        console.log('mobaBility: ', mobs[mob.name].abilities);
         this.abilities = mobs[mob.name].abilities;
         this.attackPattern = mobs[mob.name].attackPattern;
         if (!this.enemyDetails.hasAllies.includes('none')) {
@@ -11,9 +13,19 @@ class MobAI {
         }
     }
 
+    async move(mob, target) {
+        for (let i = 0; i < this.attackPattern.length; i++) {
+            const move = this.attackPattern[i];
+            if (move === 'normalAttack') {
+                await this.normalAttack(mob, target);
+            } else {
+                await this.ability(mob, target, move);
+            }
+        }
+    }
+
     async normalAttack(mob, target) {
-        const damage = calculateDamage(mob.stats.attack, target.stats.defense);
-        // mob's logic for normal attack
+        const damage = await calculateDamage(mob.stats.attack, target.stats.defense);
         return damage;
     }
 

@@ -1,5 +1,5 @@
 const bosses = require('./bosses.js');
-const abilities = require('./abilities.js');
+const abilities = require('../../data/abilities.js');
 const { calculateDamage } = require('../util/glogic.js');
 class BossAI {
     constructor(that, boss) {

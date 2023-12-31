@@ -122,10 +122,10 @@ class Battle {
     }
     if (this.enemyDetails.type === 'mob' && this.enemyDetails.hasAllies.includes('none')) {
     this.mobs.push(this.enemyDetails.name);
-    this.mobAIClass = new MobAI(this, this.enemyDetails.name);
+    this.mobAIClass = new MobAI(this, this.enemyDetails);
     } else if (this.enemyDetails.type === 'mob' && !this.enemyDetails.hasAllies.includes('none')) {
      this.mobs.push(this.enemyDetails.name);
-     this.mobAIClass = new MobAI(this, this.enemyDetails.name);
+     this.mobAIClass = new MobAI(this, this.enemyDetails);
      this.mobs.push(this.enemyDetails.hasAllies.join(','));
     }
 // console.log('familiars:', this.familiarInfo);
@@ -137,9 +137,12 @@ class Battle {
     } }
     this.allEnemies.push(...this.mobInfo);
     if (this.enemyDetails.type === 'boss') {
+        console.log('preTtygay;');
     this.characters = [this.player, ...this.familiarInfo, this.boss];
 
     } else {
+        console.log('charGAY:', this.player, ...this.familiarInfo, ...this.mobInfo);
+
     this.characters = [this.player, ...this.familiarInfo, ...this.mobInfo];
     }
     console.log('characters:', this.characters);
@@ -180,7 +183,7 @@ class Battle {
       let selectedValue;
             // Create the embed for the adventure command
     this.battleEmbed = new EmbedBuilder()
-      .setTitle('Start battle lul')
+      .setTitle('Start battle!')
       .setDescription(`### - Do you want to really fight the monsters?\n\n>>> **Player and familiars:**\n- __${this.player.name} Level__: ${this.player.exp.level} \n- __Familiars selected__: ${this.familiarInfo.map(familiar => familiar.name).join(', ' )} \n\n **Enemy Info**:\n - __${this.enemyDetails.name} Level__: It not made smh \n\n **Automate this battle?**\n- automating has its own issues it does worse than you would normally do!! \n\n **Your Power Level vs Recommended**\n- somethings you needa make that shit\n\n **Difficulty**\n- bhag le\n\n **Start Battle**\n To start, click on the "Lets Dive into it" button!!`)
             // Display options for quests, bosses, mobs, and adventures
     const optionSelectMenu = new StringSelectMenuBuilder()
@@ -207,7 +210,9 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
                          const selectedValueName = selectedValue.replace('klik_', '');
                          if (selectedValueName === 'fight') {
                            gaeMessage.delete();
+                           console.log('continue?');
    if (this.continue) {
+    console.log('continue hogaya');
  this.startBattle(this.message);
    }
       }
@@ -324,15 +329,19 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
 }
 
     async startBattle(message) {
+        console.log('startBattle');
 
         await this.getNextTurn();
-
+        console.log('currentTurn:', this.currentTurn);
         this.initialMessage = await this.sendInitialEmbed(message);
+        console.log('initialMessage:', this.initialMessage);
         this.initialMessage = await message.channel.send({
             embeds: [this.initialMessage],
             components: await
             this.getDuelActionRow()
-        }); if(this.enemyFirst) {
+        }); 
+        console.log('initialMessage2:' );
+        if(this.enemyFirst) {
        this.printBattleResult();
          const updatedEmbed = await this.sendInitialEmbed(message);
          await this.initialMessage.edit({
@@ -622,6 +631,7 @@ const gaeRow = new ActionRowBuilder().addComponents(await this.selectMenu);
     async fillAtkBars() {
         try {
             for (const character of this.characters) {
+                console.log('character:', character)
                 const speed = await this.calculateOverallSpeed(character);
               const hp = await this.calculateOverallHp(character);
                 const speedMultiplier = character.speedBuff ? 1.3 : 1; // Apply Speed Buff if active
@@ -687,6 +697,7 @@ let filledBars;
 
     async getNextTurn() {
         let nextTurn = null;
+        console.log('ho raha hai');
         while (true) {
             await this.fillAtkBars();
 
@@ -768,8 +779,8 @@ let filledBars;
     async performEnemyTurn(message) {
       for (const enemies of this.allEnemies) {
         // console.log('enemyname:', enemies.name);
-         if (enemies.name === this.currentTurn &&  !this.deadEnemies.includes(enemies.name)) {
-        //    console.log('enemy:', enemies);
+         if (enemies.name === this.currentTurn &&  !this.deadEnemies.includes(enemies.name) &&this.currentTurn != this.boss.name) {
+           console.log('enemy:', enemies);
           
           let isTargetingPlayer;
             // If the current turn is the environment, let it make a move
@@ -785,7 +796,7 @@ let filledBars;
 
             const target = targetInfo.name;
             console.log('TARGETNAME:', target);   
-            const damage = this.bossAIClass.calculateDamage(this.boss, targetInfo);
+            const damage = await this.mobAIClass.normalAttack(enemies, targetInfo);
             // const damage = calculateDamage(this.boss.stats.attack, targetInfo.stats.defense);
 
             // Update HP and battle logs
