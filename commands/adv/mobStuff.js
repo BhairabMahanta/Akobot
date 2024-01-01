@@ -8,6 +8,7 @@ class MobAI {
         console.log('mobaBility: ', mobs[mob.name].abilities);
         this.abilities = mobs[mob.name].abilities;
         this.attackPattern = mobs[mob.name].attackPattern;
+        this.battleLog = that.battleLog
         if (!this.enemyDetails.hasAllies.includes('none')) {
             this.allies = mob.allies;
         }
@@ -25,7 +26,11 @@ class MobAI {
     }
 
     async normalAttack(mob, target) {
-        const damage = await calculateDamage(mob.stats.attack, target.stats.defense);
+        var damage = await calculateDamage(mob.stats.attack, target.stats.defense);
+        if (damage < 0 ) {
+            damage = 0;
+            this.battleLog.push(`${target.name}'s defense was too strong ${mob.name}'s attack nullified!`);
+        }
         return damage;
     }
 

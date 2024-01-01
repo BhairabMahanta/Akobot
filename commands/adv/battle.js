@@ -742,12 +742,12 @@ let filledBars;
             // const move = attacker.chooseMove(); // Implement this method for the player
           
             const target = this.enemyToHit.name ;
-            const damage = calculateDamage(this.player.stats.attack, this.enemyToHit.stats.defense);
+            const damage = await calculateDamage(this.player.stats.attack, this.enemyToHit.stats.defense);
 
             // Update HP and battle logs
             this.enemyToHit.stats.hp -= damage;
             this.battleLogs.push(`+ ${this.currentTurn} attacks ${target} for ${damage} damage using gayness`);
-            console.log('loglength:', this.battleLogs.length)
+            console.log('loglength:', this.battleLogs.length);
             console.log(`${this.currentTurn} attacks ${target} for ${damage} damage using gayness`);
             // this.getNextTurn()
             // console.log('currentTurn:', this.currentTurn);
@@ -759,7 +759,7 @@ let filledBars;
             for (const familiar of this.familiarInfo) {
                 if (familiar.name === this.currentTurn) {
                     // Calculate damage for the attacking familiar
-                    damage = calculateDamage(familiar.stats.attack, this.enemyToHit.stats.defense);
+                    damage = await calculateDamage(familiar.stats.attack, this.enemyToHit.stats.defense);
 
                     // Update HP and battle logs
                     this.enemyToHit.stats.hp -= damage;
@@ -833,7 +833,7 @@ let filledBars;
 
             const target = targetInfo.name;
             console.log('TARGETNAME:', target)  ; 
-            const damage = calculateDamage(this.boss.stats.attack, targetInfo.stats.defense);
+            const damage = await calculateDamage(this.boss.stats.attack, targetInfo.stats.defense);
 
             // Update HP and battle logs
             targetInfo.stats.hp -= damage;
