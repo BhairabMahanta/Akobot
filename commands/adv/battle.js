@@ -796,7 +796,7 @@ let filledBars;
 
             const target = targetInfo.name;
             console.log('TARGETNAME:', target);   
-            const damage = await this.mobAIClass.normalAttack(enemies, targetInfo);
+            const damage = await this.mobAIClass.move(enemies, targetInfo);
             // const damage = calculateDamage(this.boss.stats.attack, targetInfo.stats.defense);
 
             // Update HP and battle logs

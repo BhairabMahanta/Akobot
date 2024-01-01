@@ -1,11 +1,13 @@
 const bosses = require('./bosses.js');
 const abilities = require('../../data/abilities.js');
+const { Ability } = require('./AbilitiesFunction.js');
 const { calculateDamage } = require('../util/glogic.js');
 class BossAI {
     constructor(that, boss) {
         this.name = boss.name;
         this.abilities = bosses[boss.name].abilities;
         this.attackPattern = bosses[boss.name].attackPattern;
+        this.ability = new Ability(this);
     }
 
     async normalAttack(boss, target) {

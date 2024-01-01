@@ -366,6 +366,32 @@ const abilities = {
         power: -25, // healing ig
         cooldown: 4,
       },
+      "Fire Breath": {
+        name: "Fire Breath",
+        description: "Breathe fire on your opponent",
+        power: 20,
+        cooldown: 0
+      }, 
+      
+      "Tail Swipe": {
+        name: "Tail Swipe",
+        description: "Swipe your opponent with your tail",
+        power: 15,
+        cooldown: 0
+      },
+       "Venom Strike": {
+        name: "Venom Strike",
+        description: "Strike your opponent with venom",
+        power: 20,
+        cooldown: 0
+        },
+        "Web Trap": {
+        name: "Web Trap",
+        description: "Trap your opponent in a web",
+        power: 15,
+        cooldown: 0
+        },
+
       
 };
 

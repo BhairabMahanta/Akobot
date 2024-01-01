@@ -311,7 +311,7 @@ class Ability {
   }
 
 
-//boss abilities
+//boss and mobs abilities
   basicAttack(user, target) {
     const damage = calculateDamage(user.stats.attack, target.stats.defense);
     target.stats.hp -= damage;
@@ -320,6 +320,37 @@ class Ability {
     console.log(`${user.name} uses Shield Bash on ${target.name}. ${target.name} is slowed!`);
 
     // Implement slow effect on the target here
+  }
+
+  fireBreath(user, target) {
+    const damage = calculateDamage(user.stats.magic, target.stats.defense);
+    target.stats.hp -= damage;
+    this.battleLogs.push(`${user.name} hurls a Fireball at ${target.name}. ${target.name} takes damage over time.`);
+    this.cooldowns.push({name: `Fireball`, cooldown: this.cooldownFinder('Fireball')});
+  }
+  
+  tailSwipe(user, target) {
+    const damage = calculateDamage(user.stats.attack * 1.5, target.stats.defense);
+    target.stats.hp -= damage;
+    this.battleLogs.push(`${user.name} performs a powerful Tail Swipe on ${target.name}. It deals ${damage} damage.`);
+    this.cooldowns.push({name: `Tail Swipe`, cooldown: this.cooldownFinder('Tail Swipe')});
+    // Implement additional effects for Tail Swipe here
+  }
+
+  venomStrike(user, target) {
+    const damage = calculateDamage(user.stats.magic * 1.2, target.stats.defense);
+    target.stats.hp -= damage;
+    this.battleLogs.push(`${user.name} delivers a Venom Strike to ${target.name}. It deals ${damage} damage.`);
+    this.cooldowns.push({name: `Venom Strike`, cooldown: this.cooldownFinder('Venom Strike')});
+    // Implement additional effects for Venom Strike here
+  }
+
+  webTrap(user, target) {
+    const damage = calculateDamage(user.stats.magic * 0.8, target.stats.defense);
+    target.stats.hp -= damage;
+    this.battleLogs.push(`${user.name} sets up a Web Trap for ${target.name}. It deals ${damage} damage.`);
+    this.cooldowns.push({name: `Web Trap`, cooldown: this.cooldownFinder('Web Trap')});
+    // Implement additional effects for Web Trap here
   }
 
   bossAbility2(user) {

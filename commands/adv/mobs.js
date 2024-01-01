@@ -6,11 +6,11 @@ const mobs = {
       attack: 50,
       defense: 40,
       speed: 101,
-      mana: 200,
+      magic: 200,
       // Other magical stats
     },
     abilities: ["Fire Breath", "Tail Swipe"],
-    attackPattern: ["Basic Attack", "Fire Breath", "Tail Swipe"]
+    attackPattern: ["Basic Attack", "Fire Breath", "Tail Swipe", "Fire Breath"]
   },
   "monsterB": {
     name: 'monsterB',
@@ -19,11 +19,11 @@ const mobs = {
       attack: 70,
       defense: 30,
       speed: 110,
-      mana: 100,
+      magic: 100,
       // Other magical stats
     },
-    abilities: ["Venom Strike", "Web Trap"],
-    attackPattern: ["Basic Attack", "Venom Strike", "Web Trap"]
+    abilities: ["Venom Strike", "Web Trap"], 
+    attackPattern: ["Basic Attack", "Venom Strike", "Web Trap", "Venom Strike"]
   },
   // Add more NPC boss characters...
 };
