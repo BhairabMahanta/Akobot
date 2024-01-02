@@ -408,7 +408,7 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
                         console.log('abilityName:a', abilityNameCamel);
                         // Check if the abilityName exists as a method in the Ability class
                         if (typeof this.ability[abilityNameCamel] === 'function') {
-                            await this.ability[abilityNameCamel](this.player, this.enemyToHit);
+                             this.ability[abilityNameCamel](this.player, this.enemyToHit);
                             await cycleCooldowns(this.cooldowns);
                             await this.getNextTurn();
                             await this.performEnemyTurn(message);
@@ -499,8 +499,8 @@ if (this.abilityOptions.length === 0) {
             try {
                 const moveFinder = playerAbility.map(cardName => getPlayerMoves(cardName));
                 // console.log('moveFinder:', moveFinder)
-                this.abilityOptions = moveFinder.map((ability, index) => {
-                    if (ability && ability.ability.description && !this.cooldowns.some(cooldown => cooldown.name === ability.name)) {
+                this.abilityOptions = moveFinder.map((ability) => {
+                    if (ability && ability.description && !this.cooldowns.some(cooldown => cooldown.name === ability.name)) {
                         // ability.execute(this.currentTurn, this.boss.name)
                         // console.log('execuTE:', ability.execute); 
                         return {
@@ -631,7 +631,6 @@ const gaeRow = new ActionRowBuilder().addComponents(await this.selectMenu);
     async fillAtkBars() {
         try {
             for (const character of this.characters) {
-                console.log('character:', character)
                 const speed = await this.calculateOverallSpeed(character);
               const hp = await this.calculateOverallHp(character);
                 const speedMultiplier = character.speedBuff ? 1.3 : 1; // Apply Speed Buff if active

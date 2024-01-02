@@ -13,7 +13,7 @@ class MobAI {
         console.log('mobaBility: ', mobs[mob.name].abilities);
         this.abilities = mobs[mob.name].abilities;
         this.attackPattern = mobs[mob.name].attackPattern;
-        this.battleLog = that.battleLog;
+        this.battleLogs = that.battleLogs;
         this.ability = new Ability(this);
         if (!this.enemyDetails.hasAllies.includes('none')) {
             this.allies = mob.allies;
@@ -24,21 +24,24 @@ class MobAI {
         if (this.i >= this.attackPattern.length) {
             this.i = 0;
         }
-        for (this.i < this.attackPattern.length; this.i++;) {
+        for (; this.i < this.attackPattern.length; this.i++) {
             const move = this.attackPattern[this.i];
+            console.log('move: ', move);
             if (move === 'Basic Attack') {
-                await this.normalAttack(mob, target);
+                console.log('moveTrue?: ', move);
+                return await this.normalAttack(mob, target);
             } else {
-                await this.ability(mob, target, move);
+                return await this.abilityUse(mob, target, move);
             }
         }
     }
 
     async normalAttack(mob, target) {
         var damage = await calculateDamage(mob.stats.attack, target.stats.defense);
+        console.log('damage: ', damage);
         if (damage < 0 ) {
             damage = 0;
-            this.battleLog.push(`${target.name}'s defense was too strong ${mob.name}'s attack nullified!`);
+            this.battleLogs.push(`${target.name}'s defense was too strong ${mob.name}'s attack nullified!`);
         }
         return damage;
     }
@@ -59,7 +62,7 @@ class MobAI {
 
 }
 
-    async ability(mob, target, nextMove) {
+    async abilityUse(mob, target, nextMove) {
         const abilityName = nextMove;
         const abilityNameCamel = await this.toCamelCase(abilityName);
                         console.log('abilityName:a', abilityNameCamel);
