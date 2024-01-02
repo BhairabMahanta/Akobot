@@ -247,7 +247,7 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
               } else if(this.enemyDetails.type === 'mob') {
                 let mobInfo = ''; // Initialize an empty string to store the info
               for (const mob of this.mobInfo) {
-                      mobInfo += `[2;35m> ${mob.name}\n[2;32m HitPoints: ${mob.hpBarEmoji} ${mob.stats.hp}\n[2;36m AttackBar: [2;34m${mob.attackBarEmoji} ${Math.floor(mob.atkBar)}\n\n`;
+                      mobInfo += `[2;35m> ${mob.name}:[2;34m Atk: ${mob.stats.attack}, Def: ${mob.stats.defense}, Spd: ${mob.stats.speed}, Magic: ${mob.stats.magic}\n[2;32m HitPoints: ${mob.hpBarEmoji} ${mob.stats.hp}\n[2;36m AttackBar: [2;34m${mob.attackBarEmoji} ${Math.floor(mob.atkBar)}\n\n`;
                 }
                 this.battleEmbed.addFields({
                     name: 'Enemies Info:',
@@ -264,11 +264,11 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
                 let playerAndFamiliarsInfo = ''; // Initialize an empty string to store the info
 
                 for (const familiar of this.familiarInfo) {
-                    playerAndFamiliarsInfo += `[2;35m> ${familiar.name}\n[2;32m HitPoints: ${familiar.hpBarEmoji} ${familiar.stats.hp}\n[2;36m AttackBar: [2;34m${familiar.attackBarEmoji} ${Math.floor(familiar.atkBar)}\n\n`;
+                    playerAndFamiliarsInfo += `[2;35m> ${familiar.name}: [2;34mAtk: ${familiar.stats.attack}, Def: ${familiar.stats.defense}, Spd: ${familiar.stats.speed}\n[2;32m HitPoints: ${familiar.hpBarEmoji} ${familiar.stats.hp}\n[2;36m AttackBar: [2;34m${familiar.attackBarEmoji} ${Math.floor(familiar.atkBar)}\n\n`;
                 }
 
                 // Add the player's HP and AttackBar to the info
-                playerAndFamiliarsInfo += `[2;35m> ${this.playerName}\n[2;32m HitPoints: ${this.player.hpBarEmoji} ${this.player.stats.hp}\n[2;36m AttackBar: [2;34m${this.player.attackBarEmoji} ${Math.floor(this.player.atkBar)}`;
+                playerAndFamiliarsInfo += `[2;35m> ${this.playerName}: [2;34mAtk: ${this.player.stats.attack}, Def: ${this.player.stats.defense}, Spd: ${this.player.stats.speed}, Magic: ${this.player.stats.magic}\n[2;32m HitPoints: ${this.player.hpBarEmoji} ${this.player.stats.hp}\n[2;36m AttackBar: [2;34m${this.player.attackBarEmoji} ${Math.floor(this.player.atkBar)}`;
 
                 this.battleEmbed.addFields({
                     name: 'Your Team Info:',
