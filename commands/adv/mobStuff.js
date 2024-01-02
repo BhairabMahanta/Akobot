@@ -26,7 +26,6 @@ class MobAI {
         }
         for (; this.i < this.attackPattern.length; this.i++) {
             console.log('i: ', this.i);
-            console.log('attackPattern: ', this.attackPattern);
             const move = this.attackPattern[this.i];
             console.log('move: ', move);
             if (move === 'Basic Attack') {

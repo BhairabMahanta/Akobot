@@ -33,10 +33,10 @@ const buttonRow = new ActionRowBuilder()
     .addComponents(
         new ButtonBuilder()
         .setCustomId('action_normal')
-        .setLabel('Attack')
+        .setLabel('Basic Attack')
         .setStyle('Danger'),
         new ButtonBuilder()
-        .setCustomId('action_doge')
+        .setCustomId('action_dodge')
         .setLabel('Dodge')
         .setStyle('Danger')
     );
@@ -396,7 +396,7 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
                 const selectedClassValue = i.values[0]; // Get the selected value // gae shit
                 console.log('selectedValues', selectedClassValue);
                 if (this.pickedChoice || this.aliveEnemies.length === 1) {
-                    this.pickedChoice = false;
+                    this.pickedChoice = true;
                     if (this.aliveEnemies.length === 1) {
                         this.enemyToHit = this.aliveEnemies[0];
                     }
