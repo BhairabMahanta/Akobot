@@ -25,15 +25,21 @@ class MobAI {
             this.i = 0;
         }
         for (; this.i < this.attackPattern.length; this.i++) {
+            console.log('i: ', this.i);
+            console.log('attackPattern: ', this.attackPattern);
             const move = this.attackPattern[this.i];
             console.log('move: ', move);
             if (move === 'Basic Attack') {
                 console.log('moveTrue?: ', move);
+                this.i++;
                 return await this.normalAttack(mob, target);
             } else {
+                console.log('moveFalse?: ', move);      
+                this.i++;
                 return await this.abilityUse(mob, target, move);
             }
         }
+        this.i++;
     }
 
     async normalAttack(mob, target) {

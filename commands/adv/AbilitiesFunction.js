@@ -313,7 +313,7 @@ class Ability {
 
   //boss and mobs abilities
   async basicAttack(user, target) {
-    const damage = calculateDamage(user.stats.attack, target.stats.defense);
+    const damage = await calculateDamage(user.stats.attack, target.stats.defense);
     target.stats.hp -= damage;
     this.battleLogs.push(`+ ${user.name} uses Shield Bash on ${target.name} dealing ${damage}. ${target.name} is slowed!`);
     console.log(this.battleLogs.length);
@@ -323,27 +323,27 @@ class Ability {
   }
 
   async fireBreath(user, target) {
-    const damage = calculateDamage(user.stats.magic, target.stats.defense);
+    const damage = await calculateDamage(user.stats.magic, target.stats.defense);
     target.stats.hp -= damage;
     this.battleLogs.push(`${user.name} hurls a Fireball at ${target.name}. ${target.name} takes damage over time.`);
   }
 
   async tailSwipe(user, target) {
-    const damage = calculateDamage(user.stats.attack * 1.5, target.stats.defense);
+    const damage = await calculateDamage(user.stats.attack * 1.5, target.stats.defense);
     target.stats.hp -= damage;
     this.battleLogs.push(`${user.name} performs a powerful Tail Swipe on ${target.name}. It deals ${damage} damage.`);
     // Implement additional effects for Tail Swipe here
   }
 
   async venomStrike(user, target) {
-    const damage = calculateDamage(user.stats.magic * 1.2, target.stats.defense);
+    const damage = await calculateDamage(user.stats.magic * 1.2, target.stats.defense);
     target.stats.hp -= damage;
     this.battleLogs.push(`${user.name} delivers a Venom Strike to ${target.name}. It deals ${damage} damage.`);
     // Implement additional effects for Venom Strike here
   }
 
   async webTrap(user, target) {
-    const damage = calculateDamage(user.stats.magic * 0.8, target.stats.defense);
+    const damage = await calculateDamage(user.stats.magic * 0.8, target.stats.defense);
     target.stats.hp -= damage;
     this.battleLogs.push(`${user.name} sets up a Web Trap for ${target.name}. It deals ${damage} damage.`);
     // Implement additional effects for Web Trap here

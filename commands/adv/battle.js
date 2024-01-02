@@ -788,21 +788,25 @@ let filledBars;
 
           const aliveFamiliars = this.familiarInfo.filter(familiar => familiar.stats.hp > 0);
           
-          if (aliveFamiliars.length < 1) {
-            isTargetingPlayer = true;
-          }
+            if (aliveFamiliars.length < 1) {
+                isTargetingPlayer = true;
+            }
         const targetInfo = isTargetingPlayer ? this.player : aliveFamiliars[Math.floor(Math.random() * aliveFamiliars.length)];
 
-            const target = targetInfo.name;
-            console.log('TARGETNAME:', target);   
-            const damage = await this.mobAIClass.move(enemies, targetInfo);
-            // const damage = calculateDamage(this.boss.stats.attack, targetInfo.stats.defense);
-
-            // Update HP and battle logs
-            targetInfo.stats.hp -= damage;
-            console.log('My turn now bitches');
+                const target = targetInfo.name;
+                console.log('TARGETNAME:', target);   
+                let damage = await this.mobAIClass.move(enemies, targetInfo);
+                // const damage = calculateDamage(this.boss.stats.attack, targetInfo.stats.defense);
+                if (isNaN(damage)) {
+                    damage = 0;
+                    var noLogs = true;
+                }
+                // Update HP and battle logs
+                targetInfo.stats.hp -= damage;
+                console.log('My turn now bitches');
+                if (!noLogs) {
             this.battleLogs.push(`- ${this.currentTurn} attacks ${target} for ${damage} damage using cum!\n ============================================`);
-            // message.channel.send(`\`\`\`${logsString}\`\`\``);
+                 } // message.channel.send(`\`\`\`${logsString}\`\`\``);
             console.log('loglength:', this.battleLogs.length);
             console.log(`${this.currentTurn} attacks ${target} for ${damage} damage using cum!`);
             await this.getNextTurn();
