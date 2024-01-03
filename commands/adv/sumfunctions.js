@@ -343,12 +343,12 @@ if (fs.existsSync(name)) {
     
   }
   // Method to deactivate an element
-  async deactivate() {
+  async deactivatedElements() {
     this.isActive = false;
   }
 
   // Method to check if the element is active
-  async isActive() {
+  async activatedElements() {
     return this.isActive;
   }
 
