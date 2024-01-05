@@ -747,7 +747,7 @@
             ]
         },
         "class": "Knight",
-        "race": null,
+        "race": "Human",
         "stuff": {
             "generatedRandomElements": false,
             "generatedRandomElements2": false
