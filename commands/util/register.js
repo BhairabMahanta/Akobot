@@ -20,7 +20,7 @@ module.exports = {
 
   async execute(client, message, args) {
     const {db} = client;
-const Player  = await playerModel(db)
+const Player  = await playerModel(db);
      if (!startedTutorial.includes(message.author.id)) {
     if (!args[0] || args[0].length > 16 || args[0].length < 3) {
       // Check character name validity
@@ -55,7 +55,8 @@ const userExists = await Player.exists({ _id: message.author.id });
   if (userExists) {
   //   const tutorial = new Tutorial(players, 'My Tutorial', message);
   // tutorial.initiateTutorial();
-  return message.channel.send('chillax, you dont needa register more than once (using database)');
+  // return message.channel.send('chillax, you dont needa register more than once (using database)');
+  console.log('Fix later');
   }
       // if (players[message.author.id]) {
       //   return message.channel.send('chillax, you dont needa register more than once');
@@ -64,7 +65,7 @@ const userExists = await Player.exists({ _id: message.author.id });
 
     function getRandomCard() {
   const cardNames = Object.keys(cards);
-      console.log('cardnames:', cardNames)
+      console.log('cardnames:', cardNames);
   const randomCardName = cardNames[Math.floor(Math.random() * cardNames.length)];
   const randomCard = cards[randomCardName];
       console.log('name:', randomCardName, 'card:', randomCard);
@@ -126,7 +127,7 @@ const randomCardData = getRandomCard();
   try {
 // If the user exists, send a message
 if (!userExists) {
-    await playerData2.save();
+    // await playerData2.save();
 
     console.log('Player data saved:', playerData);
 }
@@ -139,7 +140,7 @@ if (!userExists) {
 //send the embed to ask if they want to start tutorial and if they dont want, dont send that shit.
     
     const wantTutorial = new EmbedBuilder()
-        .setColor(0x992e22)
+        .setColor('DarkBlue')
         .setDescription('Do you wish to proceed with a small tutorial? It is honestly quite unique af, just trust me.')
         .setFields(
           { name: '🇦', value: "Sus, but Sure!.", inline: false },
@@ -159,14 +160,14 @@ if (!userExists) {
     const tutSelectC = new ButtonBuilder() // Add a new button for selecting
     .setCustomId('select_buttonC')
     .setLabel('🇨')
-    .setStyle('Danger');
+    .setStyle('Success');
     const tutSelectD = new ButtonBuilder() // Add a new button for selecting
     .setCustomId('select_buttonD')
     .setLabel('🇩')
-    .setStyle('Danger');
+    .setStyle('Success');
     const tutRow = new ActionRowBuilder().addComponents(tutSelectA, tutSelectB, tutSelectC, tutSelectD // Add the new "Select" button
 );
-    sentMessage = await message.channel.send({ embeds: [wantTutorial], components: [tutRow] });
+    const sentMessage = await message.channel.send({ embeds: [wantTutorial], components: [tutRow] });
      const filter = i => (i.customId.startsWith('select_button') || i.customId === 'select_button') && i.user.id === message.author.id;
                 const collector = sentMessage.createMessageComponentCollector({ filter, time: 300000 });
 
@@ -179,6 +180,7 @@ if (!userExists) {
                              startedTutorial.push(i.user.id);
                                 // console.log('First question:', firstQuestion);
    const tutorial = new Tutorial(players, 'My Tutorial', message);
+   sentMessage.delete();
 tutorial.initiateTutorial();
                            } else if (i.customId === 'select_buttonA')  {
                              console.log('heclicked:', i.user.id);
@@ -187,6 +189,7 @@ tutorial.initiateTutorial();
                                 // console.log('First question:', firstQuestion);
     const tutorial = new Tutorial(players, 'My Tutorial', message);
 tutorial.initiateTutorial();
+sentMessage.delete();
                            }
                           else {
                             deniedTutorial.push(i.user.id);

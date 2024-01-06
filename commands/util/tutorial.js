@@ -1,20 +1,25 @@
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, AttachmentBuilder } = require('discord.js');
 const tutorialData = require('./story.json');
+const Quest = require('../adv/quest.js');
  const firstId = tutorialData.questions.find((d) => d.id === 1);
-
+const backButton = new ButtonBuilder()
+.setCustomId('back')
+.setLabel('Back')
+.setStyle('Primary');
+const backRow = new ActionRowBuilder().addComponents(backButton);
 class Tutorial {
   constructor(player, name, message) {
-    this.player = player
+    this.player = player;
     this.playerId = message.author.id;
-    console.log('playerID:', this.playerId)
+    console.log('playerID:', this.playerId);
     this.name = name;
-    console.log('name:', this.name)
+    console.log('name:', this.name);
     this.affection = 0;
     this.dialogueIndex = 0;
     this.embed = null;
     this.row = null;
-    this.message = message
-    this.collectorMessage = null
+    this.message = message;
+    this.collectorMessage = null;
     this.collector = null;
     this.answerFields = null;
     this.selectionMap = {};
@@ -24,6 +29,7 @@ class Tutorial {
     this.answers = null;
     this.imageUrl = null;
     this.yesNoButton = null;
+    this.savedAnswers = null;
   }
 
   async askQuestion(dialogue) {
@@ -78,11 +84,11 @@ answerFields[0].value = answerFields[0].value.substring(0, answerFields[0].value
 
     await this.editFields();
     this.embed.setDescription(`### ${text}\n\n`);
-    this.embed.setImage(this.imageUrl, { format: "png", dynamic: true, size: 1024 })
+    this.embed.setImage(this.imageUrl, { format: "png", dynamic: true, size: 1024 });
     this.embed.addFields(...answerFields);
 
     // Send the question embed
-    await this.collectorMessage.edit({ embeds: [this.embed], components: [this.row] });
+    await this.collectorMessage.edit({ embeds: [this.embed], components: [this.row, backRow] });
 
     // Start the collector
     this.collectorka();
@@ -90,11 +96,11 @@ answerFields[0].value = answerFields[0].value.substring(0, answerFields[0].value
 
   async collectorka() {
     if (!this.collector) {
-      const filter = i => (i.user.id === this.message.author.id) 
+      const filter = i => (i.user.id === this.message.author.id) ;
       this.collector = await this.collectorMessage.createMessageComponentCollector({filter, idle: 600000 });
 
       this.collector.on('collect', async (interaction) => {
-        console.log('interactionId:', interaction.customId)
+        console.log('interactionId:', interaction.customId);
         await interaction.deferUpdate();
         if (interaction.customId === 'start') {
           this.askQuestion(firstId);
@@ -102,32 +108,37 @@ answerFields[0].value = answerFields[0].value.substring(0, answerFields[0].value
           // Handle cancel logic here
           this.collectorMessage.delete();
         } else if (interaction.customId === 'Accept') {
-          this.quest.acceptQuest()
+          this.quest.acceptQuest();
           
         } else if (interaction.customId === 'Decline') {
-          this.quest.declineQuest()
+          this.quest.declineQuest();
         }
         if (interaction.customId != 'cancel') {
         const selectedAnswerId = parseInt(interaction.customId.split('_')[1]);
+        console.log('selectedAnswerId:', selectedAnswerId);
         const selectedAnswer = this.answers.find((answer) => answer.id === selectedAnswerId);
+        this.savedAnswers = selectedAnswer;
+        console.log('selectedAnswer:', selectedAnswer);
 
         if (selectedAnswer) {
           const outcome = selectedAnswer.outcome;
+          console.log('OUTCOME:', outcome);
 
           if (outcome.nextQuestionId) {
             // If the outcome is another question, ask the next question
             const nextQuestion = tutorialData.questions.find((q) => q.id === outcome.nextQuestionId);
+            console.log('nextQuestion:', nextQuestion);
             this.askQuestion(nextQuestion);
           } else if (outcome.text) {
-            console.log('outcometext:', outcome.text)
-            await this.editFields()
+            console.log('outcometext:', outcome.text);
+            await this.editFields();
             this.embed.setDescription(`### ${outcome.text}\n\n`);
-            this.embed.setImage(this.imageUrl, { format: "png", dynamic: true, size: 1024 })
+            this.embed.setImage(this.imageUrl, { format: "png", dynamic: true, size: 1024 });
             await this.collectorMessage.edit({ embeds: [this.embed], components: [this.row] });
             // If the outcome is a result, show the final result to the user
            if (outcome.text.startsWith('quest_')) {
-             this.questName = outcome.text.replace('quest_', '')
-              console.log('questName:', this.questName)
+             this.questName = outcome.text.replace('quest_', '');
+              console.log('questName:', this.questName);
              this.quest = new Quest(this);
              this.quest.showQuestDetails();
            }
@@ -166,8 +177,8 @@ answerFields[0].value = answerFields[0].value.substring(0, answerFields[0].value
             .setCustomId("cancel"),
         // ];
           );
-            this.row = this.yesNoButton
-        console.log('this.row', this.row)
+            this.row = this.yesNoButton;
+        console.log('this.row', this.row);
         // this.row = new ActionRowBuilder().addComponents(options);
         // this.embed.addFields({ name: "makeIndex", value: "setDialogues from npcname:", inline: false });
 
