@@ -61,11 +61,11 @@ class Battle {
         try {
             if (player.selectedFamiliars) {
                this.playerFamiliar = player.selectedFamiliars.name;
-                 } else if (!   player.selectedFamiliars) {
+                 } else if (!player.selectedFamiliars) {
                 console.log('gay');
-                this.playerFamiliar = ["Fire Dragon"];
-                this.message.channel.send('You have to select your familiar first using a!selectFamiliar')
-                return this.continue = false;
+                this.playerFamiliar = { name: ["Fire Dragon"]} ;
+                message.channel.send('You have to select your familiar first using a!selectFamiliar')
+                this.continue = false;
             }} catch (error) { console.log('No selected Familiars!', error); }
         this.familiarInfo = [];
         this.mobInfo = [];

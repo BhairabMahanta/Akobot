@@ -4,22 +4,22 @@
 // const db = mongoClient.db('Akaimnky');
 // const collection = db.collection('akaillection');
 // const players = require('../../data/players.json');
-// console.log('gaeprofile')
+
 // module.exports = {
 //     name: 'profile',
 //     description: 'Displays the profile image of the player with inputable name, description, age, height, etc., and is an image',
 //     aliases: ['sw', 'me', 'status'],
 //   async execute(client, message, args) {
-//     console.log('gae')
+//     console.log('gae');
 //     try {
 //       // Check if a player name is provided
 //       let playerName = args[0];
-//       console.log('gae2')
+//       console.log('gae2');
 
 //        // If no player name provided, show the profile of the message author
 //        if (!playerName) {
 //         playerName = message.author.id;
-//       console.log('yes')
+//       console.log('yes');
 //     }
 
 //      // Fetch player data from JSON or MongoDB based on your implementation
@@ -28,7 +28,7 @@
 //       if (!player) {
 //         return message.reply('Player not found. Provide valid player id.');
 //       }
-//       console.log('test1')
+//       console.log('test1');
 //       // Create a canvas to draw the profile
 //       const canvas = createCanvas(650, 500);
 //       const ctx = canvas.getContext('2d');
@@ -42,27 +42,27 @@
 //       ctx.font = '20px Arial';
 //       console.log('test2')
 //       console.log('message.author.displayAvatarURL', message.author.displayAvatarURL())
-//       const URL = message.author.displayAvatarURL()
-//       const url = URL.replace('.webp', '.png')
+//       const URL = message.author.displayAvatarURL();
+//       const url = URL.replace('.webp', '.png');
 //       console.log('url:', url)
 //       // Load an image (replace 'player.imageURL' with your actual image URL property)
 //       const image = await loadImage(url);
-//       console.log('test3')
+//       console.log('test3');
 //       ctx.drawImage(image, 10, 30, 200, 200);
 //       ctx.fillText(`Name: ${player.name}`, 10, 270, 250);
 //       ctx.fillText(`Description: {player.description}`, 10, 300);
 //       ctx.fillText(`Age: {player.age}`, 10, 330);
 //       ctx.fillText(`Height: {player.height}`, 10, 360);
-//       console.log('test3')
+//       console.log('test3');
 //       // Convert the canvas to a buffer
 //       const buffer = canvas.toBuffer('image/png');
-// console.log('test4')
+// console.log('test4');
 //       // Send the image as an attachment in an embed
 //       const embed = new EmbedBuilder()
 //         .setColor(0x0099ff)
 //         .setTitle(`Profile - ${player.name}`)
 //         .setImage('attachment://profile.png');
-//         console.log('should have sent')
+//         console.log('should have sent');
 //       message.channel.send({ embeds: [embed], files: [{ name: 'profile.png', attachment: buffer }] });
 //     } catch (error) {
 //       console.error('An error occurred:', error);
