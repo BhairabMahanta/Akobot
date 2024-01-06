@@ -943,7 +943,7 @@ let filledBars;
                             name: `You won the battle against the Monster, you can continue the journey where you left off (I lied  you can't)!!`,
                             value: `Rewards:\n Exp: ${rewards.experience}, Gold: ${rewards.gold}`,
                             inline: true,
-                        })
+                        });
                         this.battleEmbed.setDescription(`GGs You've won`);
                         this.initialMessage.edit({
                             embeds: [this.battleEmbed],
