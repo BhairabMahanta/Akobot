@@ -1,5 +1,4 @@
-const players = require('../../data/players.json');
-const {mongoClient} = require('../../data/mongo/mongo.js')
+const {mongoClient} = require('../../data/mongo/mongo.js');
 const db = mongoClient.db('Akaimnky');
 const collection = db.collection('akaillection');
 const { quests } = require('./quests');
@@ -191,7 +190,7 @@ class Battle {
       .setPlaceholder('Select an option')
       .addOptions([
         { label: 'Bosses', value: 'klik_bosses' },
-        { label: 'Mobs', value: 'klik_mobs' },
+        { label: 'Mobs', value: 'klik_mobs' }, 
         { label: 'Fight', value: 'klik_fight' }
       ]);
 const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
