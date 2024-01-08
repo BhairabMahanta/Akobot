@@ -88,7 +88,7 @@ answerFields[0].value = answerFields[0].value.substring(0, answerFields[0].value
     this.embed.addFields(...answerFields);
 
     // Send the question embed
-    await this.collectorMessage.edit({ embeds: [this.embed], components: [this.row, backRow] });
+    await this.collectorMessage.edit({ embeds: [this.embed], components: [this.row] });
 
     // Start the collector
     this.collectorka();
@@ -112,6 +112,8 @@ answerFields[0].value = answerFields[0].value.substring(0, answerFields[0].value
           
         } else if (interaction.customId === 'Decline') {
           this.quest.declineQuest();
+        } else if (interaction.customId === 'back') {
+          this.askQuestion(tutorialData.questions.find((q) => q.id === this.savedAnswers.id));
         }
         if (interaction.customId != 'cancel') {
         const selectedAnswerId = parseInt(interaction.customId.split('_')[1]);
@@ -134,7 +136,7 @@ answerFields[0].value = answerFields[0].value.substring(0, answerFields[0].value
             await this.editFields();
             this.embed.setDescription(`### ${outcome.text}\n\n`);
             this.embed.setImage(this.imageUrl, { format: "png", dynamic: true, size: 1024 });
-            await this.collectorMessage.edit({ embeds: [this.embed], components: [this.row] });
+            await this.collectorMessage.edit({ embeds: [this.embed], components: [backRow] });
             // If the outcome is a result, show the final result to the user
            if (outcome.text.startsWith('quest_')) {
              this.questName = outcome.text.replace('quest_', '');
@@ -154,7 +156,7 @@ answerFields[0].value = answerFields[0].value.substring(0, answerFields[0].value
 
   async editFields() {
     this.embed = new EmbedBuilder()
-      .setTitle(`Talking to ${this.name}`)
+      .setTitle(`Proceeding with ${this.name}`)
       .setDescription(`Have something like {dialogueindex}`)
       .setColor("#0099ff");
   }

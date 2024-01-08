@@ -10,8 +10,6 @@
           "selection": "A",
           "text": "Who are you? Where am I?",
           "outcome": {
-            "id": 1,
-            "text": "Outcome 1",
             "nextQuestionId": 2
             
           }
@@ -21,8 +19,6 @@
           "selection": "B",
           "text": "Thank you for the warm welcome?",
           "outcome": {
-            "id": 2,
-            "text": "Outcome 2",
             "nextQuestionId": 4
           }
         },
@@ -31,8 +27,6 @@
           "selection": "C",
           "text": "Fuck off!",
           "outcome": {
-            "id": 2,
-            "text": "Outcome 2",
             "nextQuestionId": 3
           }
         },
@@ -41,9 +35,7 @@
           "selection": "D",
           "text": "Take your time, do not answer.",
           "outcome": {
-            "id": 2,
-            "text": "Outcome 2",
-            "nextQuestionId": 5
+           "nextQuestionId": 5
           }
         }
       ],
@@ -60,8 +52,6 @@
         "selection": "A",
           "text": "Are you real? well I probably am just dreaming.",
           "outcome": {
-            "id": 1,
-            "text": "Outcome 1",
             "nextQuestionId": 3
           }
         },
@@ -70,8 +60,6 @@
           "selection": "B",
           "text": "Is this some joke stunt?",
           "outcome": {
-            "id": 2,
-            "text": "Outcome 2",
             "nextQuestionId": 3
           }
         },
@@ -80,8 +68,6 @@
           "selection": "C",
           "text": "Take your time, do not answer.",
           "outcome": {
-            "id": 2,
-            "text": "Outcome 2",
             "nextQuestionId": 5
           }
         },
@@ -90,9 +76,7 @@
           "selection": "D",
           "text": "Go away, I dont want a Paimon IRL.",
           "outcome": {
-            "id": 2,
-            "text": "Outcome 2",
-            "nextQuestionId": 3
+           "nextQuestionId": 3
           }
         }
       ]
@@ -112,9 +96,7 @@
         "selection": "A",
           "text": "idk bruv, am I?",
           "outcome": {
-            "id": 1,
-            "text": "Outcome 1",
-            "nextQuestionId": 4
+           "nextQuestionId": 4
           }
         },
         {
@@ -122,9 +104,7 @@
           "selection": "B",
           "text": "You're quick to catch on",
           "outcome": {
-            "id": 2,
-            "text": "Outcome 2",
-            "nextQuestionId": 4
+           "nextQuestionId": 4
           }
         },
         {
@@ -132,9 +112,7 @@
           "selection": "D",
           "text": "and so?",
           "outcome": {
-            "id": 2,
-            "text": "Outcome 2",
-            "nextQuestionId": 2
+           "nextQuestionId": 2
           }
         },
         {
@@ -142,8 +120,6 @@
           "selection": "D",
           "text": "Sorry, I didnt want to sound off rude. I am just very confused.",
           "outcome": {
-            "id": 2,
-            "text": "Outcome 2",
             "nextQuestionId": 4
           }
         }
@@ -161,8 +137,6 @@
         "selection": "A",
           "text": "Are you real? well I probably am just dreaming.",
           "outcome": {
-            "id": 1,
-            "text": "Outcome 1",
             "nextQuestionId": 6
           }
         },
@@ -171,8 +145,6 @@
           "selection": "B",
           "text": "Is this some joke stunt?",
           "outcome": {
-            "id": 2,
-            "text": "Outcome 2",
             "nextQuestionId": 6
           }
         },
@@ -181,9 +153,7 @@
           "selection": "C",
           "text": "Take your time, do not answer.",
           "outcome": {
-            "id": 2,
-            "text": "Outcome 2",
-            "nextQuestionId": 5
+           "nextQuestionId": 5
           }
         },
         {
@@ -191,9 +161,7 @@
           "selection": "D",
           "text": "Go away, I dont want a Paimon IRL.",
           "outcome": {
-            "id": 2,
-            "text": "Outcome 2",
-            "nextQuestionId": 1
+            "nextQuestionId": 6
           }
         }
       ]
@@ -212,9 +180,7 @@
         "selection": "A",
           "text": "Stay silent, dont make any moves.",
           "outcome": {
-            "id": 1,
-            "text": "Outcome 1",
-            "nextQuestionId": 6
+           "nextQuestionId": 6
           }
         },
         {
@@ -222,8 +188,6 @@
           "selection": "B",
           "text": "You're quick to catch on",
           "outcome": {
-            "id": 2,
-            "text": "Outcome 2",
             "nextQuestionId": 6
           }
         },
@@ -232,8 +196,6 @@
           "selection": "D",
           "text": "Stay silent but, show a surprised expression.",
           "outcome": {
-            "id": 2,
-            "text": "Outcome 2",
             "nextQuestionId": 6
           }
         },
@@ -242,9 +204,7 @@
           "selection": "D",
           "text": "Being calculative is in my bones.",
           "outcome": {
-            "id": 2,
-            "text": "Outcome 2",
-            "nextQuestionId": 6
+           "nextQuestionId": 6
           }
         }
       ]
@@ -253,7 +213,7 @@
     {
       
       "id": 6,
-      "text": "You can get a list of commands by typing a!help. Please pick what you want to learn about.**",
+      "text": "You can get a list of commands by typing a!help. Furthermore, Please pick what you want to learn about.**",
       "imageUrl": "https://cdn.discordapp.com/attachments/984382901716148234/1128749270657417317/main-qimg-1e20142d1e62db8f22456d7b049b1782-lq.png",
       "answers":
       
@@ -272,7 +232,7 @@
           "selection": "B",
           "text": "I'm not really a newbie nor a veteran. Is there something for me?",
           "outcome": {
-            "id": 2,
+            "id": 1,
             "text": "Quite full of yourself arent you? Try to take a decision on selecting your race. Use a!tutorial again to start where you left off."
             
           }
@@ -282,8 +242,8 @@
           "selection": "D",
           "text": "I'm a veteran, I know almost everything about the bot, entertain me.",
           "outcome": {
-            "id": 2,
-            "text": "Don't be so shy lol, try it out. Use a!tutorial again to start where you left off."
+            "id": 1,
+            "text": "Take off your pants."
             
           }
         },
@@ -292,7 +252,7 @@
           "selection": "D",
           "text": "I'm an expert, show me how to get rich quickly.",
           "outcome": {
-            "id": 2,
+            "id": 1,
            "text": "KYS, (Keep yourself safe!) This world is harsh."
           }
         }
@@ -303,7 +263,7 @@
   "outcomes": [
     {
       "id": 1,
-      "text": "Outcome 69",
+      "text": "Welcome back to the tutorial! Do you want to continue?",
       "nextQuestionId": 1
     },
     {
