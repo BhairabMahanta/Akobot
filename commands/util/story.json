@@ -173,9 +173,8 @@
       "id": 5,
       "text": "Oh, a silent observer? How amusing.",
       "imageUrl": "https://cdn.discordapp.com/attachments/984382901716148234/1128749270657417317/main-qimg-1e20142d1e62db8f22456d7b049b1782-lq.png",
-      "answers":
-      
-      [{
+      "answers": [
+        {
           "id": 1,
         "selection": "A",
           "text": "Stay silent, dont make any moves.",
@@ -263,8 +262,34 @@
   "outcomes": [
     {
       "id": 1,
-      "text": "Welcome back to the tutorial! Do you want to continue?",
-      "nextQuestionId": 1
+      "text": "Welcome back to the tutorial! after selecting your race, use the command a!sc (select class) to select a class, and then use a!tutorial again to start where you left off.",
+      "answers": [
+        {
+          "id": 1,
+        "selection": "A",
+          "text": "Click to proceed with selecting a class.",
+          "outcome": {
+            "id": 2,
+           "text": "Alright, tutorial progress saved! You can use a!tutorial again to start where you left off anytime or continue after selecting a class."
+          }
+        },
+        {
+          "id": 2,
+          "selection": "B",
+          "text": "Click to continue tutorial.",
+          "outcome": {
+            "nextQuestionId": 2.11
+          }
+        },
+        {
+          "id": 3,
+          "selection": "C",
+          "text": "Click to skip selection tutorial.",
+          "outcome": {
+            "nextQuestionId": 2.2
+          }
+        }
+      ]
     },
     {
       "id": 2,

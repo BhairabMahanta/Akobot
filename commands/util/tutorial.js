@@ -43,6 +43,7 @@ class Tutorial {
     this.imageUrl = imageUrl;
 
     // Create the answer buttons
+    if (answers) {
     const answerButtons = answers.map((answer, index) => {
       const label = String.fromCharCode(65 + index); // Convert index to A, B, C, D labels
       const selection = label.toLowerCase();
@@ -55,7 +56,7 @@ class Tutorial {
 
     // Create the row with answer buttons
     this.row = new ActionRowBuilder().addComponents(...answerButtons);
-
+  }
 const answerFields = [];
 
   // Create the field for all options
@@ -64,7 +65,7 @@ answerFields.push({
   value: '- ', // Start a code block
   inline: false,
 });
-
+if (answers) {
 // Loop through answers and add them to the code block
 answers.forEach((answer, index) => {
   // Append each option to the code block
@@ -74,6 +75,7 @@ answers.forEach((answer, index) => {
 // Close the code block
 answerFields[0].value = answerFields[0].value.substring(0, answerFields[0].value.length - 2);
 // });
+}
 
     await this.editFields();
     this.embed.setDescription(`### ${text}\n\n`);
@@ -171,12 +173,18 @@ answerFields[0].value = answerFields[0].value.substring(0, answerFields[0].value
       .setColor("#0099ff");
   }
 
-  async initiateTutorial() {
+  async initiateTutorial(stuff) {
+    if (!stuff) {
     this.embed = new EmbedBuilder()
       .setTitle(`${this.name}`)
       .setDescription(`Do you want to start the tutorial?`)
       .setColor("#0099ff");
-    
+    } else {
+      this.embed = new EmbedBuilder()
+      .setTitle(`${this.name}`)
+      .setDescription(`Do you want to resume the tutorial where you left off?`)
+      .setColor("#0099ff");
+    }
  this.yesNoButton = new ActionRowBuilder().addComponents(
         // const options = [
           new ButtonBuilder()
@@ -205,7 +213,7 @@ answerFields[0].value = answerFields[0].value.substring(0, answerFields[0].value
       if (this.dialogueIndex === 0) {
         this.embed.setDescription(`## Do You want to talk to ${this.name}?`);
        
-        this.embed.addFields({ name: "makeIndex", value: "setDialogues from npcname:", inline: false });
+        // this.embed.addFields({ name: "makeIndex", value: "setDialogues from npcname:", inline: false });
 
         this.dialogueIndex++;
         return this.row;

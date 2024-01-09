@@ -78,23 +78,7 @@ const randomCardData = getRandomCard();
     const playerId = message.author.id;
      // Send the initial question to the user
     const firstQuestion = story.questions.find((q) => q.id === 1);
-    const playerData = {
-      name: characterName,
-      location: locations[0],
-      inventory: { active: [], backpack: [] },
-      stats: { attack: 1, tactics: 0, magic: 1, training: 0, defense: 1, speed: 1, hitpoints: 10, intelligence: 1, wise: 1, luck: 1, devotion: 0, potential: 1, },
-      balance: { coins: 0, gems: 0 },
-      exp:{xp:0, level:0},
-       cards: { name: [randomCardData.name] },
-      class: null,
-      race: null,
-      stuff: { generatedRandomElements: false, generatedRandomElements2: false},
-      playerpos: { x: 100, y: 50 },
-    };  
-        if (!players[message.author.id]) {
-      players[playerId] = playerData;
- console.log("PLAYER AFTER:", players[playerId])
-        }
+
   const playerData2 = new Player({
   _id: playerId,
     name: characterName,
@@ -128,17 +112,10 @@ const randomCardData = getRandomCard();
 // If the user exists, send a message
 if (!userExists) {
     // await playerData2.save();
-
-    console.log('Player data saved:', playerData);
 }
   } catch (error) {
     console.error('Error saving player data:', error);
   }
-    // fs.writeFile('./data/players.json', JSON.stringify(players, null, 3), (err) => {
-    //   if (err) console.log(err);
-    // });
-//send the embed to ask if they want to start tutorial and if they dont want, dont send that shit.
-    
     const wantTutorial = new EmbedBuilder()
         .setColor('DarkBlue')
         .setDescription('Do you wish to proceed with a small tutorial? It is honestly quite unique af, just trust me.')
@@ -146,7 +123,6 @@ if (!userExists) {
           { name: '🇦', value: "Sus, but Sure!.", inline: false },
           { name: '🇧', value: "Eh? Okay.", inline: false },
           { name: '🇨', value: "You seem.... Stinky, I refuse to.", inline: false },
-          { name: '🇩', value: "No, I'm a veteran and like to explore things myself.", inline: false }
         );
      
     const tutSelectA = new ButtonBuilder() // Add a new button for selecting
@@ -160,12 +136,8 @@ if (!userExists) {
     const tutSelectC = new ButtonBuilder() // Add a new button for selecting
     .setCustomId('select_buttonC')
     .setLabel('🇨')
-    .setStyle('Success');
-    const tutSelectD = new ButtonBuilder() // Add a new button for selecting
-    .setCustomId('select_buttonD')
-    .setLabel('🇩')
-    .setStyle('Success');
-    const tutRow = new ActionRowBuilder().addComponents(tutSelectA, tutSelectB, tutSelectC, tutSelectD // Add the new "Select" button
+    .setStyle('Primary');
+    const tutRow = new ActionRowBuilder().addComponents(tutSelectA, tutSelectB, tutSelectC // Add the new "Select" button
 );
     const sentMessage = await message.channel.send({ embeds: [wantTutorial], components: [tutRow] });
      const filter = i => (i.customId.startsWith('select_button') || i.customId === 'select_button') && i.user.id === message.author.id;
@@ -174,23 +146,15 @@ if (!userExists) {
                 collector.on('collect', async (i) => {
                         try {
                        i.deferUpdate();    
-                           if (i.customId === 'select_buttonB')  {
+                           if (i.customId === 'select_buttonB' || i.customId === 'select_buttonA')  {
                              console.log('heclicked:', i.user.id);
                               console.log('id:', i.customId);
                              startedTutorial.push(i.user.id);
                                 // console.log('First question:', firstQuestion);
-   const tutorial = new Tutorial(players, 'My Tutorial', message);
+   const tutorial = new Tutorial(playerData2, 'My Tutorial', message);
    sentMessage.delete();
 tutorial.initiateTutorial();
-                           } else if (i.customId === 'select_buttonA')  {
-                             console.log('heclicked:', i.user.id);
-                              console.log('id:', i.customId);
-                             startedTutorial.push(i.user.id);
-                                // console.log('First question:', firstQuestion);
-    const tutorial = new Tutorial(players, 'My Tutorial', message);
-tutorial.initiateTutorial();
-sentMessage.delete();
-                           }
+                           } 
                           else {
                             deniedTutorial.push(i.user.id);
                             const noTutorial = new EmbedBuilder()
@@ -211,75 +175,3 @@ sentMessage.delete();
                 });
   },
 };
-
-// async function askQuestion(channel, question, index) {
-//   const { text, answers, imageUrl } = question;
-//   const selectionMap = {}; // Map button selection (A, B, C, D) to next question ID
-
-//   // Create the answer buttons
-//   const answerButtons = answers.map((answer, index) => {
-//     const label = String.fromCharCode(65 + index); // Convert index to A, B, C, D labels
-//     const selection = label.toLowerCase();
-//     selectionMap[selection] = answer.outcome.nextQuestionId;
-//     return new ButtonBuilder()
-//       .setStyle('Danger')
-//       .setCustomId(`answer_${index + 1}`)
-//       .setLabel(label);
-   
-//   });
-
-
-//   // Create the row with answer buttons
-//   const row = new ActionRowBuilder().addComponents(...answerButtons);
-
-
-
-//   // Create the answer fields for the embed
-//   const answerFields = answers.map((answer, index) => {
-//     return {
-//       name: `Answer ${index + 1}`,
-//       value: answer.text,
-//       inline: false,
-//     };
-//   });
-
-//   // Create the question embed
-//   const questionEmbed = new EmbedBuilder()
-//     .setColor(0x992e22)
-//     .setDescription(text)
-//     .setImage(imageUrl, { format: "png", dynamic: true, size: 1024 })
-//     .addFields(...answerFields);
-
-//   // Send the question embed
-//   const sentMessage = await channel.send({ embeds: [questionEmbed], components: [row] });
-
-//   const collector = sentMessage.createMessageComponentCollector({ idle: 60000 });
-
-//   collector.on('collect', async (interaction) => {
-//     await interaction.deferUpdate();
-//     const selectedAnswerId = parseInt(interaction.customId.split('_')[1]);
-//     const selectedAnswer = answers.find((answer) => answer.id === selectedAnswerId);
-
-//     if (selectedAnswer) {
-//       const outcome = selectedAnswer.outcome;
-  
-//       if (outcome.nextQuestionId) {
-//         // If the outcome is another question, ask the next question
-//         const nextQuestion = story.questions.find((q) => q.id === outcome.nextQuestionId);
-//         askQuestion(channel, nextQuestion, index + 1);
-//       } else if (outcome.text) {
-//         // If the outcome is a result, show the final result to the user
-//         console.log('Outcome:', outcome);
-//         showResult(channel, outcome);
-//       }
-//     }
-//   });
-// }
-
-// function showResult(channel, outcome) {
-//   const { text } = outcome;
-
-//   const resultEmbed = new EmbedBuilder().setColor(0x992e22).setDescription(text);
-
-//   channel.send({ embeds: [resultEmbed] });
-// }
