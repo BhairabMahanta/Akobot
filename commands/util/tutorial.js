@@ -130,13 +130,33 @@ answerFields[0].value = answerFields[0].value.substring(0, answerFields[0].value
         if (selectedAnswer) {
           const outcome = selectedAnswer.outcome;
           console.log('OUTCOME:', outcome);
+          if (outcome.activation && outcome.text) { 
+            const activationButton = new ButtonBuilder()
+.setCustomId(outcome.activation)
+.setLabel('Do it')
+.setStyle('Primary');
+const activationButtonRow = new ActionRowBuilder().addComponents(activationButton);
+console.log('outcometext:', outcome.text);
+            const filter = { _id: this.playerId };
+            await this.editFields();
+            this.embed.setDescription(`### ${outcome.text}\n\n`);
+            this.embed.setImage(this.imageUrl, { format: "png", dynamic: true, size: 1024 });
+            await this.collectorMessage.edit({ embeds: [this.embed], components: [backRow, activationButtonRow ] });
+            const playerData = await collection.findOne(filter);
+            playerData.outcomeId = outcome.id;
+            const updates = {
+              $set: { outcomeId: outcome.id }
+              };
+            await collection.updateOne(filter, updates);
+
+          }
 
           if (outcome.nextQuestionId) {
             // If the outcome is another question, ask the next question
             const nextQuestion = tutorialData.questions.find((q) => q.id === outcome.nextQuestionId);
             console.log('nextQuestion:', nextQuestion);
             this.askQuestion(nextQuestion);
-          } else if (outcome.text) {
+          } else if (outcome.text && !outcome.activation) {
             console.log('outcometext:', outcome.text);
             const filter = { _id: this.playerId };
             await this.editFields();

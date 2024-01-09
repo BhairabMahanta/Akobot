@@ -269,7 +269,8 @@
         "selection": "A",
           "text": "Click to proceed with selecting a class.",
           "outcome": {
-            "id": 2,
+            "id": 1,
+            "activation": "selectclass",
            "text": "Alright, tutorial progress saved! You can use a!tutorial again to start where you left off anytime or continue after selecting a class."
           }
         },

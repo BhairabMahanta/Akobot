@@ -30,16 +30,16 @@ module.exports = {
         try {
           const {db} = client;
             const userId = message.author.id;
-
+console.log('working');
          async function updateClass(playerId, className) {
   const PlayerModel = await playerModel(db);
-
+  console.log('workinga');
 
   // Find the document with the _id `playerId`
   const player = await PlayerModel.findByIdAndUpdate(`${playerId}`, { class: `${className}` }, { upsert: true, new: true, setDefaultsOnInsert: true }
   );
 
-console.log('AFTERCLASS:', player)
+console.log('AFTERCLASS:', player);
   // Save the document
   await player.save();
 }
@@ -61,7 +61,7 @@ console.log('AFTERCLASS:', player)
                     inline: false,
                 };
             });
-
+            console.log('workingb');
             const page = args[0] ? parseInt(args[0], 10) : 1;
             if (isNaN(page) || page <= 0) {
                 return message.reply('Invalid page number.');
@@ -91,16 +91,17 @@ console.log('AFTERCLASS:', player)
                         .setLabel('Next Page')
                         .setStyle('Secondary')
                 );
-
+                console.log('workingc');
                 initialEmbed.setFooter({ text:`Page ${page} | Use the "Next Page" button to view more classes if any.`});
                 sentMessage = await message.channel.send({ embeds: [initialEmbed], components: [classRow, actionRow] });
-
+                    console.log('message.author.id:', message.author.id);
                 const filter = i => (i.customId.startsWith('class_select') || i.customId === 'select_button') && i.user.id === message.author.id;
                 const collector = sentMessage.createMessageComponentCollector({ filter, time: 300000 });
-
+                console.log('sentMessage:', sentMessage);
                 collector.on('collect', async (i) => {
                         try {
                        i.deferUpdate();    
+                       console.log('workingd');
                     console.log('Interaction custom ID:', i.customId);
                      let updateEmbed;
                         if (i.customId.startsWith('class_select')) {

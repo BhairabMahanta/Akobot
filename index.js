@@ -32,8 +32,9 @@ loadCommands(client);
 const BOT_PREFIX = "a!";
 
 client.on('messageCreate', message => {
+
   try {
-  if (message.content.startsWith(`${BOT_PREFIX}`)) {
+  if (message.content.toLowerCase().startsWith(`${BOT_PREFIX}`)) {
     const args = message.content.slice(2).trim().split(/ +/);
     const commandName = args.shift().toLowerCase();
     console.log(`Received command: ${commandName}`);
@@ -59,7 +60,13 @@ client.on('messageCreate', message => {
 }
 });
 
-
+// client.on('interactionCreate', async (interaction) => {
+//   if (!interaction.isButton()) return;
+//   if (interaction.customId === 'selectclass') {
+//     const selectClassCommand = require('./commands/util/selectclass.js');
+//     await selectClassCommand.execute(client, interaction.message, [], interaction);
+//   }
+// });
 
 client.on('ready', async () => {
     console.log(`${client.user.tag} is ready!🚀`);
@@ -130,12 +137,12 @@ async function checkQuestCompletion() {
       // Check if time limit is exceeded
       if (currentTime > timeLimit) {
         // Quest has failed
-        questFailure = true
+        questFailure = true;
         quest.questStatus = "timeout";
-        player.completedQuests[questId] = quest
+        player.completedQuests[questId] = quest;
         console.log(`Quest '${questId}' has failed for ${player.name}`);
         // Optionally, update the quest's result and other details
-        delete playerQuests[questId]
+        delete playerQuests[questId];
          // Remove the completed quest from quests
        const questIndex = questList.indexOf(questId);
        if (questIndex !== -1) {
@@ -195,6 +202,7 @@ async function updatePlayer(player) {
     console.error('Error updating player data:', error);
   }
 }
+
 
 
 /*console.log('eeee', client.listenerCount('messageReactionRemove'));

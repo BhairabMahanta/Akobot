@@ -25,6 +25,13 @@ module.exports = {
           const tutorial = new Tutorial(playerData, 'My Tutorial', message);
           const yes = true;
        tutorial.initiateTutorial(yes);
-
+       // In your main bot file
+client.on('interactionCreate', async (interaction) => {
+    if (!interaction.isButton()) return;
+    if (interaction.customId === 'selectclass') {
+      const selectClassCommand = require('./selectclass.js');
+      await selectClassCommand.execute(client, message, [], interaction);
+    }
+  });
   },
 };
