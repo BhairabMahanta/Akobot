@@ -10,7 +10,7 @@ const story = require('./story.json'); // Load the story from the JSON file
 const { EmbedBuilder, ButtonBuilder, ActionRowBuilder } = require('discord.js');
 const fs = require('fs');
 const locations = require('../../data/locations');
-const {cards }= require('../fun/cards.js');
+const {cards }= require('../adv/information/cards.js');
 
 
 module.exports = {
@@ -29,7 +29,7 @@ module.exports = {
 client.on('interactionCreate', async (interaction) => {
     if (!interaction.isButton()) return;
     if (interaction.customId === 'selectclass') {
-      const selectClassCommand = require('./selectclass.js');
+      const selectClassCommand = require('./playerSelection/selectclass.js');
       await selectClassCommand.execute(client, message, [], interaction);
     }
   });

@@ -9,7 +9,7 @@ const playersFilePath = path.join(__dirname, '..', '..', 'data', 'players.json')
 const playerData = JSON.parse(fs.readFileSync(playersFilePath, 'utf8'));
 const { checkResults, updateMovesOnCd, calculateAbilityDamage, getCardStats, getCardMoves,
   calculateDamage } = require('./glogic.js'); // Assuming you have implemented the duel logic in gamelogic.js
-const {cards} = require('../fun/cards.js'); // Import the cards data from 'cards.js'
+const {cards} = require('../adv/information/cards.js'); // Import the cards data from 'cards.js'
 
 // Duel command handler
 module.exports = {

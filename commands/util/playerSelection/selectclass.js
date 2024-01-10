@@ -2,16 +2,16 @@
 const fs = require('fs');
 const path = require('path');
 const mongoose = require('mongoose');
-const {playerModel} = require('../../data/mongo/playerschema.js'); // Adjust the path to match your schema file location
+const {playerModel} = require('../../../data/mongo/playerschema.js'); // Adjust the path to match your schema file location
 
 
 // Read classes and races data
-const classesData = require('../../data/classes/allclasses');
-const racesData = require('../../data/races/races');
-const abilitiesData = require('../../data/abilities');
+const classesData = require('../../../data/classes/allclasses.js');
+const racesData = require('../../../data/races/races.js');
+const abilitiesData = require('../../../data/abilities.js');
 
 // Define the path to 'players.json' file
-const playersFilePath = path.join(__dirname, '..', '..', 'data', 'players.json');
+const playersFilePath = path.join(__dirname, '..', '..', '..', 'data', 'players.json');
 const userData = JSON.parse(fs.readFileSync(playersFilePath, 'utf8'));
 const selectButton = new ButtonBuilder() // Add a new button for selecting
     .setCustomId('select_button')

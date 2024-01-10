@@ -1,6 +1,6 @@
 // gameLogic.js
 const { CommandInteraction, StringSelectMenuBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, StringSelectMenuOptionBuilder } = require('discord.js');
-const {cards} = require('../fun/cards.js'); // Import the cards data from 'cards.js'
+const {cards} = require('../adv/information/cards.js'); // Import the cards data from 'cards.js'
 const abilities = require('../../data/abilities.js');
 // Function to get the index of the maximum value among three
 function getMax(a, b, c) {

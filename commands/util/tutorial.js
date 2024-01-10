@@ -3,7 +3,7 @@ const {mongoClient} = require('../../data/mongo/mongo.js');
 const db = mongoClient.db('Akaimnky');
 const collection = db.collection('akaillection');
 const tutorialData = require('./story.json');
-const Quest = require('../adv/quest.js');
+const Quest = require('../adv/quest/quest.js');
  const firstId = tutorialData.questions.find((d) => d.id === 1);
  
 const backButton = new ButtonBuilder()

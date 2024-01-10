@@ -1,7 +1,7 @@
-const {mongoClient} = require('../../data/mongo/mongo.js')
+const {mongoClient} = require('../../data/mongo/mongo.js');
 const mongoose = require('mongoose');
 const {playerModel} = require('../../data/mongo/playerschema.js'); // Adjust the path to match your schema file location
-const {Tutorial} = require('./tutorial.js')
+const {Tutorial} = require('./tutorial.js');
 // Specify the collection name (you can use the 'collection' property of the schema)
 const collectionName = 'akaillection';
 const story = require('./story.json'); // Load the story from the JSON file
@@ -9,7 +9,7 @@ const { EmbedBuilder, ButtonBuilder, ActionRowBuilder } = require('discord.js');
 const fs = require('fs');
 const players = require('../../data/players.json');
 const locations = require('../../data/locations');
-const {cards }= require('../fun/cards.js');
+const {cards }= require('../adv/information/cards.js');
 let startedTutorial = [537619455409127442];
 let deniedTutorial = [];
 
