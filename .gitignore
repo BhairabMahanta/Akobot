@@ -4,4 +4,9 @@ config.json
 .DS_Store
 gae1.js
 gae2.js
-sofimoves.js
+purge.js
+package-lock.json
+package.json
+replit.nix
+.breakpoints
+mongo.js

@@ -2,7 +2,6 @@
  const mongoose = require('mongoose');
 
 
-// const mongoURI = "mongodb+srv://Akaimnky:57n57ng96969@cluster0.ukxb93z.mongodb.net/?retryWrites=true&w=majority";
 
 // // Connect to MongoDB
 // mongoose.connect(mongoURI, {
