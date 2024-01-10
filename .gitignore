@@ -10,4 +10,4 @@ package.json
 replit.nix
 .replit
 .breakpoints
-data/mongo/mongo.js
+mongo.js
