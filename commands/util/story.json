@@ -222,7 +222,60 @@
           "text": "I want to Learn about the basics, I am new to the bot.",
           "outcome": {
             "id": 1,
-            "text": "Gae ngl"
+            "nextQuestionId": 2.11
+            
+          }
+        },
+        {
+          "id": 2,
+          "selection": "B",
+          "text": "I'm not really a newbie nor a veteran. Is there something for me?",
+          "outcome": {
+            "id": 1,
+            "text": "Quite full of yourself arent you? Try to take a decision on selecting your race. Use a!tutorial again to start where you left off."
+            
+          }
+        },
+        {
+          "id": 3,
+          "selection": "D",
+          "text": "I'm a veteran, I know almost everything about the bot, entertain me.",
+          "outcome": {
+            "id": 1,
+            "text": "Take off your pants."
+            
+          }
+        },
+        {
+          "id": 4,
+          "selection": "D",
+          "text": "I'm an expert, show me how to get rich quickly.",
+          "outcome": {
+            "id": 1,
+           "text": "KYS, (Keep yourself safe!) This world is harsh."
+          }
+        }
+      ]
+ 
+    },
+
+
+
+
+    {
+      
+      "id": 2.1,
+      "text": "Type a!selectrace to select a race. Selecting anything right now is temporary and you can freely change you race as many times you want until you hit lvl 10. ",
+      "imageUrl": "https://cdn.discordapp.com/attachments/984382901716148234/1128749270657417317/main-qimg-1e20142d1e62db8f22456d7b049b1782-lq.png",
+      "answers":
+      
+      [{
+          "id": 1,
+        "selection": "A",
+          "text": "Click to proceed with selecting a race.",
+          "outcome": {
+            "id": 1,
+            "text": "You can restart tutorial right where you left off using a!tutorial again so dont worry, go for it!"
             
           }
         },
@@ -258,6 +311,7 @@
       ]
  
     }
+
   ],
   "outcomes": [
     {
