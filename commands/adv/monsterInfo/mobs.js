@@ -5,7 +5,7 @@ const mobs = {
       hp: 100,
       attack: 50,
       defense: 40,
-      speed: 101,
+      speed: 95,
       magic: 200,
       // Other magical stats
     },
@@ -19,7 +19,7 @@ const mobs = {
       hp: 80,
       attack: 70,
       defense: 30,
-      speed: 110,
+      speed: 99,
       magic: 100,
       // Other magical stats
     },

@@ -363,7 +363,7 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
                 try {
                     console.log('aliveEnemiesearlY:', this.aliveEnemies);
                     if (this.pickedChoice || this.aliveEnemies.length === 1){
-                        this.pickedChoice = false;
+                        this.pickedChoice = true; // i can use mongodb to allow people to turn this off and on
                     if (this.aliveEnemies.length === 1) {
                         console.log('aliveEnemies:', this.aliveEnemies);
                         this.enemyToHit = this.aliveEnemies[0];
@@ -396,6 +396,7 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
                 console.log('selectedValues', selectedClassValue);
                 if (this.pickedChoice || this.aliveEnemies.length === 1) {
                     this.pickedChoice = true;
+                    
                     if (this.aliveEnemies.length === 1) {
                         this.enemyToHit = this.aliveEnemies[0];
                     }
@@ -407,7 +408,23 @@ const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
                         console.log('abilityName:a', abilityNameCamel);
                         // Check if the abilityName exists as a method in the Ability class
                         if (typeof this.ability[abilityNameCamel] === 'function') {
-                             this.ability[abilityNameCamel](this.player, this.enemyToHit);
+                            const method = this.ability[abilityNameCamel];
+
+                            if (method) {
+                              const functionAsString = method.toString();
+                              console.log('functionAsString:', functionAsString);
+                              const parameterNames = functionAsString
+                                .replace(/[/][/].*$/mg,'') // remove inline comments
+                                .replace(/\s+/g, '') // remove white spaces
+                                .replace(/[/][*][^/*]*[*][/]/g, '') // remove multiline comments
+                                .split('){', 1)[0].replace(/^[^(]*[(]/, '') // extract the parameters
+                                .split(',').filter(Boolean); // split the parameters into an array
+                            
+                              console.log(`Method ${abilityNameCamel} has the following parameters: ${parameterNames.join(', ')}`);
+                            } else {
+                              console.log(`Method ${abilityNameCamel} does not exist.`);
+                            }
+                             this.ability[abilityNameCamel](this.player, this.enemyToHit, this.aliveEnemies);
                             await cycleCooldowns(this.cooldowns);
                             await this.getNextTurn();
                             await this.performEnemyTurn(message);
@@ -574,7 +591,7 @@ const gaeRow = new ActionRowBuilder().addComponents(await this.selectMenu);
             } else if (this.playerFamiliar.includes(character.name)) {
                 // Find the familiar's speed by matching it with this.familiarInfo
                 const familiarInfo = this.familiarInfo.find((fam) => fam.name === character.name);
-                const familiarSpeed = familiarInfo ? familiarInfo.stats.speed : 0; // Default to 0 if not found
+                const familiarSpeed = familiarInfo ? familiarInfo.stats.speed : 1; // Default to 0 if not found
 
                 return familiarSpeed;
             } else if (character === this.boss) {

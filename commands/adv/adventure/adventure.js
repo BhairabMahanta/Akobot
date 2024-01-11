@@ -17,7 +17,7 @@ module.exports = {
   description: 'Start an adventure!',
    aliases: ['a', 'adv'],
   async execute(client, message, args, interaction) {
-const player = players[message.author.id]
+const player = players[message.author.id];
 // Simulate player data (replace with your actual data)
   const playerName = player.name;
   

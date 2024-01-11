@@ -8,7 +8,7 @@ const cards = {
     stats: {
       attack: 80,
       defense: 60,
-      speed: 102,
+      speed: 98,
       hp: 100,
     },
     moves: [
@@ -38,7 +38,7 @@ const cards = {
     stats: {
       attack: 65,
       defense: 70,
-      speed: 105,
+      speed: 99,
       hp: 90,
     },
     moves: [

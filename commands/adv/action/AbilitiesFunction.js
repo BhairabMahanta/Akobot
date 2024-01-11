@@ -28,7 +28,7 @@ class Ability {
     // updateMovesOnCd(this.cooldowns, this.cooldownFinder('shieldBash'));
   }
 
- async defend(user) {
+ async arenaSpin(user) {
     user.stats.defense += 10; // Example: Increase defense by 10
     this.battleLogs.push(`+ ${user.name} uses Defend. Their defense is increased.`);
     this.cooldowns.push({name: `Defend`, cooldown: this.cooldownFinder('Defend')});
@@ -42,18 +42,25 @@ class Ability {
   }
 
   async ragingStrike(user, target) {
-    const damage = calculateDamage(user.stats.attack * 2, target.stats.defense);
+    const damage = await calculateDamage(user.stats.attack * 2, target.stats.defense);
     target.stats.hp -= damage;
     this.battleLogs.push(`${user.name} unleashes a wild Raging Strike on ${target.name}. It deals massive damage!`);
     this.cooldowns.push({name: `Raging Strike`, cooldown: this.cooldownFinder('Raging Strike')});
   }
 
-  async arenaSpin(user, targets) {
-    targets.forEach((target) => {
-      const damage = calculateDamage(user.stats.attack, target.stats.defense);
-      target.stats.hp -= damage;
-    });
-    this.battleLogs.push(`${user.name} performs an Arena Spin, hitting multiple opponents.`);
+  async defend(user, target, specialContext) {
+    let damageArray = [];
+    let enemyNameArray = [];
+   // Use Promise.all with map instead of forEach
+   await Promise.all(specialContext.map(async (targeta) => {
+    console.log('target:', targeta.stats.defense);
+    console.log('length', specialContext.length);
+    const damage = await calculateDamage(user.stats.attack, targeta.stats.defense);
+    targeta.stats.hp -= damage*(1/specialContext.length);
+    damageArray.push(damage*(1/specialContext.length));
+    enemyNameArray.push(targeta.name);
+  }));
+    this.battleLogs.push(`+ ${user.name} performs an Arena Spin, hitting ${enemyNameArray.join(` ,`)} for ${damageArray.join(' ,')} damage respectively`);
     this.cooldowns.push({name: `Arena Spin`, cooldown: this.cooldownFinder('Arena Spin')});
   }
 
