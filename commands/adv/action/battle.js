@@ -63,7 +63,7 @@ class Battle {
                  } else if (!player.selectedFamiliars) {
                 console.log('gay');
                 this.playerFamiliar = { name: ["Fire Dragon"]} ;
-                message.channel.send('You have to select your familiar first using a!selectFamiliar')
+                message.channel.send('You have to select your familiar first using a!selectFamiliar');
                 this.continue = false;
             }} catch (error) { console.log('No selected Familiars!', error); }
         this.familiarInfo = [];
@@ -183,7 +183,7 @@ class Battle {
             // Create the embed for the adventure command
     this.battleEmbed = new EmbedBuilder()
       .setTitle('Start battle!')
-      .setDescription(`### - Do you want to really fight the monsters?\n\n>>> **Player and familiars:**\n- __${this.player.name} Level__: ${this.player.exp.level} \n- __Familiars selected__: ${this.familiarInfo.map(familiar => familiar.name).join(', ' )} \n\n **Enemy Info**:\n - __${this.enemyDetails.name} Level__: It not made smh \n\n **Automate this battle?**\n- automating has its own issues it does worse than you would normally do!! \n\n **Your Power Level vs Recommended**\n- somethings you needa make that shit\n\n **Difficulty**\n- bhag le\n\n **Start Battle**\n To start, click on the "Lets Dive into it" button!!`)
+      .setDescription(`### - Do you want to really fight the monsters?\n\n>>> **Player and familiars:**\n- __${this.player.name} Level__: ${this.player.exp.level} \n- __Familiars selected__: ${this.familiarInfo.map(familiar => familiar.name).join(', ' )} \n\n **Enemy Info**:\n - __${this.enemyDetails.name} Level__: It not made smh \n\n **Automate this battle?**\n- automating has its own issues it does worse than you would normally do!! \n\n **Your Power Level vs Recommended**\n- somethings you needa make that shit\n\n **Difficulty**\n- bhag le\n\n **Start Battle**\n To start, click on the "Lets Dive into it" button!!`);
             // Display options for quests, bosses, mobs, and adventures
     const optionSelectMenu = new StringSelectMenuBuilder()
       .setCustomId('option_krlo')
@@ -194,7 +194,7 @@ class Battle {
         { label: 'Fight', value: 'klik_fight' }
       ]);
 const stringMenuRow = new ActionRowBuilder().addComponents(optionSelectMenu);
- const gaeMessage = await this.message.channel.send({embeds: [this.battleEmbed], components: [stringMenuRow]})
+ const gaeMessage = await this.message.channel.send({embeds: [this.battleEmbed], components: [stringMenuRow]});
     const filter = i => (['start_adventure', 'cancel_adventure'].includes(i.customId)) || (i.customId === 'option_krlo') || (i.customId === 'go_in');
        const collector = await gaeMessage.createMessageComponentCollector({ filter, time: 300000 });
 
@@ -791,7 +791,7 @@ let filledBars;
 
     }
 
-    async performEnemyTurn(message) {
+    async performEnemyTurn() {
       for (const enemies of this.allEnemies) {
         // console.log('enemyname:', enemies.name);
          if (enemies.name === this.currentTurn &&  !this.deadEnemies.includes(enemies.name) &&this.currentTurn != this.boss.name) {

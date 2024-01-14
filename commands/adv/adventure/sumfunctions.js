@@ -336,7 +336,7 @@ if (fs.existsSync(name)) {
            'You see an \'NPC\' and a \'Monster\', click the buttons to interact.'
          );
          initialMessage.edit({
-           components: [...navigationRow, bothButton],
+           components: [interactRow],
         });
          
        }
