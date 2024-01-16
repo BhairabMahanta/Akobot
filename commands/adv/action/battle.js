@@ -40,7 +40,7 @@ const buttonRow = new ActionRowBuilder()
         .setStyle('Danger')
     );
 
-
+//im feeling lazy today.
 class Battle {
     constructor(player, enemy, message ) {
         this.mobSource = JSON.parse(JSON.stringify(mobs));
