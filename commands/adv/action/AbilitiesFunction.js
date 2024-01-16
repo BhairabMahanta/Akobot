@@ -28,7 +28,7 @@ class Ability {
     // updateMovesOnCd(this.cooldowns, this.cooldownFinder('shieldBash'));
   }
 
- async arenaSpin(user) {
+ async defend(user) {
     user.stats.defense += 10; // Example: Increase defense by 10
     this.battleLogs.push(`+ ${user.name} uses Defend. Their defense is increased.`);
     this.cooldowns.push({name: `Defend`, cooldown: this.cooldownFinder('Defend')});
@@ -48,7 +48,7 @@ class Ability {
     this.cooldowns.push({name: `Raging Strike`, cooldown: this.cooldownFinder('Raging Strike')});
   }
 
-  async defend(user, target, specialContext) {
+  async arenaSpin(user, target, specialContext) {
     let damageArray = [];
     let enemyNameArray = [];
    // Use Promise.all with map instead of forEach
@@ -97,20 +97,37 @@ class Ability {
 
   }
 
-  async frostNova(user, targets) {
-    targets.forEach((target) => {
+  async frostNova(user, target, specialContext) {
+    let damageArray = [];
+    let enemyNameArray = [];
+   // Use Promise.all with map instead of forEach
+   await Promise.all(specialContext.map(async (targeta) => {
+    console.log('target:', targeta.stats.defense);
+    console.log('length', specialContext.length);
+    const damage = await calculateDamage(user.stats.attack, targeta.stats.defense);
+    targeta.stats.hp -= damage*(1/specialContext.length);
+    damageArray.push(damage*(1/specialContext.length));
+    enemyNameArray.push(targeta.name);
+  }));
+    this.battleLogs.push(`+ ${user.name} casts Frost Nova freezing, and dealing ${enemyNameArray.join(` ,`)} for ${damageArray.join(' ,')} damage respectively`);
       target.statusEffects.frozen = true; // Example: Freeze the target
-    });
-    this.battleLogs.push(`${user.name} casts Frost Nova, freezing enemies in a radius.`);
+
     this.cooldowns.push({name: `Frost Nova`, cooldown: this.cooldownFinder('Frost Nova')});
   }
 
- async thunderstorm(user, targets) {
-    const thunderDamage = calculateAbilityDamage(user.stats.magic, 15); // Example: Thunderstorm deals 15 magic damage
-    targets.forEach((target) => {
-      const damage = calculateDamage(thunderDamage, target.magicalStats.resistance);
-      target.magicalStats.hp -= damage;
-    });
+ async thunderstorm(user, target, specialContext) {
+  let damageArray = [];
+  let enemyNameArray = [];
+ // Use Promise.all with map instead of forEach
+ await Promise.all(specialContext.map(async (targeta) => {
+  console.log('target:', targeta.stats.defense);
+  console.log('length', specialContext.length);
+  const damage = await calculateDamage(user.stats.attack, targeta.stats.defense);
+  targeta.stats.hp -= damage*(1/specialContext.length);
+  damageArray.push(damage*(1/specialContext.length));
+  enemyNameArray.push(targeta.name);
+}));
+  this.battleLogs.push(`+ ${user.name} performs an Arena Spin, hitting ${enemyNameArray.join(` ,`)} for ${damageArray.join(' ,')} damage respectively`);
     this.battleLogs.push(`${user.name} calls forth a Thunderstorm, damaging multiple opponents.`);
     this.cooldowns.push({name: `Thunderstorm`, cooldown: this.cooldownFinder('Thunderstorm')});
   }
@@ -172,13 +189,21 @@ class Ability {
     this.cooldowns.push({name: `Smoke Bomb`, cooldown: this.cooldownFinder('Smoke Bomb')});
   }
 
-  async shurikenBarrage(user, targets) {
-    const shurikenDamage = calculateDamage(user.stats.attack, 10); // Example: Shuriken Barrage deals 10 damage per shuriken
-    targets.forEach((target) => {
-      target.stats.hp -= shurikenDamage;
-    });
-    this.battleLogs.push(`${user.name} throws a flurry of shurikens, hitting multiple targets.`);
+  async shurikenBarrage(user, target, specialContext) {
+      let damageArray = [];
+      let enemyNameArray = [];
+     // Use Promise.all with map instead of forEach
+     await Promise.all(specialContext.map(async (targeta) => {
+      console.log('target:', targeta.stats.defense);
+      console.log('length', specialContext.length);
+      const damage = await calculateDamage(user.stats.attack, targeta.stats.defense);
+      targeta.stats.hp -= damage*(1/specialContext.length);
+      damageArray.push(damage*(1/specialContext.length));
+      enemyNameArray.push(targeta.name);
+    }));
+      this.battleLogs.push(`+ ${user.name} performs Shuriken Barrage, hitting ${enemyNameArray.join(` ,`)} for ${damageArray.join(' ,')} damage respectively`);
     this.cooldowns.push({name: `Shuriken Barrage`, cooldown: this.cooldownFinder('Shuriken Barrage')});
+    
   }
 
   async charmingPresence(user, target) {
