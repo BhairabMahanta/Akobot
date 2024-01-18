@@ -398,13 +398,6 @@ class Ability {
     this.battleLogs.push(`${user.name} unleashes a wild Raging Strike on ${target.name}. It deals massive damage!`);
   }
 
-  async bossAbility5(user, targets) {
-    targets.forEach((target) => {
-      const damage = calculateDamage(user.stats.attack, target.stats.defense);
-      target.stats.hp -= damage;
-    });
-    this.battleLogs.push(`${user.name} performs an Arena Spin, hitting multiple opponents.`);
-  }
 
   async bossAbility6(user, target) {
     target.focus = user;
