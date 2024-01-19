@@ -40,7 +40,7 @@ const buttonRow = new ActionRowBuilder()
         .setStyle('Danger')
     );
 
-
+//I HAVE EXAMS BUT I GOTTA MAINTAIN STREAK SORRY GUYS ILL BE BACK IN 10 DAYS AND WILL KEEP ON FAKING MY STREAKS
 class Battle {
     constructor(player, enemy, message ) {
         this.mobSource = JSON.parse(JSON.stringify(mobs));
