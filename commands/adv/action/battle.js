@@ -40,7 +40,7 @@ const buttonRow = new ActionRowBuilder()
         .setStyle('Danger')
     );
 
-//feels bad but streak here
+//feels bad but streak here CONSISTENCY BOO
 class Battle {
     constructor(player, enemy, message ) {
         this.mobSource = JSON.parse(JSON.stringify(mobs));
