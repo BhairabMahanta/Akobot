@@ -1,14 +1,19 @@
-const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, AttachmentBuilder } = require('discord.js');
-const players = require('../../../data/players.json');
-const {areas} = require('../information/areas.js');
-const sharp = require('sharp');
-const fs = require('fs');
-const path = require('path');
-const {mongoClient} = require('../../../data/mongo/mongo.js');
-const db = mongoClient.db('Akaimnky');
-const collection = db.collection('akaillection');
-const {cards} = require('../information/cards.js'); // Import the cards data from 'cards.js'
-const abilities = require('../../../data/abilities.js');
+const {
+  EmbedBuilder,
+  ActionRowBuilder,
+  ButtonBuilder,
+  AttachmentBuilder,
+} = require("discord.js");
+const players = require("../../../data/players.json");
+const { areas } = require("../information/areas.js");
+const sharp = require("sharp");
+const fs = require("fs");
+const path = require("path");
+const { mongoClient } = require("../../../data/mongo/mongo.js");
+const db = mongoClient.db("Akaimnky");
+const collection = db.collection("akaillection");
+const { cards } = require("../information/cards.js"); // Import the cards data from 'cards.js'
+const abilities = require("../../../data/abilities.js");
 
 class GameImage {
   constructor(imgH, imgW, player, message) {
@@ -37,7 +42,11 @@ class GameImage {
     return Math.random() < probability;
   }
 
-  async generateRandomElements(monsterProbability, npcProbability, maxElements) {
+  async generateRandomElements(
+    monsterProbability,
+    npcProbability,
+    maxElements
+  ) {
     let monsterCount = 0;
     let npcCount = 0;
     console.log("imagew,h:", this.imgW, this.imgH);
@@ -62,143 +71,147 @@ class GameImage {
     }
   }
   async generateAreaElements(areaName) {
-  // Fetch area data from area.js based on areaName
-  const areaData = areas[areaName];
+    // Fetch area data from area.js based on areaName
+    const areaData = areas[areaName];
 
-  // Initialize counts for monsters and NPCs
-  let monsterCount = 0;
-  let npcCount = 0;
-   const maxElements = 10;
+    // Initialize counts for monsters and NPCs
+    let monsterCount = 0;
+    let npcCount = 0;
+    const maxElements = 10;
 
-  // Loop through the area data and generate elements
-  for (let i = this.elements.length; i < maxElements; i++) {
-    // const row = Math.floor(Math.random() * (this.imgH - 50)) + 50;
-    // const col = Math.floor(Math.random() * (this.imgW - 50)) + 50;
+    // Loop through the area data and generate elements
+    for (let i = this.elements.length; i < maxElements; i++) {
+      // const row = Math.floor(Math.random() * (this.imgH - 50)) + 50;
+      // const col = Math.floor(Math.random() * (this.imgW - 50)) + 50;
 
-    // Generate monsters
-    if (monsterCount < areaData.monsters.length) {
-      const monster = areaData.monsters[monsterCount];
-      this.elements.push({
-        name: monster.name,
-        x: monster.position.x,
-        y: monster.position.y,
-        area: areaName, // Store the area name with the element
-        type: monster.type,
-        hasAllies: monster.hasAllies,
-        waves: monster.waves,
-        rewards: monster.rewards,
-      });
-      this.monsterArray.push({
-        name: monster.name,
-        x: monster.position.x,
-        y: monster.position.y,
-        area: areaName, 
-        amt: monster.amount,
-        type: monster.type,
-        hasAllies: monster.hasAllies,
-        waves: monster.waves,
-        rewards: monster.rewards,
-      });
-      monsterCount++;
-    }
+      // Generate monsters
+      if (monsterCount < areaData.monsters.length) {
+        const monster = areaData.monsters[monsterCount];
+        this.elements.push({
+          name: monster.name,
+          x: monster.position.x,
+          y: monster.position.y,
+          area: areaName, // Store the area name with the element
+          type: monster.type,
+          hasAllies: monster.hasAllies,
+          waves: monster.waves,
+          rewards: monster.rewards,
+        });
+        this.monsterArray.push({
+          name: monster.name,
+          x: monster.position.x,
+          y: monster.position.y,
+          area: areaName,
+          amt: monster.amount,
+          type: monster.type,
+          hasAllies: monster.hasAllies,
+          waves: monster.waves,
+          rewards: monster.rewards,
+        });
+        monsterCount++;
+      }
 
-    // Generate NPCs
-    if (npcCount < areaData.npcs.length) {
-      const npc = areaData.npcs[npcCount];
-      this.elements.push({
-        name: npc.name,
-        x: npc.position.x,
-        y: npc.position.y,
-        area: areaName, // Store the area name with the element
-      });
-      this.npcArray.push({
-        name: npc.name,
-        x: npc.position.x,
-        y: npc.position.y,
-        area: areaName, // Store the area name with the element
-      });
-      npcCount++;
-    }
+      // Generate NPCs
+      if (npcCount < areaData.npcs.length) {
+        const npc = areaData.npcs[npcCount];
+        this.elements.push({
+          name: npc.name,
+          x: npc.position.x,
+          y: npc.position.y,
+          area: areaName, // Store the area name with the element
+        });
+        this.npcArray.push({
+          name: npc.name,
+          x: npc.position.x,
+          y: npc.position.y,
+          area: areaName, // Store the area name with the element
+        });
+        npcCount++;
+      }
 
-    // Break if we've generated enough monsters and NPCs
-    if (monsterCount >= areaData.monsters.length && npcCount >= areaData.npcs.length) {
-      break;
+      // Break if we've generated enough monsters and NPCs
+      if (
+        monsterCount >= areaData.monsters.length &&
+        npcCount >= areaData.npcs.length
+      ) {
+        break;
+      }
     }
   }
-}
   async forLoop() {
     const attackRadius = 40; // Adjust the radius as needed
 
     for (const element of this.monsterArray) {
-     this.distanceToMonster = Math.sqrt(
+      this.distanceToMonster = Math.sqrt(
         Math.pow(this.playerpos.x - element.x, 2) +
-        Math.pow(this.playerpos.y - element.y, 2)
+          Math.pow(this.playerpos.y - element.y, 2)
       );
- if (this.distanceToMonster <= attackRadius) {
-   this.isTrue = true;
-   console.log('it orked');
-   this.whichMon = element.name;
-   if (!this.elementArray.includes(element)) {
-   this.elementArray.push(element);
-// Sort the elementArray by shortest distanceToMonster
-      this.elementArray.sort((a, b) => {
-        const distA = Math.sqrt(
-          Math.pow(this.playerpos.x - a.x, 2) +
-          Math.pow(this.playerpos.y - a.y, 2)
-        );
-        const distB = Math.sqrt(
-          Math.pow(this.playerpos.x - b.x, 2) +
-          Math.pow(this.playerpos.y - b.y, 2)
-        );
-        return distA - distB;
-      });
-   }
-  //  console.log('ELEMENT ARRAY BANJA PLS', this.elementArray)
-  //  console.log('LOOP WALA:', this.whichMon)
-  //  console.log('isTrue:', this.isTrue)
-   break;
- } 
+      if (this.distanceToMonster <= attackRadius) {
+        this.isTrue = true;
+        console.log("it orked");
+        this.whichMon = element.name;
+        if (!this.elementArray.includes(element)) {
+          this.elementArray.push(element);
+          // Sort the elementArray by shortest distanceToMonster
+          this.elementArray.sort((a, b) => {
+            const distA = Math.sqrt(
+              Math.pow(this.playerpos.x - a.x, 2) +
+                Math.pow(this.playerpos.y - a.y, 2)
+            );
+            const distB = Math.sqrt(
+              Math.pow(this.playerpos.x - b.x, 2) +
+                Math.pow(this.playerpos.y - b.y, 2)
+            );
+            return distA - distB;
+          });
+        }
+        //  console.log('ELEMENT ARRAY BANJA PLS', this.elementArray)
+        //  console.log('LOOP WALA:', this.whichMon)
+        //  console.log('isTrue:', this.isTrue)
+        break;
+      }
     }
     return this.isTrue;
   }
 
-
   async generateUpdatedImage(areaImage, playerpos) {
-   let name;
+    let name;
     let inputImagePath;
     try {
       this.generatedRandomElements2 = false;
 
       if (!this.generatedRandomElements2) {
-         
         // Add elements to the image
         this.generatedRandomElements2 = true;
         for (const element of this.elements) {
           const elementName = element.name;
-     name = `commands/adv/npcimg/${elementName}.png`;
-             const filePath = path.join(name);
-         
-// Use fs.existsSync to check if the file exists
-if (fs.existsSync(name)) {
-  // The file exists, you can now use it
-  inputImagePath = name;
-  // console.log(`The file ${filePath} exists.`);
-} else {
-           inputImagePath = element.name.startsWith('monster')
-            ? 'commands/adv/npcimg/monster.png'
-            : 'commands/adv/npcimg/npc.png';
-}
+          name = `commands/adv/npcimg/${elementName}.png`;
+
+          // Use fs.existsSync to check if the file exists
+          if (fs.existsSync(name)) {
+            // The file exists, you can now use it
+            inputImagePath = name;
+            // console.log(`The file ${filePath} exists.`);
+          } else {
+            inputImagePath = element.name.startsWith("monster")
+              ? "commands/adv/npcimg/monster.png"
+              : "commands/adv/npcimg/npc.png";
+          }
           if (element === this.elements[0]) {
             // For the first element, apply the composite directly to the updatedImage
             this.image = await sharp(areaImage)
-              .composite([{ input: inputImagePath, left: element.x, top: element.y }])
+              .composite([
+                { input: inputImagePath, left: element.x, top: element.y },
+              ])
               .png()
               .toBuffer();
-          //   console.log(`${element.name} placed at x: ${element.x}, y: ${element.y}`);
-           } else {
+            //   console.log(`${element.name} placed at x: ${element.x}, y: ${element.y}`);
+          } else {
             // For the rest of the elements, apply the composite to the updatedImage
             this.image = await sharp(this.image)
-              .composite([{ input: inputImagePath, left: element.x, top: element.y }])
+              .composite([
+                { input: inputImagePath, left: element.x, top: element.y },
+              ])
               .png()
               .toBuffer();
             // console.log(`${element.name} placed at x: ${element.x}, y: ${element.y}`);
@@ -207,106 +220,130 @@ if (fs.existsSync(name)) {
       }
       // Load the base image
       this.gaeImage = await sharp(this.image)
-        .composite([{ input: 'commands/adv/npcimg/Old_man.png', left: playerpos.x, top: playerpos.y }])
+        .composite([
+          {
+            input: "commands/adv/npcimg/Old_man.png",
+            left: playerpos.x,
+            top: playerpos.y,
+          },
+        ])
         .png()
         .toBuffer();
 
-      return new AttachmentBuilder(this.gaeImage, { name: 'updatedMap.png' });
+      return new AttachmentBuilder(this.gaeImage, { name: "updatedMap.png" });
     } catch (error) {
       console.error("An error occurred:", error);
       // Send an error message back to the channel
-      this.message.channel.send("An error occurred while generating the updated map.");
+      this.message.channel.send(
+        "An error occurred while generating the updated map."
+      );
     }
   }
   async movePlayer(player) {
     // Load the base image
-    
-  // Other properties of the player...
+
+    // Other properties of the player...
     const updatedImageBuffer = await sharp(this.image)
-      .composite([{ input: "commands/adv/Old_man.png", left: this.playerpos.x, top: this.playerpos.y }])
+      .composite([
+        {
+          input: "commands/adv/npcimg/Old_man.png",
+          left: this.playerpos.x,
+          top: this.playerpos.y,
+        },
+      ])
       .png()
       .toBuffer();
-    // player.playerpos = 
+    // player.playerpos =
     //  fs.writeFileSync('./data/players.json', JSON.stringify(players, null, 4));
-    player.playerpos = { "x": this.playerpos.x, "y":  this.playerpos.y };
-    await collection.updateOne(this.filter, { $set: { playerpos: player.playerpos } });
-    return new AttachmentBuilder(updatedImageBuffer, { name: "updatedMap.png" });
-   
+    player.playerpos = { x: this.playerpos.x, y: this.playerpos.y };
+    await collection.updateOne(this.filter, {
+      $set: { playerpos: player.playerpos },
+    });
+    return new AttachmentBuilder(updatedImageBuffer, {
+      name: "updatedMap.png",
+    });
   }
-  
-  async nearElement(hasAttackButton, message, initialMessage, navigationRow, attackRow, talktRow, bothButton, hasTalkButton, nowBattling, interactRow) {
+
+  async nearElement(
+    hasAttackButton,
+    message,
+    initialMessage,
+    navigationRow,
+    attackRow,
+    talktRow,
+    bothButton,
+    hasTalkButton,
+    nowBattling,
+    interactRow
+  ) {
     const attackRadius = 40; // Adjust the radius as needed
     console.log("NearElement");
 
     // while (restartForLoop) {
     for (const element of this.monsterArray) {
       await this.forLoop();
-      
+
       this.distanceToMonster = Math.sqrt(
         Math.pow(this.playerpos.x - element.x, 2) +
-        Math.pow(this.playerpos.y - element.y, 2)
+          Math.pow(this.playerpos.y - element.y, 2)
       );
-  console.log('elementname:', element.name);
-       console.log('Distance to monster:', this.distanceToMonster);
-     
+      console.log("elementname:", element.name);
+      console.log("Distance to monster:", this.distanceToMonster);
 
       if (
         this.distanceToMonster <= attackRadius &&
-        element.name.startsWith('monster') &&
+        element.name.startsWith("monster") &&
         !hasAttackButton
       ) {
-        nowBattling.setFooter({text:
-          "You are in the monster field radius, click the attack button to attack."}
-        );
+        nowBattling.setFooter({
+          text: "You are in the monster field radius, click the attack button to attack.",
+        });
         this.whichMon = element.name;
         console.log("whichMon:", this.whichMon);
         initialMessage.edit({
           embeds: [nowBattling],
           components: [...attackRow],
         });
-        console.log('should break');
+        console.log("should break");
 
         break;
-      } 
-      else if (
+      } else if (
         this.distanceToMonster >= attackRadius &&
         element.name === this.whichMon &&
-        hasAttackButton && this.isTrue
+        hasAttackButton &&
+        this.isTrue
       ) {
         console.log("whichMon2:", this.whichMon);
         console.log("element:", element.name);
-        nowBattling.setFooter({text:"You moved out of attack range."});
+        nowBattling.setFooter({ text: "You moved out of attack range." });
         initialMessage.edit({
           embeds: [nowBattling],
           components: [...navigationRow],
         });
-        
+
         break;
-        
       }
-  }
-      console.log('BROCHANGED ELEMENTS WTFFF');
-    
+    }
+    console.log("BROCHANGED ELEMENTS WTFFF");
+
     //}
 
     for (const element of this.npcArray) {
-      
       this.distanceToNpc = Math.sqrt(
         Math.pow(this.playerpos.x - element.x, 2) +
-        Math.pow(this.playerpos.y - element.y, 2)
+          Math.pow(this.playerpos.y - element.y, 2)
       );
-//  console.log('elementname:', element.name);
-//       console.log('Distance to monster:', this.distanceToNpc);
-     
+      //  console.log('elementname:', element.name);
+      //       console.log('Distance to monster:', this.distanceToNpc);
 
       if (
         this.distanceToNpc <= attackRadius &&
         element.name.startsWith("npc") &&
         !hasTalkButton
       ) {
-        nowBattling.setFooter({text:
-          "You see an NPC, click the 'Talk' button to interact."}
-        );
+        nowBattling.setFooter({
+          text: "You see an NPC, click the 'Talk' button to interact.",
+        });
         this.whichMon = element.name;
         console.log("whichMonNpcOne:", this.whichMon);
         initialMessage.edit({
@@ -321,7 +358,7 @@ if (fs.existsSync(name)) {
       ) {
         console.log("whichMonNpcTwo:", this.whichMon);
         console.log("element2:", element.name);
-         nowBattling.setFooter({text:"You moved out of NPC's range."});
+        nowBattling.setFooter({ text: "You moved out of NPC's range." });
         initialMessage.edit({
           embeds: [nowBattling],
           components: [...navigationRow],
@@ -329,18 +366,19 @@ if (fs.existsSync(name)) {
         break;
       }
     }
-    if ((this.distanceToMonster <= attackRadius) && (this.distanceToNpc <= attackRadius)
-        && (!hasAttackButton && !hasTalkButton)
-        ) {
-         message.channel.send(
-           'You see an \'NPC\' and a \'Monster\', click the buttons to interact.'
-         );
-         initialMessage.edit({
-           components: [interactRow],
-        });
-         
-       }
-    
+    if (
+      this.distanceToMonster <= attackRadius &&
+      this.distanceToNpc <= attackRadius &&
+      !hasAttackButton &&
+      !hasTalkButton
+    ) {
+      message.channel.send(
+        "You see an 'NPC' and a 'Monster', click the buttons to interact."
+      );
+      initialMessage.edit({
+        components: [interactRow],
+      });
+    }
   }
   // Method to deactivate an element
   async deactivatedElements() {
@@ -360,11 +398,8 @@ if (fs.existsSync(name)) {
     } else {
       console.log(`${this.name} is inactive.`);
     }
-  }  
-  
+  }
 }
-
-
 
 class Player {
   constructor(name, health) {
@@ -398,7 +433,6 @@ class Player {
   }
 }
 
-
 async function cycleCooldowns(array) {
   // Loop through each move and decrease its cooldown by 1
 
@@ -425,32 +459,26 @@ async function cycleCooldowns(array) {
 
   try {
     if (array.length === 0) {
-      console.log('No moves on cooldown');
+      console.log("No moves on cooldown");
       return;
     }
-  array.forEach(item => {
-    if (item.cooldown > 0) {
-      item.cooldown--;
-      if (item.cooldown === 0) {
-        console.log(`${item.name} is no longer on cooldown.`);
-        array.splice(array.indexOf(item), 1);
-        console.log('array:', array);
+    array.forEach((item) => {
+      if (item.cooldown > 0) {
+        item.cooldown--;
+        if (item.cooldown === 0) {
+          console.log(`${item.name} is no longer on cooldown.`);
+          array.splice(array.indexOf(item), 1);
+          console.log("array:", array);
+        }
       }
-    }
-  });
+    });
   } catch (error) {
-    console.error('There isnt any moves on cooldown', error);
+    console.error("There isnt any moves on cooldown", error);
   }
 }
-
-
-
-
-
 
 module.exports = {
   GameImage,
   Player,
   cycleCooldowns,
-  
 };
