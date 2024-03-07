@@ -1,12 +1,8 @@
-pub fn add(left: usize, right: usize) -> usize {
+use napi_derive::napi;
+#[napi]
+pub fn add(left:i32, right: i32) -> i32 {
     left + right
 }
-// use wasm_bindgen::prelude::*;
-#[no_mangle]
-pub extern "C" fn add_numbers(a: i32, b: i32) -> i32 {
-    a + b
-}
-
 
 #[cfg(test)]
 mod tests {

@@ -1,13 +1,11 @@
 const fs = require("fs");
 const path = require("path");
 const { readdirSync } = require("node:fs");
-const { add_numbers } = require("./my_rust_library/pkg/my_rust_library.js");
-
-const result = add_numbers(5, 7);
-console.log("Result of adding numbers:", result);
+const { add } = require("./my_rust_library/my_rust_library.node");
 
 // Function to load commands from a specific folder recursively
 function loadCommandsFromFolder(client, folderPath) {
+  console.log("testSTSATAT:", add(1, 2));
   console.log(`Loading commands from ${folderPath}...`);
 
   if (!fs.existsSync(folderPath)) {
