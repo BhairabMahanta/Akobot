@@ -1,7 +1,10 @@
-const fs = require('fs');
-const path = require('path');
-const { readdirSync } = require('node:fs');
+const fs = require("fs");
+const path = require("path");
+const { readdirSync } = require("node:fs");
+const { add_numbers } = require("./my_rust_library/pkg/my_rust_library.js");
 
+const result = add_numbers(5, 7);
+console.log("Result of adding numbers:", result);
 
 // Function to load commands from a specific folder recursively
 function loadCommandsFromFolder(client, folderPath) {
@@ -21,7 +24,7 @@ function loadCommandsFromFolder(client, folderPath) {
     if (fileStat.isDirectory()) {
       // If it's a directory, recursively load commands from it
       loadCommandsFromFolder(client, filePath);
-    } else if (file.endsWith('.js')) {
+    } else if (file.endsWith(".js")) {
       // If it's a JavaScript file, require and add the command
       const command = require(filePath);
       if (command.name && command.description && command.execute) {
@@ -34,7 +37,7 @@ function loadCommandsFromFolder(client, folderPath) {
 
 // Function to load all the commands from multiple folders recursively
 function loadCommands(client) {
-  const commandsPath = path.join(__dirname, 'commands');
+  const commandsPath = path.join(__dirname, "commands");
   loadCommandsFromFolder(client, commandsPath);
 }
 
