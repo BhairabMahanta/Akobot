@@ -146,12 +146,12 @@ class Battle {
         console.log("preTtygay;");
         this.characters = [this.player, ...this.familiarInfo, this.boss];
       } else {
-        console.log(
-          "charGAY:",
-          this.player,
-          ...this.familiarInfo,
-          ...this.mobInfo
-        );
+        // console.log(
+        //   "charGAY:",
+        //   this.player,
+        //   ...this.familiarInfo,
+        //   ...this.mobInfo
+        // );
 
         this.characters = [this.player, ...this.familiarInfo, ...this.mobInfo];
       }
@@ -267,69 +267,68 @@ class Battle {
       //  const attackBarString = `${'⚔️'.repeat(filledBars)}${' '.repeat(emptyBars)}`;
       console.log(this.player.name, "-inside", this.player.attackBarEmoji);
       this.battleEmbed = new EmbedBuilder()
-        .setTitle("Battle")
-        .setDescription(`You are fighting against ${this.enemyDetails.name}`)
+        .setTitle(`Battle VS ${this.enemyDetails.name}`)
+        // .setDescription(`You are fighting against`)
         .setFooter({
           text: "You can run if you want lol no issues",
         })
         .setColor(0x0099ff);
+      this.battleEmbed.addFields({
+        name: `Current Turn`,
+        value: `\`\`\`${this.currentTurn}\`\`\``,
+        inline: false,
+      });
       if (this.enemyDetails.type === "boss") {
         this.battleEmbed.addFields({
           name: `Enemies Info:`,
-          value: `\`\`\`ansi\n[2;31m> ${this.boss.name}\n[2;32m HitPoints: ${
-            this.boss.hpBarEmoji
-          } ${this.boss.stats.hp}\n[2;36m AttackBar: [2;34m${
-            this.boss.attackBarEmoji
-          } ${Math.floor(this.boss.atkBar)}\`\`\``,
+          value: `\`\`\`ansi\n[2;31m> ${this.boss.name}\n[2;32m ${this.boss.hpBarEmoji} ${
+            this.boss.stats.hp
+          } HP\n[2;36m [2;34m${this.boss.attackBarEmoji} ${Math.floor(
+            this.boss.atkBar
+          )} AB\`\`\``,
           inline: false,
         });
       } else if (this.enemyDetails.type === "mob") {
         let mobInfo = ""; // Initialize an empty string to store the info
         for (const mob of this.mobInfo) {
-          mobInfo += `[2;35m> ${mob.name}:[2;34m Atk: ${mob.stats.attack}, Def: ${
+          mobInfo += `[2;35m> ${mob.name}:[2;34m ⚔️: ${mob.stats.attack}, 🛡️: ${
             mob.stats.defense
-          }, Spd: ${mob.stats.speed}, Magic: ${mob.stats.magic}\n[2;32m HitPoints: ${
+          }, 💨: ${mob.stats.speed}, 🔮: ${mob.stats.magic}\n[2;32m ${
             mob.hpBarEmoji
-          } ${mob.stats.hp}\n[2;36m AttackBar: [2;34m${mob.attackBarEmoji} ${Math.floor(
+          } ${mob.stats.hp} ♥️\n[2;36m [2;34m${mob.attackBarEmoji} ${Math.floor(
             mob.atkBar
-          )}\n\n`;
+          )} 🙋\n\n`;
         }
+
         this.battleEmbed.addFields({
           name: "Enemies Info:",
           value: `\`\`\`ansi\n${mobInfo}\`\`\``,
           inline: false,
         });
       }
-      this.battleEmbed.addFields({
-        name: `Current Turn`,
-        value: `\`\`\`${this.currentTurn}\`\`\``,
-        inline: false,
-      });
       if (this.player) {
         let playerAndFamiliarsInfo = ""; // Initialize an empty string to store the info
 
         for (const familiar of this.familiarInfo) {
-          playerAndFamiliarsInfo += `[2;35m> ${familiar.name}: [2;34mAtk: ${
+          playerAndFamiliarsInfo += `[2;35m> ${familiar.name}: [2;34m ⚔️: ${
             familiar.stats.attack
-          }, Def: ${familiar.stats.defense}, Spd: ${
-            familiar.stats.speed
-          }\n[2;32m HitPoints: ${familiar.hpBarEmoji} ${
-            familiar.stats.hp
-          }\n[2;36m AttackBar: [2;34m${familiar.attackBarEmoji} ${Math.floor(
+          }, 🛡️: ${familiar.stats.defense}, 💨: ${familiar.stats.speed}\n[2;32m ${
+            familiar.hpBarEmoji
+          } ${familiar.stats.hp} ♥️\n[2;36m [2;34m${familiar.attackBarEmoji} ${Math.floor(
             familiar.atkBar
-          )}\n\n`;
+          )} 🙋\n\n`;
         }
 
         // Add the player's HP and AttackBar to the info
-        playerAndFamiliarsInfo += `[2;35m> ${this.playerName}: [2;34mAtk: ${
+        playerAndFamiliarsInfo += `[2;35m> ${this.playerName}: [2;34m ⚔️: ${
           this.player.stats.attack
-        }, Def: ${this.player.stats.defense}, Spd: ${
+        }, 🛡️: ${this.player.stats.defense}, 💨: ${
           this.player.stats.speed
-        }, Magic: ${this.player.stats.magic}\n[2;32m HitPoints: ${
-          this.player.hpBarEmoji
-        } ${this.player.stats.hp}\n[2;36m AttackBar: [2;34m${
-          this.player.attackBarEmoji
-        } ${Math.floor(this.player.atkBar)}`;
+        }, 🔮: ${this.player.stats.magic}\n[2;32m ${this.player.hpBarEmoji} ${
+          this.player.stats.hp
+        } ♥️\n[2;36m [2;34m${this.player.attackBarEmoji} ${Math.floor(
+          this.player.atkBar
+        )} 🙋`;
 
         this.battleEmbed.addFields({
           name: "Your Team Info:",
