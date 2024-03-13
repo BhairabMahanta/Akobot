@@ -51,7 +51,7 @@ module.exports = {
       let output = [];
 
       for (const id of extractedIDs) {
-        output.push(`sc ${id} hp>279 atk>50 def>79 spd>70\n`);
+        output.push(`sc ${id} hp>329 def>79 spd>70\n`);
       }
 
       if (message.channel && !message.author.bot) {
