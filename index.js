@@ -1,27 +1,38 @@
-  const config = require('./config.json');
-const { Client, IntentsBitField, EmbedBuilder, ButtonBuilder, ActionRowBuilder, SlashCommandBuilder, Events, GatewayIntentBits, ModalBuilder, Collection, Partials } = require('discord.js');
-const path = require('path');
-const fs = require('fs');
-const { connectToDB} = require('./data/mongo/mongo.js')
-const { AuditLogEvent } = require('discord.js');
-
+const config = require("./config.json");
+const {
+  Client,
+  IntentsBitField,
+  EmbedBuilder,
+  ButtonBuilder,
+  ActionRowBuilder,
+  SlashCommandBuilder,
+  Events,
+  GatewayIntentBits,
+  ModalBuilder,
+  Collection,
+  Partials,
+} = require("discord.js");
+const path = require("path");
+const fs = require("fs");
+const { connectToDB } = require("./data/mongo/mongo.js");
+const { AuditLogEvent } = require("discord.js");
 
 const client = new Client({
   intents: [
     IntentsBitField.Flags.Guilds,
     IntentsBitField.Flags.GuildMessages,
     IntentsBitField.Flags.MessageContent,
-    GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, 
+    GatewayIntentBits.GuildMessageReactions,
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
   ],
   partials: [Partials.Message, Partials.Channel, Partials.Reaction],
-
 });
 
 client.db = null;
 
-
-const Discord = require('discord.js');
-const { loadCommands } = require('./handler');
+const Discord = require("discord.js");
+const { loadCommands } = require("./handler");
 
 // Create a new collection to store the commands
 client.commands = new Collection();
@@ -31,33 +42,45 @@ loadCommands(client);
 
 const BOT_PREFIX = "a!";
 
-client.on('messageCreate', message => {
-
+client.on("messageCreate", async (message) => {
   try {
-  if (message.content.toLowerCase().startsWith(`${BOT_PREFIX}`)) {
-    const args = message.content.slice(2).trim().split(/ +/);
-    const commandName = args.shift().toLowerCase();
-    console.log(`Received command: ${commandName}`);
-// console.log('commandAlias:', client.commands)
+    if (message.content.toLowerCase().startsWith(`${BOT_PREFIX}`)) {
+      const args = message.content.slice(2).trim().split(/ +/);
+      const commandName = args.shift().toLowerCase();
+      console.log(`Received command: ${commandName}`);
+      // console.log('commandAlias:', client.commands)
 
-   
+      const command =
+        client.commands.get(commandName) ||
+        client.commands.find(
+          (c) => c.aliases && c.aliases.includes(commandName.toLowerCase())
+        );
 
-    const command = client.commands.get(commandName) || client.commands.find(c => c.aliases && c.aliases.includes(commandName.toLowerCase()));
+      if (!command) return;
+      const player = await collection.findOne({ _id: message.author.id });
 
+      // If player is not found, return null
+      if (!player) {
+        return message.channel.send(
+          "Player not found. Please use the `a!register yourname` command to register."
+        );
+      }
 
-    if (!command) return;
+      if (command.guildOnly && message.channel.type === "dm") {
+        return message.reply("I can't execute that command inside DMs!");
+      }
 
-    try {
-      console.log('Executing command:', command.name);
-      command.execute(client, message, args);
-    } catch (error) {
-      console.error(error);
-      message.reply('An error occurred while executing the command.');
+      try {
+        console.log("Executing command:", command.name);
+        command.execute(client, message, args);
+      } catch (error) {
+        console.error(error);
+        message.reply("An error occurred while executing the command.");
+      }
     }
+  } catch (error) {
+    console.log("what the fuck:", error);
   }
-    } catch (error) {
-  console.log('what the fuck:', error);
-}
 });
 
 // client.on('interactionCreate', async (interaction) => {
@@ -68,21 +91,27 @@ client.on('messageCreate', message => {
 //   }
 // });
 
-client.on('ready', async () => {
-    console.log(`${client.user.tag} is ready!🚀`);
-const db = await connectToDB(); // Connect to MongoDB when the bot is ready
+client.on("ready", async () => {
+  console.log(`${client.user.tag} is ready!🚀`);
+  const db = await connectToDB(); // Connect to MongoDB when the bot is ready
 
- client.db = db;
+  client.db = db;
 
-  client.user.setPresence({ activities: [{ name: 'Watching myself being coded!' }], status: 'idle' });
+  client.user.setPresence({
+    activities: [{ name: "Watching myself being coded!" }],
+    status: "idle",
+  });
 }); //tells that bot is hot and on
 
-
-client.on('messageCreate', async (message, args) => {
+client.on("messageCreate", async (message, args) => {
   const goe = message.content.toLowerCase().substring(BOT_PREFIX.length);
- 
+
   const cmd = message.content.toLowerCase().substring(BOT_PREFIX.length);
-  if (message.channel && !message.author.bot && (cmd === "botinfo" || cmd === "bi") /*&& !botInfoSent*/) {
+  if (
+    message.channel &&
+    !message.author.bot &&
+    (cmd === "botinfo" || cmd === "bi") /*&& !botInfoSent*/
+  ) {
     // botInfoSent = true; // Set the flag to true to indicate bot info has been sent
     setTimeout(async () => {
       // Calculate the API latency
@@ -92,31 +121,37 @@ client.on('messageCreate', async (message, args) => {
       const clientPing = Math.round(Date.now() - message.createdTimestamp);
 
       const embed = new EmbedBuilder()
-        .setColor('DarkBlue')
-        .setTitle('Bot Info')
-        .setDescription('Kriz drives truck!!')
+        .setColor("DarkBlue")
+        .setTitle("Bot Info")
+        .setDescription("Kriz drives truck!!")
         .addFields(
-          { name: 'Bot ID', value: client.user.id, inline: true },
-          { name: 'Server Count', value: client.guilds.cache.size.toString(), inline: true },
-          { name: 'User Count', value: client.users.cache.size.toString(), inline: true },
-          { name: 'Library', value: 'Discord.js', inline: true },
-          { name: 'Version', value: `v 1.0`, inline: true },
-          { name: 'Creator', value: '<@537619455409127442>', inline: true },
-          { name: 'API Latency', value: `${apiLatency}ms`, inline: true },
-          { name: 'Client Ping', value: `${clientPing}ms`, inline: true }
+          { name: "Bot ID", value: client.user.id, inline: true },
+          {
+            name: "Server Count",
+            value: client.guilds.cache.size.toString(),
+            inline: true,
+          },
+          {
+            name: "User Count",
+            value: client.users.cache.size.toString(),
+            inline: true,
+          },
+          { name: "Library", value: "Discord.js", inline: true },
+          { name: "Version", value: `v 1.0`, inline: true },
+          { name: "Creator", value: "<@537619455409127442>", inline: true },
+          { name: "API Latency", value: `${apiLatency}ms`, inline: true },
+          { name: "Client Ping", value: `${clientPing}ms`, inline: true }
         )
         .setThumbnail(client.user.displayAvatarURL({ dynamic: true }));
 
       await message.channel.send({ embeds: [embed] });
     }, 1000); // delay for 1 second
   }
-
-
 });
 
-const { mongoClient } = require('./data/mongo/mongo.js')
-const db = mongoClient.db('Akaimnky');
-const collection = db.collection('akaillection');
+const { mongoClient } = require("./data/mongo/mongo.js");
+const db = mongoClient.db("Akaimnky");
+const collection = db.collection("akaillection");
 // Define a function to periodically check quest completion
 async function checkQuestCompletion() {
   const currentTime = Math.floor(Date.now() / 1000);
@@ -127,11 +162,11 @@ async function checkQuestCompletion() {
     const playerQuests = player.activeQuests;
     let questSuccess = false;
     let questFailure = false;
-   
+
     // Iterate through active quests of the player
     for (const questId in playerQuests) {
       const quest = playerQuests[questId];
-     const questList = player.quests
+      const questList = player.quests;
       const timeLimit = quest.timeLimit.daysLeft;
 
       // Check if time limit is exceeded
@@ -143,11 +178,11 @@ async function checkQuestCompletion() {
         console.log(`Quest '${questId}' has failed for ${player.name}`);
         // Optionally, update the quest's result and other details
         delete playerQuests[questId];
-         // Remove the completed quest from quests
-       const questIndex = questList.indexOf(questId);
-       if (questIndex !== -1) {
-         questList.splice(questIndex, 1);
-       }
+        // Remove the completed quest from quests
+        const questIndex = questList.indexOf(questId);
+        if (questIndex !== -1) {
+          questList.splice(questIndex, 1);
+        }
       } else {
         // Quest is still active
         const objectives = quest.objectives;
@@ -159,13 +194,15 @@ async function checkQuestCompletion() {
 
         if (allObjectivesMet) {
           // Quest is completed successfully
-          questSuccess = true
+          questSuccess = true;
           quest.questStatus = "completed";
-          player.completedQuests[questId] = quest
-          console.log(`Quest '${questId}' has been completed successfully for ${player.name}`);
-           // Remove the completed quest from activeQuests
-           delete playerQuests[questId]
-           // Remove the completed quest from quests
+          player.completedQuests[questId] = quest;
+          console.log(
+            `Quest '${questId}' has been completed successfully for ${player.name}`
+          );
+          // Remove the completed quest from activeQuests
+          delete playerQuests[questId];
+          // Remove the completed quest from quests
           const questIndex = questList.indexOf(questId);
           if (questIndex !== -1) {
             questList.splice(questIndex, 1);
@@ -174,10 +211,10 @@ async function checkQuestCompletion() {
       }
     }
     if (questSuccess || questFailure) {
-    // Update the player's data in the database
-    console.log('player.activeQuests:', player.activeQuests)
-    console.log('player.activeQuests:', player)
-    await updatePlayer(player);
+      // Update the player's data in the database
+      console.log("player.activeQuests:", player.activeQuests);
+      console.log("player.activeQuests:", player);
+      await updatePlayer(player);
     }
   });
 }
@@ -199,11 +236,9 @@ async function updatePlayer(player) {
     await collection.updateOne(filter, update);
     console.log(`Player data updated for ${player.name}`);
   } catch (error) {
-    console.error('Error updating player data:', error);
+    console.error("Error updating player data:", error);
   }
 }
-
-
 
 /*console.log('eeee', client.listenerCount('messageReactionRemove'));
 
@@ -319,8 +354,6 @@ client.on('messageCreate', async message => {
 });
 */
 
-
-
 client.login(config.token);
-                                                                                                                                  
-module.exports = {client};
+
+module.exports = { client };

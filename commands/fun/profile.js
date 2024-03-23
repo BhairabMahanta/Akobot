@@ -7,66 +7,60 @@ const players = require("../../data/players.json");
 
 module.exports = {
   name: "profile",
-  description:
-    "Displays the profile image of the player with inputable name, description, age, height, etc., and is an image",
+  description: "Displays the profile of a player.",
   aliases: ["sw", "me", "status"],
   async execute(client, message, args) {
-    console.log("gae");
+    console.log("Executing profile command...");
+
     try {
       // Check if a player name is provided
-      let playerName = args[0];
-      console.log("gae2");
+      let playerId = args[0] || message.author.id;
 
-      // If no player name provided, show the profile of the message author
-      if (!playerName) {
-        playerName = message.author.id;
-        console.log("yes");
-      }
-
-      // Fetch player data from JSON or MongoDB based on your implementation
-      const player = await getPlayerData(playerName); // Implement this function
+      // Fetch player data from MongoDB
+      const player = await getPlayerData(playerId);
 
       if (!player) {
-        return message.reply("Player not found. Provide valid player id.");
+        return message.reply("Player not found. Provide a valid player ID.");
       }
+
       console.log(`Player data found: ${player}`);
+
       // Create a canvas to draw the profile
-      const canvas = Canvas.createCanvas(650, 500);
+      const canvas = Canvas.createCanvas(750, 580);
       const ctx = canvas.getContext("2d");
 
       // Background color
       ctx.fillStyle = "#f9ecb6";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-      console.log("test2");
+
+      // Load and draw the rounded user avatar
+      const avatar = await Canvas.loadImage(
+        message.author.displayAvatarURL({ format: "jpg" })
+      );
+      ctx.beginPath();
+      ctx.arc(110, 130, 80, 0, Math.PI * 2, true);
+      ctx.closePath();
+      ctx.clip();
+      ctx.drawImage(avatar, 30, 50, 160, 160);
+
       // Draw player information
       ctx.fillStyle = "#000000";
       ctx.font = "20px Arial";
-      console.log("test2");
-      console.log(
-        "message.author.displayAvatarURL",
-        message.author.displayAvatarURL()
-      );
-      const URL = message.author.displayAvatarURL();
-      const url = URL.replace(".webp", ".png");
-      console.log("url:", url);
-      // Load an image (replace 'player.imageURL' with your actual image URL property)
-      const image = await Canvas.loadImage(url);
-      console.log("test3");
-      ctx.drawImage(image, 10, 30, 200, 200);
-      ctx.fillText(`Name: ${player.name}`, 10, 270, 250);
-      ctx.fillText(`Description: {player.description}`, 10, 300);
-      ctx.fillText(`Age: {player.age}`, 10, 330);
-      ctx.fillText(`Height: {player.height}`, 10, 360);
-      console.log("test3");
+      ctx.beginPath();
+      ctx.fillText(`Name: {player.name}`, 10, 270, 250);
+      ctx.fillText(`Description: {player.description}`, 210, 130);
+      ctx.fillText(`Age: {player.age}`, 210, 160);
+      ctx.fillText(`Height: {player.height}`, 210, 190);
+      ctx.closePath();
       // Convert the canvas to a buffer
       const buffer = canvas.toBuffer("image/png");
-      console.log("test4");
+
       // Send the image as an attachment in an embed
       const embed = new EmbedBuilder()
-        .setColor(0x0099ff)
+        .setColor("#0099ff")
         .setTitle(`Profile - ${player.name}`)
         .setImage("attachment://profile.png");
-      console.log("should have sent");
+
       message.channel.send({
         embeds: [embed],
         files: [{ name: "profile.png", attachment: buffer }],
@@ -78,14 +72,11 @@ module.exports = {
   },
 };
 
-// Function to get player data from MongoDB based on player name
-async function getPlayerData(playerName) {
+// Function to get player data from MongoDB based on player ID
+async function getPlayerData(playerId) {
   try {
-    // Convert the player name to lowercase for case-insensitive search
-    // const lowerPlayerName = playerName.toLowerCase();
-
     // Find the player in the MongoDB collection
-    const player = await collection.findOne({ _id: playerName });
+    const player = await collection.findOne({ _id: playerId });
 
     // If player is not found, return null
     if (!player) {
