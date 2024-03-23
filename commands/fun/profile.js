@@ -29,7 +29,7 @@ module.exports = {
       if (!player) {
         return message.reply("Player not found. Provide valid player id.");
       }
-      console.log("test1");
+      console.log(`Player data found: ${player}`);
       // Create a canvas to draw the profile
       const canvas = Canvas.createCanvas(650, 500);
       const ctx = canvas.getContext("2d");
