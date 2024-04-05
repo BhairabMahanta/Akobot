@@ -197,17 +197,18 @@ class Battle {
     let selectedValue;
     // Create the embed for the adventure command
     this.battleEmbed = new EmbedBuilder()
-      .setTitle("Start battle!")
+      .setTitle(`Fight: ${this.enemyDetails.name}`)
       .setDescription(
-        `### - Do you want to really fight the monsters?\n\n>>> **Player and familiars:**\n- __${
-          this.player.name
-        } Level__: ${
+        `**Player and familiars:**\n __${this.player.name}__ Level: ${
           this.player.exp.level
-        } \n- __Familiars selected__: ${this.familiarInfo
+        } \n __Familiars selected__: ${this.familiarInfo
           .map((familiar) => familiar.name)
-          .join(", ")} \n\n **Enemy Info**:\n - __${
-          this.enemyDetails.name
-        } Level__: It not made smh \n\n **Automate this battle?**\n- automating has its own issues it does worse than you would normally do!! \n\n **Your Power Level vs Recommended**\n- somethings you needa make that shit\n\n **Difficulty**\n- bhag le\n\n **Start Battle**\n To start, click on the "Lets Dive into it" button!!`
+          .join(
+            ", "
+          )} \n\n **Enemy Info**:\nLevel: It not made smh\n Click on the options in the button to find **available** info about the enemies! 
+
+          **Automate this battle?**
+          Automating has its own issues it does worse than you normally would!! \n\n **Your Power Level vs Recommended**\n- being cooked still\n\n **Difficulty**\n- cooking fr\n\n **Start Battle**\n To start, click on the "Lets Dive into it" button!!`
       );
     // Display options for quests, bosses, mobs, and adventures
     const optionSelectMenu = new StringSelectMenuBuilder()
@@ -291,13 +292,11 @@ class Battle {
       } else if (this.enemyDetails.type === "mob") {
         let mobInfo = ""; // Initialize an empty string to store the info
         for (const mob of this.mobInfo) {
-          mobInfo += `[2;35m> ${mob.name}:[2;34m ⚔️: ${mob.stats.attack}, 🛡️: ${
+          mobInfo += `[2;37m ${mob.name}: ⚔️ ${mob.stats.attack} 🛡️ ${
             mob.stats.defense
-          }, 💨: ${mob.stats.speed}, 🔮: ${mob.stats.magic}\n[2;32m ${
-            mob.hpBarEmoji
-          } ${mob.stats.hp} ♥️\n[2;36m [2;34m${mob.attackBarEmoji} ${Math.floor(
-            mob.atkBar
-          )} 🙋\n\n`;
+          } 💨 ${mob.stats.speed} 🔮 ${mob.stats.magic}\n[2;32m ${mob.hpBarEmoji} ${
+            mob.stats.hp
+          } ♥️\n[2;36m [2;34m${mob.attackBarEmoji} ${Math.floor(mob.atkBar)} 🙋\n\n`;
         }
 
         this.battleEmbed.addFields({
@@ -310,9 +309,9 @@ class Battle {
         let playerAndFamiliarsInfo = ""; // Initialize an empty string to store the info
 
         for (const familiar of this.familiarInfo) {
-          playerAndFamiliarsInfo += `[2;35m> ${familiar.name}: [2;34m ⚔️: ${
+          playerAndFamiliarsInfo += `[2;37m ${familiar.name}: ⚔️${
             familiar.stats.attack
-          }, 🛡️: ${familiar.stats.defense}, 💨: ${familiar.stats.speed}\n[2;32m ${
+          } 🛡️${familiar.stats.defense} 💨${familiar.stats.speed}\n[2;32m ${
             familiar.hpBarEmoji
           } ${familiar.stats.hp} ♥️\n[2;36m [2;34m${familiar.attackBarEmoji} ${Math.floor(
             familiar.atkBar
@@ -320,15 +319,13 @@ class Battle {
         }
 
         // Add the player's HP and AttackBar to the info
-        playerAndFamiliarsInfo += `[2;35m> ${this.playerName}: [2;34m ⚔️: ${
+        playerAndFamiliarsInfo += `[2;37m ${this.playerName}: ⚔️${
           this.player.stats.attack
-        }, 🛡️: ${this.player.stats.defense}, 💨: ${
-          this.player.stats.speed
-        }, 🔮: ${this.player.stats.magic}\n[2;32m ${this.player.hpBarEmoji} ${
-          this.player.stats.hp
-        } ♥️\n[2;36m [2;34m${this.player.attackBarEmoji} ${Math.floor(
-          this.player.atkBar
-        )} 🙋`;
+        } 🛡️${this.player.stats.defense} 💨${this.player.stats.speed} 🔮${
+          this.player.stats.magic
+        }\n[2;32m ${this.player.hpBarEmoji} ${this.player.stats.hp} ♥️\n[2;36m [2;34m${
+          this.player.attackBarEmoji
+        } ${Math.floor(this.player.atkBar)} 🙋`;
 
         this.battleEmbed.addFields({
           name: "Your Team Info:",
