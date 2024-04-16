@@ -58,9 +58,10 @@ client.on("messageCreate", async (message) => {
 
       if (!command) return;
       const player = await collection.findOne({ _id: message.author.id });
+      console.log("Player:", player);
 
       // If player is not found, return null
-      if (!player) {
+      if (!player && command.name !== "register") {
         return message.channel.send(
           "Player not found. Please use the `a!register yourname` command to register."
         );

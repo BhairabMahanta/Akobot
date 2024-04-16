@@ -41,7 +41,11 @@ module.exports = {
     );
 
     // Update the collection name
-    akaillection = `akaillection${collectionCounter}`;
+    if (collectionCounter > 0) {
+      akaillection = `akaillection${collectionCounter}`;
+    } else {
+      akaillection = "akaillection";
+    }
     Player = await playerModel(db, akaillection);
 
     if (!startedTutorial.includes(message.author.id)) {
