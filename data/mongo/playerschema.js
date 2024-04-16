@@ -1,11 +1,5 @@
 const mongoose = require("mongoose");
 
-// // Connect to MongoDB
-// mongoose.connect(mongoURI, {
-//   useNewUrlParser: true,
-//   useUnifiedTopology: true,
-// });
-
 const { Schema } = mongoose;
 const playerSchema = new Schema(
   {

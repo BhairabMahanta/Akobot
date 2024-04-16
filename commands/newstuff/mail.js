@@ -1,30 +1,36 @@
 const { mongoClient } = require("../../data/mongo/mongo.js");
 const db = mongoClient.db("Akaimnky");
 const collection = db.collection("akaillection");
-const { playerModel } = require("../../data/mongo/playerschema.js"); // Adjust the path to match your schema file location
-class mail {
-  // this is used to send mail info to the database
-  constructor(sendWho) {
+const { playerModel } = require("../../data/mongo/mailschema.js");
+
+class Mail {
+  constructor(sendWho, mailName, mailText) {
     this.userInfo = sendWho;
-    this.name = "mail";
-    this.aliases = ["email"];
-    this.usage = "mail";
-  }
-  async mailTo(client) {
-    const { db } = client;
-    let akaillection = "maildoc";
-    const Player = await playerModel(db, akaillection);
-    if (this.userInfo == "everyone") {
-      //get info from database and send to every id
-    } else if (this.userInfo == "activeAll") {
-      //get info from database and send to every active id in the past x days
-    } else if (this.userInfo.isArray) {
-      //get info from database and send to every id in the array
-    }
-    //get info from database and send to the id
+    this.mailName = mailName;
+    this.mailText = mailText;
   }
 
-  async run(client, message, args) {
-    message.channel.send("This is the mail command!");
+  async mailTo(client, mailTo, achievement, deleteAfter, autoClaim, rewards) {
+    const { db } = client;
+    const akaillection = "maildoc";
+    const Player = await playerModel(db, akaillection);
+    const mailData = new Player({
+      _id: "mail" + Math.floor(Math.random() * 1000000),
+      name: this.mailName,
+      mailText: this.mailText, // Include mail text
+      mailTrigger: "will do later",
+      mailTo: mailTo,
+      mailClaimed: false,
+      numberClaimed: 0, // Assuming you want to start with 0
+      achievement: achievement,
+      deleteAfter: deleteAfter,
+      autoClaim: autoClaim,
+      rewards: rewards,
+    });
+
+    await mailData.save();
+    console.log("Saved mail data");
   }
 }
+
+module.exports = { Mail };
