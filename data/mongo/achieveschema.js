@@ -12,7 +12,8 @@ const achievementSchema = new Schema(
       gems: Number,
       xp: Number,
     },
-    achievedBy: Number, // Store the user ID directly
+    firstAchieved: Number,
+    achievedBy: Number, // +1 everytime
   },
   { strict: false }
 );
