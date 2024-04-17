@@ -57,6 +57,7 @@ client.on("messageCreate", async (message) => {
         );
 
       if (!command) return;
+
       const player = await collection.findOne({ _id: message.author.id });
       console.log("Player:", player);
 
