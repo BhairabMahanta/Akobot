@@ -1,4 +1,4 @@
-const { achievementModel } = require("../../data/mongo/achievementSchema.js");
+const { achievementModel } = require("../../data/mongo/achieveschema.js");
 const { playerModel } = require("../../data/mongo/mailschema.js");
 class Achievement {
   constructor(name, description, reward) {
