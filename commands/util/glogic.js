@@ -23,7 +23,7 @@ async function calculateDamage(authorAttack, opponentDefense) {
   return Math.floor(
     Math.pow(
       Math.sqrt(authorAttack),
-      Math.pow(Math.sqrt(3.4), Math.sqrt(authorAttack / opponentDefense))
+      Math.pow(Math.sqrt(3), Math.sqrt(authorAttack / opponentDefense))
     )
   );
 }
