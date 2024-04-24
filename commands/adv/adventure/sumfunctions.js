@@ -6,6 +6,7 @@ const {
 } = require("discord.js");
 const players = require("../../../data/players.json");
 const { areas } = require("../information/areas.js");
+const firstArea = require("../maps/tutorialmap/mapstart.json");
 const sharp = require("sharp");
 const fs = require("fs");
 const path = require("path");
@@ -41,6 +42,7 @@ class GameImage {
   getRandomBoolean(probability) {
     return Math.random() < probability;
   }
+  async generateTutorialMap() {}
 
   async generateRandomElements(
     monsterProbability,

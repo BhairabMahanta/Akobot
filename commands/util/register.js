@@ -20,32 +20,23 @@ module.exports = {
 
   async execute(client, message, args) {
     const { db } = client;
-    // Get the collection name
-    let akaillection =
-      collectionCounter > 0
-        ? `akaillection${collectionCounter}`
-        : "akaillection";
-    // Get the number of documents in the collection
+    let akaillection = "akaillection";
+
     let Player = await playerModel(db, akaillection);
-    const count = await Player.countDocuments();
-    // Check if the count exceeds 20
-    if (count >= 20) {
+
+    /* const count = await Player.countDocuments();
+  if (count >= 20) {
       // Increment the collection counter
       collectionCounter++;
     }
-    console.log(
-      "collection:",
-      `akaillection${collectionCounter}`,
-      "count:",
-      count
-    );
+  
 
     // Update the collection name
     if (collectionCounter > 0) {
       akaillection = `akaillection${collectionCounter}`;
     } else {
       akaillection = "akaillection";
-    }
+    }*/
     Player = await playerModel(db, akaillection);
 
     if (!startedTutorial.includes(message.author.id)) {

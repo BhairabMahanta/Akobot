@@ -16,6 +16,7 @@ const {
 } = require("../information/loc.js");
 const { quests } = require("../quest/quests.js"); // Import quest data
 const { bosses } = require("../monsterInfo/bosses"); // Import boss data
+const firstArea = require("../maps/tutorialmap/mapstart.json");
 // const { mobs } = require('./mobs'); // Import mob data
 const players = require("../../../data/players.json");
 const { navigationRow, handleNavigation } = require("./navigation.js");
@@ -26,8 +27,7 @@ const fs = require("fs");
 let selectedValue = [];
 const { mongoClient } = require("../../../data/mongo/mongo.js");
 
-const areaImage = "commands/adv/information/area2.png";
-
+let areaImage = "commands/adv/information/area2.png";
 module.exports = {
   name: "testpng",
   description: "Start an adventure!",
@@ -49,20 +49,20 @@ module.exports = {
     const selectedFloor = allFloors[playerFloorIndex];
     const selectedLocation = selectedFloor.locations[playerLocationIndex];
 
-    // message.channel.send({ files: [areaImage] })
-    const attachment = new AttachmentBuilder(
-      "./commands/adv/information/area2.png",
-      "area2.png"
-    );
+    if (firstArea.customFields.levelName === selectedLocation.name) {
+      areaImage = "commands/adv/maps/tutorialmap/composite.png";
+    }
+    const attachment = new AttachmentBuilder(`${areaImage}`, "composite.png");
+
     console.log("attachment:", attachment);
     const adventureLoading = new EmbedBuilder()
       .setTitle(selectedLocation.name)
-      .setImage("attachment://area2.png")
+      .setImage("attachment://composite.png")
       .setDescription("Loading please wait! <a:Green:874929269741072414>");
     // Create the embed for the adventure command
     const adventureIntoEmbedConfirmation = new EmbedBuilder()
       .setTitle(selectedLocation.name)
-      .setImage("attachment://area2.png")
+      .setImage("attachment://composite.png")
       .setDescription(
         "Do you want to go in? If you had any saved progress, you will spawn right there!"
       )

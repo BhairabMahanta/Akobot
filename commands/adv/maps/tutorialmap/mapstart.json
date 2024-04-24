@@ -7,7 +7,17 @@
 	"height": 576,
 	"bgColor": "#696A79",
 	"neighbourLevels": [],
-	"customFields" : {},
+	"customFields" : {
+		"levelName" : "Forest Clearing",
+		"levelDescription" : "This is the first level of the game. It is a simple level with some entities and teleports.",
+		"levelType" : "Level",
+		"levelDifficulty" : "Easy",
+		"levelHint" : "This is the first level of the game. It is a simple level with some entities and teleports.",
+		"levelObjective" : "This is the first level of the game. It is a simple level with some entities and teleports.",
+		"levelObjectiveHint" : "This is the first level of the game. It is a simple level with some entities and teleports.",
+		"levelObjectiveHint2" : "This is the first level of the game. It is a simple level with some entities and teleports.",
+		"levelObjectiveHint3" : "This is the first level of the game. It is a simple level with some entities and teleports."
+	},
 	"layers": [
 		"Background.png",
 		"Tiles3.png",
