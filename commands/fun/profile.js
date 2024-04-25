@@ -26,7 +26,7 @@ module.exports = {
       console.log(`Player data found: ${player}`);
 
       // Create a canvas to draw the profile
-      const canvas = Canvas.createCanvas(750, 580);
+      const canvas = Canvas.createCanvas(1050, 700);
       const ctx = canvas.getContext("2d");
 
       // Background color
@@ -37,21 +37,28 @@ module.exports = {
       const avatar = await Canvas.loadImage(
         message.author.displayAvatarURL({ format: "jpg" })
       );
+
+      // Draw player information
+      ctx.fillStyle = "#000000";
+      ctx.font = "50px Arial";
+      ctx.beginPath();
+      ctx.fillText(`${player.name}`, 400, 65);
+      ctx.fillStyle = "#000000";
+      ctx.font = "24px Arial";
+      ctx.fillText(`${player.race}:`, 45, 240);
+      ctx.fillText(`${player.class}:`, 45, 270);
+      ctx.font = "30px Arial";
+      ctx.fillText(`Player Stats:`, 45, 310);
+      ctx.fillText(`Player Description:`, 355, 310);
+      ctx.fillText(`Player Affiliations:`, 745, 310);
+      ctx.closePath();
+
       ctx.beginPath();
       ctx.arc(110, 130, 80, 0, Math.PI * 2, true);
       ctx.closePath();
       ctx.clip();
       ctx.drawImage(avatar, 30, 50, 160, 160);
 
-      // Draw player information
-      ctx.fillStyle = "#000000";
-      ctx.font = "20px Arial";
-      ctx.beginPath();
-      ctx.fillText(`Name: {player.name}`, 10, 270, 250);
-      ctx.fillText(`Description: {player.description}`, 210, 130);
-      ctx.fillText(`Age: {player.age}`, 210, 160);
-      ctx.fillText(`Height: {player.height}`, 210, 190);
-      ctx.closePath();
       // Convert the canvas to a buffer
       const buffer = canvas.toBuffer("image/png");
 
@@ -62,7 +69,6 @@ module.exports = {
         .setImage("attachment://profile.png");
 
       message.channel.send({
-        embeds: [embed],
         files: [{ name: "profile.png", attachment: buffer }],
       });
     } catch (error) {
