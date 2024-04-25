@@ -42,7 +42,33 @@ class GameImage {
   getRandomBoolean(probability) {
     return Math.random() < probability;
   }
-  async generateTutorialMap() {}
+  async generateTutorialMap() {
+    firstArea.entities.entity.forEach((entity) => {
+      console.log(entity);
+      this.elements.push({
+        name: entity.id,
+        x: entity.x,
+        y: entity.y,
+        area: "tutorial",
+        type: entity.type,
+        hasAllies: entity.hasAllies,
+        waves: entity.waves,
+        rewards: entity.rewards,
+      });
+    });
+
+    // Accessing teleport
+    console.log("Teleports:");
+    firstArea.entities.teleport.forEach((teleport) => {
+      console.log(teleport);
+    });
+
+    // Accessing npc
+    console.log("NPCs:");
+    firstArea.entities.npc.forEach((npc) => {
+      console.log(npc);
+    });
+  }
 
   async generateRandomElements(
     monsterProbability,
