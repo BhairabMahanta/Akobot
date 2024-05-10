@@ -51,6 +51,7 @@ class Duel {
     this.opponentFamiliar = [];
     this.cooldowns = [];
     this.currentTurn = null;
+    this.currentTurnId = null;
     this.battleLogs = [];
     this.characters = [];
     this.aliveCharacters = [];
@@ -356,10 +357,7 @@ class Duel {
         console.log("familiar._id:", familiar._id);
         const comparisonResult =
           familiar.name === this.currentTurn &&
-          familiar._id === this.opponent._id;
-        console.log(
-          `Familiar nameOpponent: ${familiar.name},Current Turn: ${this.currentTurn}, Comparison result: ${comparisonResult}`
-        );
+          this.currentTurnId === this.opponent._id;
         return comparisonResult;
       })
     ) {
@@ -398,10 +396,10 @@ class Duel {
         console.log("familiar._id:", familiar._id);
         const comparisonResult =
           familiar.name === this.currentTurn &&
-          familiar._id === this.player._id;
-        console.log(
-          `Familiar namePlayer: ${familiar.name},Current Turn: ${this.currentTurn}, Comparison result: ${comparisonResult}`
-        );
+          this.currentTurnId === this.player._id;
+        // console.log(
+        //   `Familiar namePlayer: ${familiar.name},Current Turn: ${this.currentTurn}, Comparison result: ${comparisonResult}`
+        // );
         return comparisonResult;
       })
     ) {
@@ -514,7 +512,10 @@ class Duel {
       // Loop through the familiars to find the attacking familiar
       for (const familiar of this.enemyFamiliars) {
         console.log("familiarname for current turn:", familiar.name);
-        if (familiar.name === this.currentTurn) {
+        if (
+          familiar.name === this.currentTurn &&
+          this.currentTurnId === this.opponent._id
+        ) {
           // Calculate damage for the attacking familiar
           damage = await calculateDamage(
             familiar.stats.attack,
@@ -535,7 +536,10 @@ class Duel {
 
       // Loop through the familiars to find the attacking familiar
       for (const familiar of this.allyFamiliars) {
-        if (familiar.name === this.currentTurn) {
+        if (
+          familiar.name === this.currentTurn &&
+          this.currentTurnId === this.player._id
+        ) {
           // Calculate damage for the attacking familiar
           damage = await calculateDamage(
             familiar.stats.attack,
@@ -739,6 +743,7 @@ class Duel {
       const characterWith100AtkBar = charactersWith100AtkBar[0];
       // console.log(`${characterWith100AtkBar.name} has reached 100 attack bar.`);
       this.currentTurn = characterWith100AtkBar.name;
+      this.currentTurnId = characterWith100AtkBar._id;
       characterWith100AtkBar.attackBarEmoji = await this.generateAttackBarEmoji(
         characterWith100AtkBar.atkBar
       );
