@@ -42,30 +42,30 @@ class GameImage {
   getRandomBoolean(probability) {
     return Math.random() < probability;
   }
-  async generateTutorialMap() {
-    firstArea.entities.entity.forEach((entity) => {
+  async generateTutorialEntities() {
+    firstArea.entities.Entity.forEach((entity) => {
       console.log(entity);
       this.elements.push({
-        name: entity.id,
+        name: entity.customFields.name,
         x: entity.x,
         y: entity.y,
         area: "tutorial",
-        type: entity.type,
-        hasAllies: entity.hasAllies,
-        waves: entity.waves,
-        rewards: entity.rewards,
+        type: entity.customFields.type,
+        hasAllies: entity.customFields.hasAllies,
+        waves: entity.customFields.waves,
+        rewards: entity.customFields.rewards,
       });
     });
 
     // Accessing teleport
     console.log("Teleports:");
-    firstArea.entities.teleport.forEach((teleport) => {
+    firstArea.entities.Teleport.forEach((teleport) => {
       console.log(teleport);
     });
 
     // Accessing npc
     console.log("NPCs:");
-    firstArea.entities.npc.forEach((npc) => {
+    firstArea.entities.Npc.forEach((npc) => {
       console.log(npc);
     });
   }
@@ -93,7 +93,7 @@ class GameImage {
         npcCount++;
       }
 
-      if (monsterCount > 5 && npcCount > 2) {
+      if (monsterCount > 2 && npcCount > 2) {
         break;
       }
     }
@@ -212,6 +212,7 @@ class GameImage {
         // Add elements to the image
         this.generatedRandomElements2 = true;
         for (const element of this.elements) {
+          console.log("element:", element);
           const elementName = element.name;
           name = `commands/adv/npcimg/${elementName}.png`;
 

@@ -730,19 +730,20 @@ class Battle {
 
   async fillAtkBars() {
     try {
+      this.characters.sort((a, b) => b.stats.speed - a.stats.speed);
       for (const character of this.characters) {
         const speed = await this.calculateOverallSpeed(character);
-        const hp = await this.calculateOverallHp(character);
+
         const speedMultiplier = character.speedBuff ? 1.3 : 1; // Apply Speed Buff if active
         character.atkBar += speed * 0.05 * speedMultiplier;
         character.attackBarEmoji = await this.generateAttackBarEmoji(
           character.atkBar
         );
 
-        character.hpBarEmoji = await this.generateHPBarEmoji(
-          character.stats.hp,
-          character.stats.hp
-        );
+        // character.hpBarEmoji = await this.generateHPBarEmoji(
+        //   character.stats.hp,
+        //   character.stats.hp
+        // );
       }
     } catch (error) {
       console.log("fillBarError:", error);
@@ -752,6 +753,7 @@ class Battle {
   async fillHpBars() {
     try {
       for (const character of this.characters) {
+        const hp = await this.calculateOverallHp(character);
         character.hpBarEmoji = await this.generateHPBarEmoji(
           character.stats.hp,
           character.maxHp

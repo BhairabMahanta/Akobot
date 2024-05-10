@@ -139,7 +139,8 @@ async function handleNavigation(
 
   // Call methods on the instances
   await gameImage.generateAreaElements("Forest Clearing");
-  await gameImage.generateRandomElements(0.55, 0.5, 10);
+  // await gameImage.generateRandomElements(0.55, 0.5, 10);
+  await gameImage.generateTutorialEntities();
 
   // Generate the updated image with the player's position
   updatedImageBuffer = await gameImage.generateUpdatedImage(

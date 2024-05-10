@@ -36,7 +36,18 @@
 				"width": 16,
 				"height": 16,
 				"color": 12470831,
-				"customFields" : {}
+				"customFields" : {
+					"name": "monsterA",
+        "amount": 4,
+        "type": "mob",
+        "hasAllies": ["none"],
+        "waves": 2,
+        "rewards": {
+          "experience": 300,
+          "gold": 100,
+          "items": { "Gold": 100}
+        }
+				}
 			},
 			{
 				"id": "Entity",
@@ -47,7 +58,18 @@
 				"width": 16,
 				"height": 16,
 				"color": 12470831,
-				"customFields" : {}
+				"customFields" : {
+					"name": "monsterA",
+        "amount": 4,
+        "type": "mob",
+        "hasAllies": ["none"],
+        "waves": 2,
+        "rewards": {
+          "experience": 300,
+          "gold": 100,
+          "items": { "Gold": 100}
+        }
+				}
 			},
 			{
 				"id": "Entity",
@@ -58,7 +80,18 @@
 				"width": 16,
 				"height": 16,
 				"color": 12470831,
-				"customFields" : {}
+				"customFields" : {
+					"name": "monsterA",
+        "amount": 4,
+        "type": "mob",
+        "hasAllies": ["none"],
+        "waves": 2,
+        "rewards": {
+          "experience": 300,
+          "gold": 100,
+          "items": { "Gold": 100}
+        }
+				}
 			},
 			{
 				"id": "Entity",
@@ -69,7 +102,18 @@
 				"width": 16,
 				"height": 16,
 				"color": 12470831,
-				"customFields" : {}
+				"customFields" : {
+					"name": "monsterA",
+        "amount": 4,
+        "type": "mob",
+        "hasAllies": ["none"],
+        "waves": 2,
+        "rewards": {
+          "experience": 300,
+          "gold": 100,
+          "items": { "Gold": 100}
+        }
+				}
 			},
 			{
 				"id": "Entity",
@@ -80,7 +124,18 @@
 				"width": 16,
 				"height": 16,
 				"color": 12470831,
-				"customFields" : {}
+				"customFields" : {
+					"name": "monsterA",
+        "amount": 4,
+        "type": "mob",
+        "hasAllies": ["none"],
+        "waves": 2,
+        "rewards": {
+          "experience": 300,
+          "gold": 100,
+          "items": { "Gold": 100}
+        }
+				}
 			},
 			{
 				"id": "Entity",
@@ -91,7 +146,18 @@
 				"width": 16,
 				"height": 16,
 				"color": 12470831,
-				"customFields" : {}
+				"customFields" : {
+					"name": "monsterA",
+        "amount": 4,
+        "type": "mob",
+        "hasAllies": ["none"],
+        "waves": 2,
+        "rewards": {
+          "experience": 300,
+          "gold": 100,
+          "items": { "Gold": 100}
+        }
+				}
 			}
 		],
 		"Teleport": [

@@ -9,6 +9,7 @@ const {
 } = require("discord.js");
 const { cards } = require("../adv/information/cards.js"); // Import the cards data from 'cards.js'
 const abilities = require("../../data/abilities.js");
+const { run } = require("node:test");
 // Function to get the index of the maximum value among three
 function getMax(a, b, c) {
   if (a >= b && a >= c) {
@@ -19,13 +20,41 @@ function getMax(a, b, c) {
     return 3;
   }
 }
-async function calculateDamage(authorAttack, opponentDefense) {
+// Define base stats
+const baseAttack = 50;
+const baseDefense = 50;
+
+// Function to calculate damage
+function calculateDamage(authorAttack, opponentDefense) {
   return Math.floor(
     Math.pow(
       Math.sqrt(authorAttack),
-      Math.pow(Math.sqrt(3), Math.sqrt(authorAttack / opponentDefense))
+      Math.pow(
+        Math.sqrt(3),
+        Math.sqrt((850 + authorAttack) / (450 + 1.26 * opponentDefense))
+      )
     )
   );
+}
+// runCalcDamageTest();
+// Loop for incrementing attack
+function runCalcDamageTest() {
+  console.log("Incrementing Attack by 50:");
+  for (let i = 1; i <= 90; i++) {
+    const newAttack = baseAttack + i * 50;
+    const newBaseDefense = 150;
+    const damage = calculateDamage(newAttack, newBaseDefense);
+    console.log(`New Attack: ${newAttack}, Damage: ${damage}`);
+  }
+  console.log("\nIncrementing Attack by 50 and Defense by 20:");
+  for (let i = 1; i <= 90; i++) {
+    const newAttack = baseAttack + i * 50;
+    const newDefense = baseDefense + i * 23;
+    const damage = calculateDamage(newAttack, newDefense);
+    console.log(
+      `New Attack: ${newAttack}, New Defense: ${newDefense}, Damage: ${damage}`
+    );
+  }
 }
 function calculateAbilityDamage(abilityPower) {
   return Math.floor(abilityPower);
