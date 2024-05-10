@@ -352,7 +352,16 @@ class Duel {
 
     if (
       this.currentTurn === this.opponent.name ||
-      this.opponentFamiliar.includes(this.currentTurn)
+      this.enemyFamiliars.some((familiar) => {
+        console.log("familiar._id:", familiar._id);
+        const comparisonResult =
+          familiar.name === this.currentTurn &&
+          familiar._id === this.opponent._id;
+        console.log(
+          `Familiar nameOpponent: ${familiar.name},Current Turn: ${this.currentTurn}, Comparison result: ${comparisonResult}`
+        );
+        return comparisonResult;
+      })
     ) {
       this.teamTurn = this.opponent.name;
       this.pickEnemyOptions = this.allies.map((enemy, index) => ({
@@ -385,7 +394,16 @@ class Duel {
       return rows;
     } else if (
       this.currentTurn === this.player.name ||
-      this.playerFamiliar.includes(this.currentTurn)
+      this.allyFamiliars.some((familiar) => {
+        console.log("familiar._id:", familiar._id);
+        const comparisonResult =
+          familiar.name === this.currentTurn &&
+          familiar._id === this.player._id;
+        console.log(
+          `Familiar namePlayer: ${familiar.name},Current Turn: ${this.currentTurn}, Comparison result: ${comparisonResult}`
+        );
+        return comparisonResult;
+      })
     ) {
       this.teamTurn = this.player.name;
       this.pickEnemyOptions = this.opponentsTeam.map((enemy, index) => ({
@@ -483,10 +501,14 @@ class Duel {
       // this.getNextTurn()
       // console.log('currentTurn:', this.currentTurn);
     } else if (
-      this.playerFamiliar.includes(this.currentTurn) ||
-      this.opponentFamiliar.includes(this.currentTurn)
+      this.enemyFamiliars.some(
+        (familiar) => familiar.name === this.currentTurn
+      ) ||
+      this.allyFamiliars.some((familiar) => familiar.name === this.currentTurn)
     ) {
-      const target = this.enemyToHit.name; // Implement target selection logic
+      const target = this.enemyToHit.name;
+      console.log("target:", target);
+      // Implement target selection logic
       let damage = 0;
 
       // Loop through the familiars to find the attacking familiar
