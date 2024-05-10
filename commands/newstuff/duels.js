@@ -98,6 +98,7 @@ class Duel {
           // Create a deep copy of the familiar object before pushing it into allies
           const clonedFamiliar = JSON.parse(JSON.stringify(familiarData));
           this.allies.push(clonedFamiliar);
+          this.alivePlayerTeam = [...this.allies];
           this.allyFamiliars.push(clonedFamiliar);
         }
       }
@@ -108,6 +109,7 @@ class Duel {
           // Create a deep copy of the familiar object before pushing it into opponentsTeam
           const clonedFamiliar = JSON.parse(JSON.stringify(familiarData));
           this.opponentsTeam.push(clonedFamiliar);
+          this.aliveOpponentTeam = [...this.opponentsTeam];
           this.enemyFamiliars.push(clonedFamiliar);
         }
       }
@@ -161,7 +163,7 @@ class Duel {
         //     character.hpBarEmoji;
       }
 
-      //   this.aliveEnemies = this.allEnemies.flat();
+         this.aliveCharacters = this.aliveCharacters.flat();
     } catch (error) {
       console.log("The error is here:", error);
     }
@@ -912,14 +914,14 @@ class Duel {
       if (i.customId === "action_normal") {
         try {
           if (this.teamTurn === this.player.name) {
-            if (this.opponentsTeam.length === 1) {
+            if (this.aliveOpponentTeam.length === 1) {
               this.pickedChoice = true;
-              this.enemyToHit = this.opponentsTeam[0];
+              this.enemyToHit = this.aliveOpponentTeam[0];
             }
           } else if (this.teamTurn === this.opponent.name) {
-            if (this.allies.length === 1) {
+            if (this.alivePlayerTeam.length === 1) {
               this.pickedChoice = true;
-              this.enemyToHit = this.allies[0];
+              this.enemyToHit = this.alivePlayerTeam[0];
             }
           }
           if (this.pickedChoice) {
@@ -944,22 +946,30 @@ class Duel {
         console.log("targetIndex:", targetIndex);
         const realTarget = targetIndex.replace("enemy_", "");
         if (this.teamTurn === this.player.name) {
-          this.enemyToHit = this.opponentsTeam[realTarget];
+          this.enemyToHit = this.aliveOpponentTeam[realTarget];
           this.pickedChoice = true;
         } else if (this.teamTurn === this.opponent.name) {
-          this.enemyToHit = this.allies[realTarget];
+          this.enemyToHit = this.alivePlayerTeam[realTarget];
           this.pickedChoice = true;
         }
         // Continue with your code logic after selecting an enemy
       } else if (i.customId === "starter") {
         const selectedClassValue = i.values[0]; // Get the selected value // gae shit
         console.log("selectedValues", selectedClassValue);
-        if (this.pickedChoice || this.aliveCharacters.length === 1) {
+        if (this.teamTurn === this.player.name) {
+          if (this.aliveOpponentTeam.length === 1) {
+            this.pickedChoice = true;
+            this.enemyToHit = this.aliveOpponentTeam[0];
+          }
+        } else if (this.teamTurn === this.opponent.name) {
+          if (this.alivePlayerTeam.length === 1) {
+            this.pickedChoice = true;
+            this.enemyToHit = this.alivePlayerTeam[0];
+          }
+        }
+        if (this.pickedChoice) {
           this.pickedChoice = true;
 
-          if (this.aliveCharacters.length === 1) {
-            this.enemyToHit = this.aliveCharacters[0];
-          }
           if (selectedClassValue.startsWith("player_ability_")) {
             try {
               const abilityName = selectedClassValue.replace(
@@ -993,10 +1003,17 @@ class Duel {
                 } else {
                   console.log(`Method ${abilityNameCamel} does not exist.`);
                 }
+                if (this.teamTurn === this.player.name) {
                 this.ability[abilityNameCamel](
                   this.player,
                   this.enemyToHit,
-                  this.aliveEnemies
+                  this.aliveOpponentTeam
+                );
+              } else if (this.teamTurn === this.opponent.name) {
+                this.ability[abilityNameCamel](
+                  this.opponent,
+                  this.enemyToHit,
+                  this.alivePlayerTeam
                 );
                 await cycleCooldowns(this.cooldowns);
                 await this.getNextTurn();
@@ -1063,7 +1080,7 @@ class Duel {
         character.stats.hp = 0;
         this.deadCharacters.push(character.name);
         console.log("adeadenem:", this.deadEnemies);
-        this.aliveCharacters = this.aliveCharacters.filter(
+        this.alivePlayerTeam = this.alivePlayerTeam.filter(
           (enemy) => enemy !== character
         );
         console.log("ALIVEFAM:", this.characters);
@@ -1071,13 +1088,16 @@ class Duel {
       }
     }
     for (const character of this.aliveOpponentTeam) {
-      if (character.stats.hp < 0 && !this.aliveFam.includes(character.name)) {
+      if (
+        character.stats.hp < 0 &&
+        !this.deadCharacters.includes(character.name)
+      ) {
         this.battleLogs.push(`${character.name} died lol`);
         character.stats.speed = 0;
         character.atkBar = 0;
         character.stats.hp = 0;
         this.deadCharacters.push(character.name);
-        this.aliveCharacters = this.aliveCharacters.filter(
+        this.aliveOpponentTeam = this.aliveOpponentTeam.filter(
           (enemy) => enemy !== character
         );
         console.log("ALIVEFAM:", this.characters);
@@ -1117,30 +1137,30 @@ class Duel {
           }
         }
       });
-      try {
-        const filter = { _id: this.player._id };
-        const playerData2 = await collection.findOne(filter);
-        if (playerData2) {
-          // Create an object with only the xp property to update
-          const updates = {
-            $inc: {
-              "exp.xp": rewards.experience,
-              "balance.coins": rewards.gold,
-            },
-            $set: { activeQuests: this.player.activeQuests },
-          };
-          console.log("rewards.xpereince:", rewards.experience);
-          // Update the player's document with the xpUpdate object
-          await collection.updateOne(filter, updates);
+      // try {
+      //   const filter = { _id: this.player._id };
+      //   const playerData2 = await collection.findOne(filter);
+      //   if (playerData2) {
+      //     // Create an object with only the xp property to update
+      //     const updates = {
+      //       $inc: {
+      //         "exp.xp": rewards.experience,
+      //         "balance.coins": rewards.gold,
+      //       },
+      //       $set: { activeQuests: this.player.activeQuests },
+      //     };
+      //     console.log("rewards.xpereince:", rewards.experience);
+      //     // Update the player's document with the xpUpdate object
+      //     await collection.updateOne(filter, updates);
 
-          console.log("Player XP updated:", updates);
-        } else {
-          console.log("Player not found or updated.");
-        }
-      } catch (error) {
-        console.error("Error updating player XP:", error);
-      }
-      console.log("thisplayeractiveQuest:", this.player.activeQuests);
+      //     console.log("Player XP updated:", updates);
+      //   } else {
+      //     console.log("Player not found or updated.");
+      //   }
+      // } catch (error) {
+      //   console.error("Error updating player XP:", error);
+      // }
+      // console.log("thisplayeractiveQuest:", this.player.activeQuests);
 
       this.battleEmbed.setFields({
         name: `You won the battle against the Monster, you can continue the journey where you left off (I lied  you can't)!!`,
