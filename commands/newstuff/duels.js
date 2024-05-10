@@ -1,24 +1,24 @@
-const { mongoClient } = require("../../../data/mongo/mongo.js");
+const { mongoClient } = require("../../data/mongo/mongo.js");
 const db = mongoClient.db("Akaimnky");
 const collection = db.collection("akaillection");
-const { quests } = require("../quest/quests.js");
-const { cycleCooldowns } = require("../adventure/sumfunctions.js");
-const { bosses } = require("../monsterInfo/bosses.js");
-const { mobs } = require("../monsterInfo/mobs.js");
-const { cards } = require("../information/cards.js"); // Import the cards data from 'cards.js'
+const { quests } = require("../adv/quest/quests.js");
+const { cycleCooldowns } = require("../adv/adventure/sumfunctions.js");
+const { bosses } = require("../adv/monsterInfo/bosses.js");
+const { mobs } = require("../adv/monsterInfo/mobs.js");
+const { cards } = require("../adv/information/cards.js"); // Import the cards data from 'cards.js'
 const {
   checkResults,
   getCardStats,
   getCardMoves,
   calculateDamage,
   getPlayerMoves,
-} = require("../../util/glogic.js");
-const classes = require("../../../data/classes/allclasses.js");
-const abilities = require("../../../data/abilities.js");
+} = require("../util/glogic.js");
+const classes = require("../../data/classes/allclasses.js");
+const abilities = require("../../data/abilities.js");
 const {
   Ability,
   // eslint-disable-next-line no-undef
-} = require("./AbilitiesFunction.js");
+} = require("../adv/action/AbilitiesFunction.js");
 let initialMessage = null;
 const {
   EmbedBuilder,
@@ -49,8 +49,15 @@ class Duel {
     this.enemyFamiliars = [];
     this.playerFamiliar = [];
     this.opponentFamiliar = [];
+    this.cooldowns = [];
     this.currentTurn = null;
     this.battleLogs = [];
+    this.characters = [];
+    this.aliveCharacters = [];
+    this.alivePlayerTeam = [];
+    this.aliveOpponentTeam = [];
+    this.deadCharacters = [];
+    this.teamTurn = null;
   }
   async initialiseStuff() {
     console.log("initialised");
@@ -85,25 +92,43 @@ class Duel {
       this.allies.push(this.player);
       this.opponentsTeam.push(this.opponent);
       for (const familiarName of this.playerFamiliar) {
-        // console.log('familiarName:', this.playerFamiliar);
         const familiarData = this.famSource[familiarName];
         if (familiarData) {
-          this.allies.push(familiarData);
-          this.allyFamiliars.push(familiarData);
+          // Create a deep copy of the familiar object before pushing it into allies
+          const clonedFamiliar = JSON.parse(JSON.stringify(familiarData));
+          this.allies.push(clonedFamiliar);
+          this.allyFamiliars.push(clonedFamiliar);
         }
       }
 
       for (const familiarName of this.opponentFamiliar) {
         const familiarData = this.famSource[familiarName];
-
         if (familiarData) {
-          this.opponentsTeam.push(familiarData);
-          this.opponentFamiliar.push(familiarData);
+          // Create a deep copy of the familiar object before pushing it into opponentsTeam
+          const clonedFamiliar = JSON.parse(JSON.stringify(familiarData));
+          this.opponentsTeam.push(clonedFamiliar);
+          this.enemyFamiliars.push(clonedFamiliar);
+        }
+      }
+
+      for (const character of this.allies) {
+        try {
+          character._id = this.player._id;
+        } catch (error) {
+          console.log("disstupiderror:", error);
+        }
+        // console.log("character:", character);
+      }
+      for (const character of this.opponentsTeam) {
+        try {
+          character._id = this.opponent._id;
+        } catch (error) {
+          console.log("disstupiderror:", error);
         }
       }
       this.characters = [...this.allies, ...this.opponentsTeam];
+      this.aliveCharacters = [...this.characters];
 
-      console.log("characters:", this.characters);
       if (this.player.class != null) {
         this.playerClass = this.player.class;
         this.continue = true;
@@ -130,7 +155,9 @@ class Duel {
         character.atkBar = 0;
         character.attackBarEmoji = [];
         character.hpBarEmoji = [];
-        //   console.log(character.name, '-', character.attackBarEmoji), '-', character.hpBarEmoji;
+        //   console.log(character.name, "-", character.atkBar),
+        //     "-",
+        //     character.hpBarEmoji;
       }
 
       //   this.aliveEnemies = this.allEnemies.flat();
@@ -165,7 +192,8 @@ class Duel {
       components: [stringMenuRow],
     });
     const filter = (i) =>
-      i.customId === "option_select" && i.user.id === this.opponent.id;
+      (i.customId === "option_select" && i.user.id === this.opponent._id) ||
+      i.user.id === this.player._id;
     const collector = await gaeMessage.createMessageComponentCollector({
       filter,
       time: 300000,
@@ -180,11 +208,12 @@ class Duel {
           console.log("bro clicked fr??:", selectedValue);
           const selectedValueName = selectedValue.replace("klik_", "");
           if (selectedValueName === "decline") {
-            this.battleEmbed.setDescription(`bro declined the duel, idot.`);
-            gaeMessage.edit({ embeds: [this.battleEmbed], components: [] });
+            const battleEmbed = new EmbedBuilder().setTitle(`PLAYOFFS!`);
+            battleEmbed.setDescription(`bro declined the duel, idot.`);
+            gaeMessage.edit({ embeds: [battleEmbed], components: [] });
             this.continue = false;
           }
-          if (selectedValueName === accept) {
+          if (selectedValueName === "accept") {
             this.continue = true;
           }
           if (this.continue) {
@@ -205,6 +234,7 @@ class Duel {
     //    console.log('thiscurenttyrn:', this.playerFamiliar)
     let familiarArray = [];
     let opponentFamiliarArray = [];
+    let rows;
     if (
       this.playerFamiliar.includes(this.currentTurn) ||
       this.opponentFamiliar.includes(this.currentTurn)
@@ -244,13 +274,14 @@ class Duel {
         console.log("moveOptionsError:", error);
       }
     } else if (this.currentTurn === this.player.name) {
+      console.log("playerclass:", this.player.class);
       const playerAbility = classes[this.player.class].abilities;
       // console.log('stuffimportant:', playerAbility)
       try {
         const moveFinder = playerAbility.map((cardName) =>
           getPlayerMoves(cardName)
         );
-        // console.log('moveFinder:', moveFinder)
+        // console.log("moveFinder:", moveFinder);
         this.abilityOptions = moveFinder
           .map((ability) => {
             if (
@@ -259,7 +290,7 @@ class Duel {
               !this.cooldowns.some((cooldown) => cooldown.name === ability.name)
             ) {
               // ability.execute(this.currentTurn, this.boss.name)
-              // console.log('execuTE:', ability.execute);
+              // console.log("execuTE:", ability.execute);
               return {
                 label: ability.name,
                 description: ability.description,
@@ -276,9 +307,9 @@ class Duel {
             value: "cooldown",
           });
         }
-        // console.log('abilityOptions:', this.abilityOptions)
+        // console.log("abilityOptions:", this.abilityOptions);
       } catch (error) {
-        console.log("moveOptionsError:", error);
+        console.error("moveOptionsError:", error);
       }
     } else if (this.currentTurn === this.opponent.name) {
       const playerAbility = classes[this.opponent.class].abilities;
@@ -317,7 +348,47 @@ class Duel {
       } catch (error) {
         console.log("moveOptionsError:", error);
       }
-      this.pickEnemyOptions = this.aliveEnemies.map((enemy, index) => ({
+    }
+
+    if (
+      this.currentTurn === this.opponent.name ||
+      this.opponentFamiliar.includes(this.currentTurn)
+    ) {
+      this.teamTurn = this.opponent.name;
+      this.pickEnemyOptions = this.allies.map((enemy, index) => ({
+        label: enemy.name,
+        description: `Attack ${enemy.name}`,
+        value: `enemy_${index}`,
+      }));
+
+      try {
+        this.selectMenu = new StringSelectMenuBuilder()
+          .setCustomId("action_select")
+          .setPlaceholder("Select the target")
+          .addOptions(this.pickEnemyOptions);
+        //   console.log('This.selectEmnu:', this.selectMenu)
+
+        const stringMenu = new StringSelectMenuBuilder()
+          .setCustomId("starter")
+          .setPlaceholder("Make a selection!")
+          .addOptions(this.abilityOptions);
+
+        const stringMenuRow = new ActionRowBuilder().addComponents(stringMenu);
+        // console.log('stringMENUROW:', stringMenuRow)
+        const gaeRow = new ActionRowBuilder().addComponents(this.selectMenu);
+
+        rows = [buttonRow, stringMenuRow, gaeRow];
+      } catch (error) {
+        console.log("error:", error);
+      }
+
+      return rows;
+    } else if (
+      this.currentTurn === this.player.name ||
+      this.playerFamiliar.includes(this.currentTurn)
+    ) {
+      this.teamTurn = this.player.name;
+      this.pickEnemyOptions = this.opponentsTeam.map((enemy, index) => ({
         label: enemy.name,
         description: `Attack ${enemy.name}`,
         value: `enemy_${index}`,
@@ -340,7 +411,7 @@ class Duel {
           await this.selectMenu
         );
 
-        var rows = [buttonRow, stringMenuRow, gaeRow];
+        rows = [buttonRow, stringMenuRow, gaeRow];
       } catch (error) {
         console.log("error:", error);
       }
@@ -370,6 +441,7 @@ class Duel {
     // this.getNextTurn()
     console.log("currentTurn:", this.currentTurn);
     // If the current turn is the player, let the player choose a move
+
     if (this.currentTurn === this.player.name) {
       // const move = attacker.chooseMove(); // Implement this method for the player
 
@@ -384,18 +456,63 @@ class Duel {
       this.battleLogs.push(
         `+ ${this.currentTurn} attacks ${target} for ${damage} damage.`
       );
-      console.log("loglength:", this.battleLogs.length);
+      // console.log("loglength:", this.battleLogs.length);
       console.log(
         `${this.currentTurn} attacks ${target} for ${damage} damage.`
       );
       // this.getNextTurn()
       // console.log('currentTurn:', this.currentTurn);
-    } else if (this.playerFamiliar.includes(this.currentTurn)) {
+    } else if (this.currentTurn === this.opponent.name) {
+      // const move = attacker.chooseMove(); // Implement this method for the player
+
+      const target = this.enemyToHit.name;
+      const damage = await calculateDamage(
+        this.opponent.stats.attack,
+        this.enemyToHit.stats.defense
+      );
+
+      // Update HP and battle logs
+      this.enemyToHit.stats.hp -= damage;
+      this.battleLogs.push(
+        `+ ${this.currentTurn} attacks ${target} for ${damage} damage.`
+      );
+      // console.log("loglength:", this.battleLogs.length);
+      console.log(
+        `${this.currentTurn} attacks ${target} for ${damage} damage.`
+      );
+      // this.getNextTurn()
+      // console.log('currentTurn:', this.currentTurn);
+    } else if (
+      this.playerFamiliar.includes(this.currentTurn) ||
+      this.opponentFamiliar.includes(this.currentTurn)
+    ) {
       const target = this.enemyToHit.name; // Implement target selection logic
       let damage = 0;
 
       // Loop through the familiars to find the attacking familiar
-      for (const familiar of this.familiarInfo) {
+      for (const familiar of this.enemyFamiliars) {
+        console.log("familiarname for current turn:", familiar.name);
+        if (familiar.name === this.currentTurn) {
+          // Calculate damage for the attacking familiar
+          damage = await calculateDamage(
+            familiar.stats.attack,
+            this.enemyToHit.stats.defense
+          );
+
+          // Update HP and battle logs
+          this.enemyToHit.stats.hp -= damage;
+          this.battleLogs.push(
+            `+ ${this.currentTurn} attacks ${target} for ${damage} damage using an attack`
+          );
+          console.log(
+            `${this.currentTurn} attacks ${target} for ${damage} damage using an attack`
+          );
+          break; // Exit the loop once the attacking familiar is found
+        }
+      }
+
+      // Loop through the familiars to find the attacking familiar
+      for (const familiar of this.allyFamiliars) {
         if (familiar.name === this.currentTurn) {
           // Calculate damage for the attacking familiar
           damage = await calculateDamage(
@@ -417,6 +534,7 @@ class Duel {
 
       // Set the current turn to the boss's name
     }
+
     // this.currentTurn = this.currentTurn === this.player ? this.boss.name : this.playerName;
   } //
 
@@ -426,12 +544,15 @@ class Duel {
         return this.player.stats.speed;
       } else if (this.playerFamiliar.includes(character.name)) {
         // Find the familiar's speed by matching it with this.familiarInfo
-        const familiarInfo = this.familiarInfo.find(
+        const familiarInfo = this.characters.find(
           (fam) => fam.name === character.name
         );
+        // console.log("familiarInfoOOOOO:", familiarInfo);
         const familiarSpeed = familiarInfo ? familiarInfo.stats.speed : 1; // Default to 0 if not found
 
         return familiarSpeed;
+      } else if (character === this.opponent) {
+        return this.opponent.stats.speed;
       } else {
         console.log(`Calculating speed for unknown character type: 0`);
         return 0; // Default to 0 for unknown character types
@@ -448,14 +569,14 @@ class Duel {
         return this.player.stats.hp;
       } else if (this.playerFamiliar.includes(character.name)) {
         // Find the familiar's speed by matching it with this.familiarInfo
-        const familiarInfo = this.familiarInfo.find(
+        const familiarInfo = this.characters.find(
           (fam) => fam.name === character.name
         );
         const familiarHp = familiarInfo ? familiarInfo.stats.hp : 0; // Default to 0 if not found
 
         return familiarHp;
       } else {
-        console.log(`Calculating speed for unknown character type: 0`);
+        // console.log(`Calculating speed for unknown character type: 0`);
         return 0; // Default to 0 for unknown character types
       }
     } catch (error) {
@@ -463,22 +584,73 @@ class Duel {
     }
   } //
 
+  // async fillAtkBars() {
+  //   try {
+  //     this.characters.sort((a, b) => b.stats.speed - a.stats.speed);
+  //     console.log("characters:", this.characters);
+  //     for (const character of this.characters) {
+  //       // console.log("characterName:", character);
+  //       const speed = await this.calculateOverallSpeed(character);
+
+  //       const speedMultiplier = character.speedBuff ? 1.3 : 1; // Apply Speed Buff if active
+  //       character.atkBar += speed * 0.05 * speedMultiplier;
+  //       character.attackBarEmoji = await this.generateAttackBarEmoji(
+  //         character.atkBar
+  //       );
+  //     }
+  //   } catch (error) {
+  //     console.log("fillBarError:", error);
+  //   }
+  // } //
+
   async fillAtkBars() {
+    let charactersWith100AtkBar = [];
+    let turnDecided = false;
     try {
       this.characters.sort((a, b) => b.stats.speed - a.stats.speed);
+      // console.log("characters:", this.characters);
       for (const character of this.characters) {
-        const speed = await this.calculateOverallSpeed(character);
+        if (character.atkBar >= 100) {
+          charactersWith100AtkBar.push(character);
+          if (charactersWith100AtkBar.length > 0) {
+            console.log(
+              `Characters with 100 attack bar: ${charactersWith100AtkBar.length}`
+            );
+          }
+          return charactersWith100AtkBar; // Return immediately if any character already has atkBar >= 100
+        }
+      }
 
-        const speedMultiplier = character.speedBuff ? 1.3 : 1; // Apply Speed Buff if active
-        character.atkBar += speed * 0.05 * speedMultiplier;
+      while (!turnDecided) {
+        // let anyCharacterReached100 = false; // Flag to track if any character reached 100 attack bar in this iteration
+        for (const character of this.characters) {
+          const speed = await this.calculateOverallSpeed(character);
+          const speedMultiplier = character.speedBuff ? 1.3 : 1; // Apply Speed Buff if active
+          character.atkBar += speed * 0.05 * speedMultiplier;
+          if (character.atkBar >= 100) {
+            charactersWith100AtkBar.push(character);
+            turnDecided = true;
+          }
+        }
+      }
+      for (const character of this.characters) {
         character.attackBarEmoji = await this.generateAttackBarEmoji(
           character.atkBar
         );
       }
+
+      if (charactersWith100AtkBar.length > 0) {
+        console.log(
+          `Characters with 100 attack bar: ${charactersWith100AtkBar.length}`
+        );
+        // Process characters with 100 attack bar further (sorting, additional actions)
+        // Do something with charactersWith100AtkBar
+      }
     } catch (error) {
       console.log("fillBarError:", error);
     }
-  } //
+    return charactersWith100AtkBar;
+  }
 
   async fillHpBars() {
     try {
@@ -536,57 +708,48 @@ class Duel {
 
   async getNextTurn() {
     let nextTurn = null;
-    console.log("ho raha hai");
-    while (true) {
-      await this.fillAtkBars();
+    // console.log("ho raha hai");
 
-      // Get all characters that have reached 100 attack bar
-      const charactersWith100AtkBar = this.characters.filter(
-        (character) => character.atkBar >= 100
+    const charactersWith100AtkBar = await this.fillAtkBars();
+
+    // console.log('charactersWITHQ100ATKBAR:', charactersWith100AtkBar.length)
+    if (charactersWith100AtkBar.length === 1) {
+      const characterWith100AtkBar = charactersWith100AtkBar[0];
+      // console.log(`${characterWith100AtkBar.name} has reached 100 attack bar.`);
+      this.currentTurn = characterWith100AtkBar.name;
+      characterWith100AtkBar.attackBarEmoji = await this.generateAttackBarEmoji(
+        characterWith100AtkBar.atkBar
       );
-      // console.log('charactersWITHQ100ATKBAR:', charactersWith100AtkBar.length)
-      if (charactersWith100AtkBar.length === 1) {
-        const characterWith100AtkBar = charactersWith100AtkBar[0];
-        console.log(
-          `${characterWith100AtkBar.name} has reached 100 attack bar.`
-        );
-        this.currentTurn = characterWith100AtkBar.name;
-        characterWith100AtkBar.attackBarEmoji =
-          await this.generateAttackBarEmoji(characterWith100AtkBar.atkBar);
-        characterWith100AtkBar.atkBar = 0;
-        console.log(
-          `${characterWith100AtkBar.name} - ${characterWith100AtkBar.attackBarEmoji}`
-        );
-        break; // Exit the loop
-      } else if (charactersWith100AtkBar.length > 1) {
-        // If multiple characters have reached 100 attack bar, determine the next turn based on speed
-        let fastestCharacter = charactersWith100AtkBar[0];
-        for (const character of charactersWith100AtkBar) {
-          if (character.atkBar > fastestCharacter.atkBar) {
-            fastestCharacter = character;
-          }
-        }
-        console.log(
-          `${fastestCharacter.name} has the highest atkBar and will take the next turn.`
-        );
-        this.currentTurn = fastestCharacter.name;
-        fastestCharacter.attackBarEmoji = await this.generateAttackBarEmoji(
-          fastestCharacter.atkBar
-        );
+      characterWith100AtkBar.atkBar -= 100;
+    } else if (charactersWith100AtkBar.length > 1) {
+      // If multiple characters have reached 100 attack bar, determine the next turn based on speed
+      charactersWith100AtkBar.sort((a, b) => b.atkBar - a.atkBar);
+      let fastestCharacter = charactersWith100AtkBar[0];
+      // for (const character of charactersWith100AtkBar) {
+      //   if (character.atkBar > fastestCharacter.atkBar) {
+      //     fastestCharacter = character;
+      //   }
+      // }
+      console.log(
+        `${fastestCharacter.name} has the highest atkBar and will take the next turn.`
+      );
+      this.currentTurn = fastestCharacter.name;
+      fastestCharacter.attackBarEmoji = await this.generateAttackBarEmoji(
+        fastestCharacter.atkBar
+      );
 
-        console.log(
-          `${fastestCharacter.name} - ${fastestCharacter.atkBar} - ${fastestCharacter.attackBarEmoji}`
-        );
-        fastestCharacter.atkBar -= 100;
-        break; // Exit the loop
-      }
+      console.log(
+        `${fastestCharacter.name} - ${fastestCharacter.atkBar} - ${fastestCharacter.attackBarEmoji}`
+      );
+      fastestCharacter.atkBar -= 100;
     }
+
     await this.fillHpBars();
     return nextTurn;
   } //
   async sendInitialEmbed() {
     try {
-      console.log(this.player.name, "-inside", this.player.attackBarEmoji);
+      // console.log(this.player.name, "-inside", this.player.attackBarEmoji);
       this.battleEmbed = new EmbedBuilder()
         .setTitle(`${this.player.name} VS ${this.opponent.name}`)
         .setDescription(`**Current Turn:** \`\`${this.currentTurn}\`\``)
@@ -639,12 +802,12 @@ class Duel {
 
       // Add the player's HP and AttackBar to the info
       opponentAndFamiliarsInfo += `[2;37m ${this.opponent.name}: ⚔️${
-        this.player.stats.attack
-      } 🛡️${this.player.stats.defense} 💨${this.player.stats.speed} 🔮${
-        this.player.stats.magic
-      }\n[2;32m ${this.player.hpBarEmoji} ${this.player.stats.hp} ♥️\n[2;36m [2;34m${
-        this.player.attackBarEmoji
-      } ${Math.floor(this.player.atkBar)} 🙋`;
+        this.opponent.stats.attack
+      } 🛡️${this.opponent.stats.defense} 💨${this.opponent.stats.speed} 🔮${
+        this.opponent.stats.magic
+      }\n[2;32m ${this.opponent.hpBarEmoji} ${this.opponent.stats.hp} ♥️\n[2;36m [2;34m${
+        this.opponent.attackBarEmoji
+      } ${Math.floor(this.opponent.atkBar)} 🙋`;
 
       this.battleEmbed.addFields({
         name: `${this.opponent.name}'s Team Info:`,
@@ -652,7 +815,7 @@ class Duel {
         inline: false,
       });
 
-      console.log("battleLOgsLengthBefore", this.battleLogs.length);
+      // console.log("battleLOgsLengthBefore", this.battleLogs.length);
       if (this.battleLogs.length > 6 && this.battleLogs.length <= 7) {
         this.battleLogs.shift();
       } else if (this.battleLogs.length > 7 && this.battleLogs.length <= 8) {
@@ -663,7 +826,7 @@ class Duel {
         this.battleLogs.shift();
         this.battleLogs.shift();
       }
-      console.log("battleLogsLengthAfterr:", this.battleLogs.length);
+      // console.log("battleLogsLengthAfterr:", this.battleLogs.length);
 
       if (this.battleLogs.length > 0) {
         this.battleEmbed.addFields({
@@ -692,12 +855,12 @@ class Duel {
     await this.getNextTurn();
     console.log("currentTurn:", this.currentTurn);
     this.initialMessage = await this.sendInitialEmbed(message);
-    console.log("initialMessage:", this.initialMessage);
+    // console.log("initialMessage:", this.initialMessage);
     this.initialMessage = await message.channel.send({
       embeds: [this.initialMessage],
       components: await this.getDuelActionRow(),
     });
-    console.log("initialMessage2:");
+
     if (this.enemyFirst) {
       this.printBattleResult();
       const updatedEmbed = await this.sendInitialEmbed(message);
@@ -707,7 +870,7 @@ class Duel {
       });
     }
     const filter = (i) =>
-      (i.user.id === message.user.id && i.customId.startsWith("action_")) ||
+      (i.user.id === message.author.id && i.customId.startsWith("action_")) ||
       i.customId === "starter";
 
     const collector = this.initialMessage.createMessageComponentCollector({
@@ -721,17 +884,23 @@ class Duel {
 
       if (i.customId === "action_normal") {
         try {
-          console.log("aliveEnemiesearlY:", this.aliveEnemies);
-          if (this.pickedChoice || this.aliveEnemies.length === 1) {
-            this.pickedChoice = true; // i can use mongodb to allow people to turn this off and on
-            if (this.aliveEnemies.length === 1) {
-              console.log("aliveEnemies:", this.aliveEnemies);
-              this.enemyToHit = this.aliveEnemies[0];
+          if (this.teamTurn === this.player.name) {
+            if (this.opponentsTeam.length === 1) {
+              this.pickedChoice = true;
+              this.enemyToHit = this.opponentsTeam[0];
             }
+          } else if (this.teamTurn === this.opponent.name) {
+            if (this.allies.length === 1) {
+              this.pickedChoice = true;
+              this.enemyToHit = this.allies[0];
+            }
+          }
+          if (this.pickedChoice) {
+            this.pickedChoice = true; // i can use mongodb to allow people to turn this off and on
             this.performTurn(message);
             await cycleCooldowns(this.cooldowns);
             await this.getNextTurn();
-            await this.performEnemyTurn(message);
+            // await this.performEnemyTurn(message);
             console.log("currentTurn:", this.currentTurn);
             this.printBattleResult();
           } else {
@@ -745,18 +914,24 @@ class Duel {
         }
       } else if (i.customId === "action_select") {
         const targetIndex = i.values[0];
+        console.log("targetIndex:", targetIndex);
         const realTarget = targetIndex.replace("enemy_", "");
-        this.enemyToHit = this.aliveEnemies[realTarget];
-        this.pickedChoice = true;
+        if (this.teamTurn === this.player.name) {
+          this.enemyToHit = this.opponentsTeam[realTarget];
+          this.pickedChoice = true;
+        } else if (this.teamTurn === this.opponent.name) {
+          this.enemyToHit = this.allies[realTarget];
+          this.pickedChoice = true;
+        }
         // Continue with your code logic after selecting an enemy
       } else if (i.customId === "starter") {
         const selectedClassValue = i.values[0]; // Get the selected value // gae shit
         console.log("selectedValues", selectedClassValue);
-        if (this.pickedChoice || this.aliveEnemies.length === 1) {
+        if (this.pickedChoice || this.aliveCharacters.length === 1) {
           this.pickedChoice = true;
 
-          if (this.aliveEnemies.length === 1) {
-            this.enemyToHit = this.aliveEnemies[0];
+          if (this.aliveCharacters.length === 1) {
+            this.enemyToHit = this.aliveCharacters[0];
           }
           if (selectedClassValue.startsWith("player_ability_")) {
             try {
@@ -846,4 +1021,122 @@ class Duel {
       }
     });
   }
+  async printBattleResult() {
+    // Implement code to display the battle result (victory, defeat, or draw)
+    // this.printBattleResult();
+    let updatedEmbed;
+    for (const character of this.alivePlayerTeam) {
+      if (
+        character.stats.hp < 0 &&
+        !this.deadCharacters.includes(character.name)
+      ) {
+        this.battleLogs.push(`${character.name} died poggers`);
+        character.stats.speed = 0;
+        character.atkBar = 0;
+        character.stats.hp = 0;
+        this.deadCharacters.push(character.name);
+        console.log("adeadenem:", this.deadEnemies);
+        this.aliveCharacters = this.aliveCharacters.filter(
+          (enemy) => enemy !== character
+        );
+        console.log("ALIVEFAM:", this.characters);
+        break;
+      }
+    }
+    for (const character of this.aliveOpponentTeam) {
+      if (character.stats.hp < 0 && !this.aliveFam.includes(character.name)) {
+        this.battleLogs.push(`${character.name} died lol`);
+        character.stats.speed = 0;
+        character.atkBar = 0;
+        character.stats.hp = 0;
+        this.deadCharacters.push(character.name);
+        this.aliveCharacters = this.aliveCharacters.filter(
+          (enemy) => enemy !== character
+        );
+        console.log("ALIVEFAM:", this.characters);
+
+        break;
+      }
+    }
+    if (this.aliveCharacters.length === 0) {
+      const rewards = this.enemyDetails.rewards;
+      if (this.player.activeQuests) {
+        for (const activeQuestName in this.player.activeQuests) {
+          if (this.player.activeQuests.hasOwnProperty(activeQuestName)) {
+            const activeQuestDetails = quests[activeQuestName];
+            const activeQuestDetails2 =
+              this.player.activeQuests[activeQuestName];
+            console.log(`stuffHere: ${activeQuestDetails.title}`);
+            console.log(`stuffHere: ${activeQuestDetails2.objectives[0]}`);
+          }
+        }
+      }
+
+      this.mobs.forEach((mobName) => {
+        for (const questName in this.player.activeQuests) {
+          if (this.player.activeQuests.hasOwnProperty(questName)) {
+            const objectives = this.player.activeQuests[questName].objectives;
+
+            // Iterate through all objective elements
+            for (const objective of objectives) {
+              console.log("objectiveNameTargetnotMatch:", objective.target);
+              if (objective.target === mobName) {
+                console.log("objectiveNameTarget:", objective.target);
+                // Match found, increment objective.current by 1
+                objective.current = String(Number(objective.current) + 1);
+                console.log("thisisobjective.current:", objective.current);
+              }
+            }
+          }
+        }
+      });
+      try {
+        const filter = { _id: this.player._id };
+        const playerData2 = await collection.findOne(filter);
+        if (playerData2) {
+          // Create an object with only the xp property to update
+          const updates = {
+            $inc: {
+              "exp.xp": rewards.experience,
+              "balance.coins": rewards.gold,
+            },
+            $set: { activeQuests: this.player.activeQuests },
+          };
+          console.log("rewards.xpereince:", rewards.experience);
+          // Update the player's document with the xpUpdate object
+          await collection.updateOne(filter, updates);
+
+          console.log("Player XP updated:", updates);
+        } else {
+          console.log("Player not found or updated.");
+        }
+      } catch (error) {
+        console.error("Error updating player XP:", error);
+      }
+      console.log("thisplayeractiveQuest:", this.player.activeQuests);
+
+      this.battleEmbed.setFields({
+        name: `You won the battle against the Monster, you can continue the journey where you left off (I lied  you can't)!!`,
+        value: `Rewards:\n Exp: ${rewards.experience}, Gold: ${rewards.gold}`,
+        inline: true,
+      });
+      this.battleEmbed.setDescription(`GGs You've won`);
+      this.initialMessage.edit({
+        embeds: [this.battleEmbed],
+        components: [],
+      });
+    } else if (this.player.stats.hp < 0) {
+      this.message.channel.send("You lost, skill issue.");
+      this.player.stats.speed = 0;
+    } else {
+      updatedEmbed = await this.sendInitialEmbed(this.message);
+      this.initialMessage.edit({
+        embeds: [updatedEmbed],
+        components: await this.getDuelActionRow(),
+      });
+    }
+  }
 }
+module.exports = {
+  Duel,
+};

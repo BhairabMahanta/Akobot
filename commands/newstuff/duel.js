@@ -10,7 +10,7 @@ const {
   GameImage,
   Player,
   Element,
-} = require("./adv/adventure/sumfunctions.js");
+} = require("../adv/adventure/sumfunctions.js");
 const fs = require("fs");
 let selectedValue = [];
 const { mongoClient } = require("../../data/mongo/mongo.js");
@@ -20,6 +20,7 @@ const { Duel } = require("./duels.js");
 module.exports = {
   name: "duel",
   description: "Challenge someone to a duel!",
+  aliases: ["fight", "challenge", "battle"],
   async execute(client, message, args) {
     try {
       const opponentId = extractOpponentId(args);
@@ -33,10 +34,9 @@ module.exports = {
       // Extract opponent ID from command arguments
 
       // Create a new instance of DuelLogic
-      const duel = new Duel(player, opponent, message.channel);
-
-      // Start the duel
-      await duel.start();
+      const duel = new Duel(player, opponent, message);
+      console.log("worked Here beta");
+      await duel.startEmbed();
     } catch (error) {
       console.error("Error executing duel command:", error);
       message.reply({
