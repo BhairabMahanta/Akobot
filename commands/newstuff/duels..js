@@ -44,7 +44,9 @@ class Duel {
     this.player = player;
     this.opponent = opponent;
     this.allies = [];
+    this.allyFamiliars = [];
     this.opponentsTeam = [];
+    this.enemyFamiliars = [];
     this.playerFamiliar = [];
     this.opponentFamiliar = [];
     this.currentTurn = null;
@@ -87,6 +89,7 @@ class Duel {
         const familiarData = this.famSource[familiarName];
         if (familiarData) {
           this.allies.push(familiarData);
+          this.allyFamiliars.push(familiarData);
         }
       }
 
@@ -95,6 +98,7 @@ class Duel {
 
         if (familiarData) {
           this.opponentsTeam.push(familiarData);
+          this.opponentFamiliar.push(familiarData);
         }
       }
       this.characters = [...this.allies, ...this.opponentsTeam];
@@ -196,13 +200,151 @@ class Duel {
     // this.startBattle(this.message);
     //   }
   } //
-  async getDuelActionRow(player) {
-    try {
-      // Logic to get action row for a player's turn
-      // Example: const actionRow = await this.constructActionRow(player);
-      // return actionRow;
-    } catch (error) {
-      console.error("Error getting action row:", error);
+  async getDuelActionRow() {
+    // console.log('thiscurenttyrn:', this.currentTurn)
+    //    console.log('thiscurenttyrn:', this.playerFamiliar)
+    let familiarArray = [];
+    let opponentFamiliarArray = [];
+    if (
+      this.playerFamiliar.includes(this.currentTurn) ||
+      this.opponentFamiliar.includes(this.currentTurn)
+    ) {
+      familiarArray.push(this.currentTurn);
+      const moveFinder = familiarArray.map((cardName) =>
+        getCardMoves(cardName)
+      );
+
+      try {
+        this.abilityOptions = moveFinder[0]
+          .map((ability) => {
+            if (
+              ability &&
+              ability.id &&
+              !this.cooldowns.some((cooldown) => cooldown.name === ability.name)
+            ) {
+              return {
+                label: ability.name,
+                description: ability.description,
+                value: `fam-${ability.name}`,
+              };
+            }
+          })
+          .filter(Boolean); // Remove undefined items
+        // If there are no abilities available, add a failsafe option
+        if (this.abilityOptions.length === 0) {
+          this.abilityOptions.push({
+            label: "Cooldown",
+            description: "Your abilities are on cooldown",
+            value: "cooldown",
+          });
+        }
+        familiarArray = [];
+        // console.log('abilityOptions:', this.abilityOptions)
+      } catch (error) {
+        console.log("moveOptionsError:", error);
+      }
+    } else if (this.currentTurn === this.player.name) {
+      const playerAbility = classes[this.player.class].abilities;
+      // console.log('stuffimportant:', playerAbility)
+      try {
+        const moveFinder = playerAbility.map((cardName) =>
+          getPlayerMoves(cardName)
+        );
+        // console.log('moveFinder:', moveFinder)
+        this.abilityOptions = moveFinder
+          .map((ability) => {
+            if (
+              ability &&
+              ability.description &&
+              !this.cooldowns.some((cooldown) => cooldown.name === ability.name)
+            ) {
+              // ability.execute(this.currentTurn, this.boss.name)
+              // console.log('execuTE:', ability.execute);
+              return {
+                label: ability.name,
+                description: ability.description,
+                value: `player_ability_${ability.name}`,
+              };
+            }
+          })
+          .filter(Boolean); // Remove undefined items
+        // If there are no abilities available, add a failsafe option
+        if (this.abilityOptions.length === 0) {
+          this.abilityOptions.push({
+            label: "Cooldown",
+            description: "Your abilities are on cooldown",
+            value: "cooldown",
+          });
+        }
+        // console.log('abilityOptions:', this.abilityOptions)
+      } catch (error) {
+        console.log("moveOptionsError:", error);
+      }
+    } else if (this.currentTurn === this.opponent.name) {
+      const playerAbility = classes[this.opponent.class].abilities;
+      // console.log('stuffimportant:', playerAbility)
+      try {
+        const moveFinder = playerAbility.map((cardName) =>
+          getPlayerMoves(cardName)
+        );
+        // console.log('moveFinder:', moveFinder)
+        this.abilityOptions = moveFinder
+          .map((ability) => {
+            if (
+              ability &&
+              ability.description &&
+              !this.cooldowns.some((cooldown) => cooldown.name === ability.name)
+            ) {
+              // ability.execute(this.currentTurn, this.boss.name)
+              // console.log('execuTE:', ability.execute);
+              return {
+                label: ability.name,
+                description: ability.description,
+                value: `player_ability_${ability.name}`,
+              };
+            }
+          })
+          .filter(Boolean); // Remove undefined items
+        // If there are no abilities available, add a failsafe option
+        if (this.abilityOptions.length === 0) {
+          this.abilityOptions.push({
+            label: "Cooldown",
+            description: "Your abilities are on cooldown",
+            value: "cooldown",
+          });
+        }
+        // console.log('abilityOptions:', this.abilityOptions)
+      } catch (error) {
+        console.log("moveOptionsError:", error);
+      }
+      this.pickEnemyOptions = this.aliveEnemies.map((enemy, index) => ({
+        label: enemy.name,
+        description: `Attack ${enemy.name}`,
+        value: `enemy_${index}`,
+      }));
+      try {
+        this.selectMenu = new StringSelectMenuBuilder()
+          .setCustomId("action_select")
+          .setPlaceholder("Select the target")
+          .addOptions(this.pickEnemyOptions);
+        //   console.log('This.selectEmnu:', this.selectMenu)
+
+        const stringMenu = new StringSelectMenuBuilder()
+          .setCustomId("starter")
+          .setPlaceholder("Make a selection!")
+          .addOptions(this.abilityOptions);
+
+        const stringMenuRow = new ActionRowBuilder().addComponents(stringMenu);
+        // console.log('stringMENUROW:', stringMenuRow)
+        const gaeRow = new ActionRowBuilder().addComponents(
+          await this.selectMenu
+        );
+
+        var rows = [buttonRow, stringMenuRow, gaeRow];
+      } catch (error) {
+        console.log("error:", error);
+      }
+      return rows;
     }
   }
 
@@ -442,4 +584,266 @@ class Duel {
     await this.fillHpBars();
     return nextTurn;
   } //
+  async sendInitialEmbed() {
+    try {
+      console.log(this.player.name, "-inside", this.player.attackBarEmoji);
+      this.battleEmbed = new EmbedBuilder()
+        .setTitle(`${this.player.name} VS ${this.opponent.name}`)
+        .setDescription(`**Current Turn:** \`\`${this.currentTurn}\`\``)
+        // .setFooter({
+        //   text: "You can run if you want lol no issues",
+        // })
+        .setColor(0x0099ff);
+      //   this.battleEmbed.addFields({
+      //     name: `Current Turn`,
+      //     value: `\`\`\`${this.currentTurn}\`\`\``,
+      //     inline: false,
+      //   });
+      let playerAndFamiliarsInfo = ""; // Initialize an empty string to store the info
+
+      for (const familiar of this.allyFamiliars) {
+        playerAndFamiliarsInfo += `[2;37m ${familiar.name}: ⚔️${
+          familiar.stats.attack
+        } 🛡️${familiar.stats.defense} 💨${familiar.stats.speed}\n[2;32m ${
+          familiar.hpBarEmoji
+        } ${familiar.stats.hp} ♥️\n[2;36m [2;34m${familiar.attackBarEmoji} ${Math.floor(
+          familiar.atkBar
+        )} 🙋\n\n`;
+      }
+
+      // Add the player's HP and AttackBar to the info
+      playerAndFamiliarsInfo += `[2;37m ${this.player.name}: ⚔️${
+        this.player.stats.attack
+      } 🛡️${this.player.stats.defense} 💨${this.player.stats.speed} 🔮${
+        this.player.stats.magic
+      }\n[2;32m ${this.player.hpBarEmoji} ${this.player.stats.hp} ♥️\n[2;36m [2;34m${
+        this.player.attackBarEmoji
+      } ${Math.floor(this.player.atkBar)} 🙋`;
+
+      this.battleEmbed.addFields({
+        name: `${this.player.name}'s Team Info`,
+        value: `\`\`\`ansi\n${playerAndFamiliarsInfo}\`\`\``,
+        inline: false,
+      });
+      let opponentAndFamiliarsInfo = ""; // Initialize an empty string to store the info
+
+      for (const familiar of this.enemyFamiliars) {
+        opponentAndFamiliarsInfo += `[2;37m ${familiar.name}: ⚔️${
+          familiar.stats.attack
+        } 🛡️${familiar.stats.defense} 💨${familiar.stats.speed}\n[2;32m ${
+          familiar.hpBarEmoji
+        } ${familiar.stats.hp} ♥️\n[2;36m [2;34m${familiar.attackBarEmoji} ${Math.floor(
+          familiar.atkBar
+        )} 🙋\n\n`;
+      }
+
+      // Add the player's HP and AttackBar to the info
+      opponentAndFamiliarsInfo += `[2;37m ${this.opponent.name}: ⚔️${
+        this.player.stats.attack
+      } 🛡️${this.player.stats.defense} 💨${this.player.stats.speed} 🔮${
+        this.player.stats.magic
+      }\n[2;32m ${this.player.hpBarEmoji} ${this.player.stats.hp} ♥️\n[2;36m [2;34m${
+        this.player.attackBarEmoji
+      } ${Math.floor(this.player.atkBar)} 🙋`;
+
+      this.battleEmbed.addFields({
+        name: `${this.opponent.name}'s Team Info:`,
+        value: `\`\`\`ansi\n${opponentAndFamiliarsInfo}\`\`\``,
+        inline: false,
+      });
+
+      console.log("battleLOgsLengthBefore", this.battleLogs.length);
+      if (this.battleLogs.length > 6 && this.battleLogs.length <= 7) {
+        this.battleLogs.shift();
+      } else if (this.battleLogs.length > 7 && this.battleLogs.length <= 8) {
+        this.battleLogs.shift();
+        this.battleLogs.shift();
+      } else if (this.battleLogs.length > 8) {
+        this.battleLogs.shift();
+        this.battleLogs.shift();
+        this.battleLogs.shift();
+      }
+      console.log("battleLogsLengthAfterr:", this.battleLogs.length);
+
+      if (this.battleLogs.length > 0) {
+        this.battleEmbed.addFields({
+          name: "Battle Logs",
+          value: "```diff\n" + this.battleLogs.join("\n") + "```",
+          inline: false,
+        });
+      } else {
+        this.battleEmbed.addFields({
+          name: "Battle Logs",
+          value: "No battle logs yet.",
+          inline: false,
+        });
+      }
+      return this.battleEmbed;
+      // return await message.channel.send({ embeds: [initialEmbed], components: [buttonRow] });
+    } catch (error) {
+      console.error("Error on hit:", error);
+    }
+    // Implement code to send an initial embed with battle information
+  }
+
+  async startBattle(message) {
+    console.log("startBattle");
+
+    await this.getNextTurn();
+    console.log("currentTurn:", this.currentTurn);
+    this.initialMessage = await this.sendInitialEmbed(message);
+    console.log("initialMessage:", this.initialMessage);
+    this.initialMessage = await message.channel.send({
+      embeds: [this.initialMessage],
+      components: await this.getDuelActionRow(),
+    });
+    console.log("initialMessage2:");
+    if (this.enemyFirst) {
+      this.printBattleResult();
+      const updatedEmbed = await this.sendInitialEmbed(message);
+      await this.initialMessage.edit({
+        embeds: [updatedEmbed],
+        components: await this.getDuelActionRow(),
+      });
+    }
+    const filter = (i) =>
+      (i.user.id === message.user.id && i.customId.startsWith("action_")) ||
+      i.customId === "starter";
+
+    const collector = this.initialMessage.createMessageComponentCollector({
+      filter,
+      time: 600000,
+    });
+    // Handle button interactions
+    collector.on("collect", async (i) => {
+      await i.deferUpdate();
+      console.log("customid:", i.customId);
+
+      if (i.customId === "action_normal") {
+        try {
+          console.log("aliveEnemiesearlY:", this.aliveEnemies);
+          if (this.pickedChoice || this.aliveEnemies.length === 1) {
+            this.pickedChoice = true; // i can use mongodb to allow people to turn this off and on
+            if (this.aliveEnemies.length === 1) {
+              console.log("aliveEnemies:", this.aliveEnemies);
+              this.enemyToHit = this.aliveEnemies[0];
+            }
+            this.performTurn(message);
+            await cycleCooldowns(this.cooldowns);
+            await this.getNextTurn();
+            await this.performEnemyTurn(message);
+            console.log("currentTurn:", this.currentTurn);
+            this.printBattleResult();
+          } else {
+            i.followUp({
+              content: "Please pick an enemy to hit using the Select Menu",
+              ephemeral: true,
+            });
+          }
+        } catch (error) {
+          console.error("Error on hit:", error);
+        }
+      } else if (i.customId === "action_select") {
+        const targetIndex = i.values[0];
+        const realTarget = targetIndex.replace("enemy_", "");
+        this.enemyToHit = this.aliveEnemies[realTarget];
+        this.pickedChoice = true;
+        // Continue with your code logic after selecting an enemy
+      } else if (i.customId === "starter") {
+        const selectedClassValue = i.values[0]; // Get the selected value // gae shit
+        console.log("selectedValues", selectedClassValue);
+        if (this.pickedChoice || this.aliveEnemies.length === 1) {
+          this.pickedChoice = true;
+
+          if (this.aliveEnemies.length === 1) {
+            this.enemyToHit = this.aliveEnemies[0];
+          }
+          if (selectedClassValue.startsWith("player_ability_")) {
+            try {
+              const abilityName = selectedClassValue.replace(
+                "player_ability_",
+                ""
+              );
+              console.log("abilityName:a", abilityName);
+              const abilityNameCamel = await this.toCamelCase(abilityName);
+              console.log("abilityName:a", abilityNameCamel);
+              // Check if the abilityName exists as a method in the Ability class
+              if (typeof this.ability[abilityNameCamel] === "function") {
+                const method = this.ability[abilityNameCamel];
+
+                if (method) {
+                  const functionAsString = method.toString();
+                  console.log("functionAsString:", functionAsString);
+                  const parameterNames = functionAsString
+                    .replace(/[/][/].*$/gm, "") // remove inline comments
+                    .replace(/\s+/g, "") // remove white spaces
+                    .replace(/[/][*][^/*]*[*][/]/g, "") // remove multiline comments
+                    .split("){", 1)[0]
+                    .replace(/^[^(]*[(]/, "") // extract the parameters
+                    .split(",")
+                    .filter(Boolean); // split the parameters into an array
+
+                  console.log(
+                    `Method ${abilityNameCamel} has the following parameters: ${parameterNames.join(
+                      ", "
+                    )}`
+                  );
+                } else {
+                  console.log(`Method ${abilityNameCamel} does not exist.`);
+                }
+                this.ability[abilityNameCamel](
+                  this.player,
+                  this.enemyToHit,
+                  this.aliveEnemies
+                );
+                await cycleCooldowns(this.cooldowns);
+                await this.getNextTurn();
+                await this.performEnemyTurn(message);
+                console.log("currentTurn:", this.currentTurn);
+                this.printBattleResult();
+                const updatedEmbed = await this.sendInitialEmbed(message);
+              } else {
+                console.log(`Ability ${abilityName} not found.`);
+              }
+            } catch (error) {
+              console.error("Error on hit:", error);
+              message.channel.send(
+                'You perhaps have not selected a class yet. Please select it using "a!classselect", and select race using "a!raceselect".'
+              );
+            }
+          } else if (selectedClassValue.startsWith("fam-")) {
+            try {
+              const abilityName = selectedClassValue.replace("fam-", "");
+              console.log("abilityName:a", abilityName);
+              const abilityNameCamel = await this.toCamelCase(abilityName);
+              console.log("abilityName:a", abilityNameCamel);
+              if (typeof this.ability[abilityNameCamel] === "function") {
+                // Execute the ability by calling it using square brackets
+                for (const familiar of this.familiarInfo) {
+                  if (familiar.name === this.currentTurn) {
+                    this.ability[abilityNameCamel](familiar, this.enemyToHit);
+                    await cycleCooldowns(this.cooldowns);
+                    await this.getNextTurn();
+                    await this.performEnemyTurn(message);
+                    console.log("currentTurn:", this.currentTurn);
+                    this.printBattleResult();
+                    break;
+                  }
+                }
+              } else {
+                console.log(`Ability ${abilityName} not found.`);
+              }
+            } catch (error) {
+              console.log("ErrorFamiliar:", error);
+            }
+          }
+        } else {
+          i.followUp({
+            content: "Please pick an enemy to hit using the Select Menu",
+            ephemeral: true,
+          });
+        }
+      }
+    });
+  }
 }
