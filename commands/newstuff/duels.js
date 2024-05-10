@@ -58,7 +58,9 @@ class Duel {
     this.alivePlayerTeam = [];
     this.aliveOpponentTeam = [];
     this.deadCharacters = [];
+    this.sendFollowUp = true;
     this.teamTurn = null;
+    this.ability = new Ability(this);
   }
   async initialiseStuff() {
     console.log("initialised");
@@ -163,7 +165,7 @@ class Duel {
         //     character.hpBarEmoji;
       }
 
-         this.aliveCharacters = this.aliveCharacters.flat();
+      this.aliveCharacters = this.aliveCharacters.flat();
     } catch (error) {
       console.log("The error is here:", error);
     }
@@ -217,6 +219,7 @@ class Duel {
             this.continue = false;
           }
           if (selectedValueName === "accept") {
+            gaeMessage.delete();
             this.continue = true;
           }
           if (this.continue) {
@@ -364,7 +367,7 @@ class Duel {
       })
     ) {
       this.teamTurn = this.opponent.name;
-      this.pickEnemyOptions = this.allies.map((enemy, index) => ({
+      this.pickEnemyOptions = this.alivePlayerTeam.map((enemy, index) => ({
         label: enemy.name,
         description: `Attack ${enemy.name}`,
         value: `enemy_${index}`,
@@ -406,7 +409,7 @@ class Duel {
       })
     ) {
       this.teamTurn = this.player.name;
-      this.pickEnemyOptions = this.opponentsTeam.map((enemy, index) => ({
+      this.pickEnemyOptions = this.aliveOpponentTeam.map((enemy, index) => ({
         label: enemy.name,
         description: `Attack ${enemy.name}`,
         value: `enemy_${index}`,
@@ -899,7 +902,8 @@ class Duel {
       });
     }
     const filter = (i) =>
-      (i.user.id === message.author.id && i.customId.startsWith("action_")) ||
+      i.user.id === message.author.id ||
+      (i.user.id === this.opponent._id && i.customId.startsWith("action_")) ||
       i.customId === "starter";
 
     const collector = this.initialMessage.createMessageComponentCollector({
@@ -913,16 +917,32 @@ class Duel {
 
       if (i.customId === "action_normal") {
         try {
-          if (this.teamTurn === this.player.name) {
+          if (
+            this.teamTurn === this.player.name &&
+            i.user.id === this.player._id
+          ) {
+            console.log("true");
             if (this.aliveOpponentTeam.length === 1) {
               this.pickedChoice = true;
+              this.sendFollowUp = true;
               this.enemyToHit = this.aliveOpponentTeam[0];
             }
-          } else if (this.teamTurn === this.opponent.name) {
+          } else if (
+            this.teamTurn === this.opponent.name &&
+            i.user.id === this.opponent._id
+          ) {
             if (this.alivePlayerTeam.length === 1) {
               this.pickedChoice = true;
+              this.sendFollowUp = true;
               this.enemyToHit = this.alivePlayerTeam[0];
             }
+          } else {
+            this.pickedChoice = false;
+            this.sendFollowUp = false;
+            await i.followUp({
+              content: "I dont think it is your turn dawg.",
+              ephemeral: true,
+            });
           }
           if (this.pickedChoice) {
             this.pickedChoice = true; // i can use mongodb to allow people to turn this off and on
@@ -933,10 +953,12 @@ class Duel {
             console.log("currentTurn:", this.currentTurn);
             this.printBattleResult();
           } else {
-            i.followUp({
-              content: "Please pick an enemy to hit using the Select Menu",
-              ephemeral: true,
-            });
+            if (this.sendFollowUp) {
+              i.followUp({
+                content: "Please pick an enemy to hit using the Select Menu",
+                ephemeral: true,
+              });
+            }
           }
         } catch (error) {
           console.error("Error on hit:", error);
@@ -1004,20 +1026,20 @@ class Duel {
                   console.log(`Method ${abilityNameCamel} does not exist.`);
                 }
                 if (this.teamTurn === this.player.name) {
-                this.ability[abilityNameCamel](
-                  this.player,
-                  this.enemyToHit,
-                  this.aliveOpponentTeam
-                );
-              } else if (this.teamTurn === this.opponent.name) {
-                this.ability[abilityNameCamel](
-                  this.opponent,
-                  this.enemyToHit,
-                  this.alivePlayerTeam
-                );
+                  this.ability[abilityNameCamel](
+                    this.player,
+                    this.enemyToHit,
+                    this.aliveOpponentTeam
+                  );
+                } else if (this.teamTurn === this.opponent.name) {
+                  this.ability[abilityNameCamel](
+                    this.opponent,
+                    this.enemyToHit,
+                    this.alivePlayerTeam
+                  );
+                }
                 await cycleCooldowns(this.cooldowns);
                 await this.getNextTurn();
-                await this.performEnemyTurn(message);
                 console.log("currentTurn:", this.currentTurn);
                 this.printBattleResult();
                 const updatedEmbed = await this.sendInitialEmbed(message);
@@ -1038,15 +1060,33 @@ class Duel {
               console.log("abilityName:a", abilityNameCamel);
               if (typeof this.ability[abilityNameCamel] === "function") {
                 // Execute the ability by calling it using square brackets
-                for (const familiar of this.familiarInfo) {
-                  if (familiar.name === this.currentTurn) {
-                    this.ability[abilityNameCamel](familiar, this.enemyToHit);
-                    await cycleCooldowns(this.cooldowns);
-                    await this.getNextTurn();
-                    await this.performEnemyTurn(message);
-                    console.log("currentTurn:", this.currentTurn);
-                    this.printBattleResult();
-                    break;
+                if (this.teamTurn === this.player.name) {
+                  for (const familiar of this.characters) {
+                    if (
+                      familiar.name === this.currentTurn &&
+                      this.currentTurnId === this.player._id
+                    ) {
+                      this.ability[abilityNameCamel](familiar, this.enemyToHit);
+                      await cycleCooldowns(this.cooldowns);
+                      await this.getNextTurn();
+                      console.log("currentTurn:", this.currentTurn);
+                      this.printBattleResult();
+                      break;
+                    }
+                  }
+                } else if (this.teamTurn === this.opponent.name) {
+                  for (const familiar of this.characters) {
+                    if (
+                      familiar.name === this.currentTurn &&
+                      this.currentTurnId === this.opponent._id
+                    ) {
+                      this.ability[abilityNameCamel](familiar, this.enemyToHit);
+                      await cycleCooldowns(this.cooldowns);
+                      await this.getNextTurn();
+                      console.log("currentTurn:", this.currentTurn);
+                      this.printBattleResult();
+                      break;
+                    }
                   }
                 }
               } else {
@@ -1105,76 +1145,40 @@ class Duel {
         break;
       }
     }
-    if (this.aliveCharacters.length === 0) {
-      const rewards = this.enemyDetails.rewards;
-      if (this.player.activeQuests) {
-        for (const activeQuestName in this.player.activeQuests) {
-          if (this.player.activeQuests.hasOwnProperty(activeQuestName)) {
-            const activeQuestDetails = quests[activeQuestName];
-            const activeQuestDetails2 =
-              this.player.activeQuests[activeQuestName];
-            console.log(`stuffHere: ${activeQuestDetails.title}`);
-            console.log(`stuffHere: ${activeQuestDetails2.objectives[0]}`);
-          }
-        }
-      }
-
-      this.mobs.forEach((mobName) => {
-        for (const questName in this.player.activeQuests) {
-          if (this.player.activeQuests.hasOwnProperty(questName)) {
-            const objectives = this.player.activeQuests[questName].objectives;
-
-            // Iterate through all objective elements
-            for (const objective of objectives) {
-              console.log("objectiveNameTargetnotMatch:", objective.target);
-              if (objective.target === mobName) {
-                console.log("objectiveNameTarget:", objective.target);
-                // Match found, increment objective.current by 1
-                objective.current = String(Number(objective.current) + 1);
-                console.log("thisisobjective.current:", objective.current);
-              }
-            }
-          }
-        }
-      });
-      // try {
-      //   const filter = { _id: this.player._id };
-      //   const playerData2 = await collection.findOne(filter);
-      //   if (playerData2) {
-      //     // Create an object with only the xp property to update
-      //     const updates = {
-      //       $inc: {
-      //         "exp.xp": rewards.experience,
-      //         "balance.coins": rewards.gold,
-      //       },
-      //       $set: { activeQuests: this.player.activeQuests },
-      //     };
-      //     console.log("rewards.xpereince:", rewards.experience);
-      //     // Update the player's document with the xpUpdate object
-      //     await collection.updateOne(filter, updates);
-
-      //     console.log("Player XP updated:", updates);
-      //   } else {
-      //     console.log("Player not found or updated.");
-      //   }
-      // } catch (error) {
-      //   console.error("Error updating player XP:", error);
-      // }
-      // console.log("thisplayeractiveQuest:", this.player.activeQuests);
-
-      this.battleEmbed.setFields({
-        name: `You won the battle against the Monster, you can continue the journey where you left off (I lied  you can't)!!`,
-        value: `Rewards:\n Exp: ${rewards.experience}, Gold: ${rewards.gold}`,
+    if (this.alivePlayerTeam.length === 0) {
+      const battleEmbed = new EmbedBuilder().setTitle(
+        `The battle has been concluded!!`
+      );
+      battleEmbed.setFields({
+        name: `GGs ${this.opponent.name}You've won!!`,
+        value: `The player ${this.opponent.name} has won the battle against ${this.player.name} \n Skill issues honestly lol`,
         inline: true,
       });
-      this.battleEmbed.setDescription(`GGs You've won`);
+      // this.initialMessage.edit({
+      //   embeds: [this.battleEmbed],
+      //   components: [],
+      // });
+      updatedEmbed = await this.sendInitialEmbed(this.message);
       this.initialMessage.edit({
-        embeds: [this.battleEmbed],
+        embeds: [updatedEmbed],
         components: [],
       });
-    } else if (this.player.stats.hp < 0) {
-      this.message.channel.send("You lost, skill issue.");
-      this.player.stats.speed = 0;
+      this.message.channel.send({ embeds: [battleEmbed] });
+    } else if (this.aliveOpponentTeam.length === 0) {
+      const battleEmbed = new EmbedBuilder().setTitle(
+        `The battle has been concluded!!`
+      );
+      battleEmbed.setFields({
+        name: `GGs ${this.player.name}You've won!!`,
+        value: `The player ${this.player.name} has won the battle against ${this.opponent.name} \n Skill issues honestly lol`,
+        inline: true,
+      });
+      updatedEmbed = await this.sendInitialEmbed(this.message);
+      this.initialMessage.edit({
+        embeds: [updatedEmbed],
+        components: [],
+      });
+      this.message.channel.send({ embeds: [battleEmbed] });
     } else {
       updatedEmbed = await this.sendInitialEmbed(this.message);
       this.initialMessage.edit({
