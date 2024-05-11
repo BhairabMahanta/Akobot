@@ -219,7 +219,7 @@ module.exports = {
         });
 
         collector.on("end", (collected) => {
-          if (!sentMessage.deleted) {
+          if (sentMessage) {
             sentMessage.edit({ components: [] });
           }
         });

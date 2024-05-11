@@ -110,7 +110,10 @@ module.exports = {
       .setColor("#00FFFF");
 
     // Send the embed with the SelectMenu
-    await message.channel.send({ embeds: [embed], components: [row] });
+    const messageja = await message.channel.send({
+      embeds: [embed],
+      components: [row],
+    });
 
     // Handle SelectMenu interactions
     const filterr = (interaction) => {
@@ -120,50 +123,54 @@ module.exports = {
       );
     };
 
-    const collector = message.channel.createMessageComponentCollector({
+    const collector = messageja.createMessageComponentCollector({
       filterr,
       time: 300000,
     });
     let selectedFamiliars = [];
 
     collector.on("collect", async (interaction) => {
-      const selectedValues = interaction.values;
+      try {
+        const selectedValues = interaction.values;
 
-      console.log("Selected values:", selectedValues);
+        console.log("Selected values:", selectedValues);
 
-      // Update the selectedFamiliars array
-      selectedFamiliars = selectedValues;
+        // Update the selectedFamiliars array
+        selectedFamiliars = selectedValues;
 
-      // Update the SelectMenu options
-      selectMenu.setOptions(
-        familiars.map((familiar, i) => {
-          const isSelected = selectedValues.includes(familiar);
-          return { label: familiar, value: familiar, default: false };
-        })
-      );
-      console.log("selectedFamiliars:", selectedFamiliars);
-      const selectedFamiliarsArray = [];
-      selectedFamiliarsArray.push(selectedFamiliars);
-      console.log("sfArray:", selectedFamiliarsArray);
-      // Update the embed
-      embed.setDescription(
-        "You have selected the following familiars:\n" +
-          selectedFamiliars.join("\n")
-      );
-      // players[playerId].selectedFamiliars.name = selectedFamiliars;
-      await updateClass(playerId, selectedFamiliarsArray);
-      // Save the updated data back to the file
-      // fs.writeFile('./data/players.json', JSON.stringify(players, null, 2), 'utf8', (writeErr) => {
-      //   if (writeErr) {
-      //     console.error('Error writing updated player data:', writeErr);
-      //   }
-      // });
+        // Update the SelectMenu options
+        selectMenu.setOptions(
+          familiars.map((familiar, i) => {
+            const isSelected = selectedValues.includes(familiar);
+            return { label: familiar, value: familiar, default: false };
+          })
+        );
+        console.log("selectedFamiliars:", selectedFamiliars);
+        const selectedFamiliarsArray = [];
+        selectedFamiliarsArray.push(selectedFamiliars);
+        console.log("sfArray:", selectedFamiliarsArray);
+        // Update the embed
+        embed.setDescription(
+          "You have selected the following familiars:\n" +
+            selectedFamiliars.join("\n")
+        );
+        // players[playerId].selectedFamiliars.name = selectedFamiliars;
+        await updateClass(playerId, selectedFamiliarsArray);
+        // Save the updated data back to the file
+        // fs.writeFile('./data/players.json', JSON.stringify(players, null, 2), 'utf8', (writeErr) => {
+        //   if (writeErr) {
+        //     console.error('Error writing updated player data:', writeErr);
+        //   }
+        // });
 
-      // Send the updated embed with the SelectMenu
-      interaction.update({
-        embeds: [embed],
-        components: [new ActionRowBuilder().addComponents(selectMenu)],
-      });
+        // Send the updated embed with the SelectMenu
+        interaction.update({
+          embeds: [embed],
+          components: [new ActionRowBuilder().addComponents(selectMenu)],
+        });
+      } catch (err) {
+        console.error("Error updating player data:", err);
+      }
     });
 
     collector.on("end", () => {
