@@ -1053,7 +1053,7 @@ class Battle {
       const rewards = this.enemyDetails.rewards;
       if (this.player.activeQuests) {
         for (const activeQuestName in this.player.activeQuests) {
-          if (this.player.activeQuests.hasOwnProperty(activeQuestName)) {
+          if (this.player.activeQuests.hasOwn(activeQuestName)) {
             const activeQuestDetails = quests[activeQuestName];
             const activeQuestDetails2 =
               this.player.activeQuests[activeQuestName];
@@ -1065,7 +1065,7 @@ class Battle {
 
       this.mobs.forEach((mobName) => {
         for (const questName in this.player.activeQuests) {
-          if (this.player.activeQuests.hasOwnProperty(questName)) {
+          if (this.player.activeQuests.hasOwn(questName)) {
             const objectives = this.player.activeQuests[questName].objectives;
 
             // Iterate through all objective elements
