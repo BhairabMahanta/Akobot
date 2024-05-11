@@ -72,7 +72,7 @@ class Duel {
           console.log("gay");
           this.playerFamiliar = { name: ["Fire Dragon"] };
           this.message.channel.send(
-            "You have to select your familiar first using a!selectFamiliar"
+            "You have to select your familiar first using a!selectfamiliar"
           );
           this.continue = false;
         }
@@ -167,6 +167,9 @@ class Duel {
 
       this.aliveCharacters = this.aliveCharacters.flat();
     } catch (error) {
+      this.message.channel.send(
+        "Please select a class, your race and also select your familiars!"
+      );
       console.log("The error is here:", error);
     }
   }
@@ -785,15 +788,10 @@ class Duel {
       this.battleEmbed = new EmbedBuilder()
         .setTitle(`${this.player.name} VS ${this.opponent.name}`)
         .setDescription(`**Current Turn:** \`\`${this.currentTurn}\`\``)
-        // .setFooter({
-        //   text: "You can run if you want lol no issues",
-        // })
+        .setFooter({
+          text: `Team Turn: ${this.teamTurn}'s Team!`,
+        })
         .setColor(0x0099ff);
-      //   this.battleEmbed.addFields({
-      //     name: `Current Turn`,
-      //     value: `\`\`\`${this.currentTurn}\`\`\``,
-      //     inline: false,
-      //   });
       let playerAndFamiliarsInfo = ""; // Initialize an empty string to store the info
 
       for (const familiar of this.allyFamiliars) {
@@ -964,13 +962,23 @@ class Duel {
           console.error("Error on hit:", error);
         }
       } else if (i.customId === "action_select") {
+        // if (
+        //   this.teamTurn === this.player.name &&
+        //   i.user.id === this.player._id
+        // ) {} else if ( this.teamTurn === this.opponent.name && i.user.id === this.opponent._id) {}
         const targetIndex = i.values[0];
         console.log("targetIndex:", targetIndex);
         const realTarget = targetIndex.replace("enemy_", "");
-        if (this.teamTurn === this.player.name) {
+        if (
+          this.teamTurn === this.player.name &&
+          i.user.id === this.player._id
+        ) {
           this.enemyToHit = this.aliveOpponentTeam[realTarget];
           this.pickedChoice = true;
-        } else if (this.teamTurn === this.opponent.name) {
+        } else if (
+          this.teamTurn === this.opponent.name &&
+          i.user.id === this.opponent._id
+        ) {
           this.enemyToHit = this.alivePlayerTeam[realTarget];
           this.pickedChoice = true;
         }
@@ -978,12 +986,18 @@ class Duel {
       } else if (i.customId === "starter") {
         const selectedClassValue = i.values[0]; // Get the selected value // gae shit
         console.log("selectedValues", selectedClassValue);
-        if (this.teamTurn === this.player.name) {
+        if (
+          this.teamTurn === this.player.name &&
+          i.user.id === this.player._id
+        ) {
           if (this.aliveOpponentTeam.length === 1) {
             this.pickedChoice = true;
             this.enemyToHit = this.aliveOpponentTeam[0];
           }
-        } else if (this.teamTurn === this.opponent.name) {
+        } else if (
+          this.teamTurn === this.opponent.name &&
+          i.user.id === this.opponent._id
+        ) {
           if (this.alivePlayerTeam.length === 1) {
             this.pickedChoice = true;
             this.enemyToHit = this.alivePlayerTeam[0];
@@ -1025,13 +1039,19 @@ class Duel {
                 } else {
                   console.log(`Method ${abilityNameCamel} does not exist.`);
                 }
-                if (this.teamTurn === this.player.name) {
+                if (
+                  this.teamTurn === this.player.name &&
+                  i.user.id === this.player._id
+                ) {
                   this.ability[abilityNameCamel](
                     this.player,
                     this.enemyToHit,
                     this.aliveOpponentTeam
                   );
-                } else if (this.teamTurn === this.opponent.name) {
+                } else if (
+                  this.teamTurn === this.opponent.name &&
+                  i.user.id === this.opponent._id
+                ) {
                   this.ability[abilityNameCamel](
                     this.opponent,
                     this.enemyToHit,
@@ -1060,7 +1080,10 @@ class Duel {
               console.log("abilityName:a", abilityNameCamel);
               if (typeof this.ability[abilityNameCamel] === "function") {
                 // Execute the ability by calling it using square brackets
-                if (this.teamTurn === this.player.name) {
+                if (
+                  this.teamTurn === this.player.name &&
+                  i.user.id === this.player._id
+                ) {
                   for (const familiar of this.characters) {
                     if (
                       familiar.name === this.currentTurn &&
@@ -1074,7 +1097,10 @@ class Duel {
                       break;
                     }
                   }
-                } else if (this.teamTurn === this.opponent.name) {
+                } else if (
+                  this.teamTurn === this.opponent.name &&
+                  i.user.id === this.opponent._id
+                ) {
                   for (const familiar of this.characters) {
                     if (
                       familiar.name === this.currentTurn &&
