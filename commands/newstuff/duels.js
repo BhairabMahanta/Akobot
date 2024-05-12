@@ -6,6 +6,10 @@ const { cycleCooldowns } = require("../adv/adventure/sumfunctions.js");
 const { bosses } = require("../adv/monsterInfo/bosses.js");
 const { mobs } = require("../adv/monsterInfo/mobs.js");
 const { cards } = require("../adv/information/cards.js"); // Import the cards data from 'cards.js'
+
+const {
+  calculate_damage,
+} = require("../../my_rust_library/my_rust_library.node");
 const {
   checkResults,
   getCardStats,
@@ -470,10 +474,18 @@ class Duel {
       // const move = attacker.chooseMove(); // Implement this method for the player
 
       const target = this.enemyToHit.name;
-      const damage = await calculateDamage(
+      const damage = calculate_damage(
         this.player.stats.attack,
         this.enemyToHit.stats.defense
       );
+      // .then((result) => {
+      //   console.log("Damage:", result);
+      //   // Do something with the calculated damage
+      // })
+      // .catch((error) => {
+      //   console.error("Error:", error);
+      //   // Handle the error
+      // });
 
       // Update HP and battle logs
       this.enemyToHit.stats.hp -= damage;
