@@ -2,6 +2,7 @@ const allFamiliars = {
   Tier1: {
     "Fire Blob": {
       id: 1,
+      sl: 1,
       name: "Fire Blob",
       element: "Fire",
       tier: 1,
@@ -36,6 +37,7 @@ const allFamiliars = {
     },
     "Water Nymph": {
       id: 2,
+      sl: 2,
       name: "Water Nymph",
       element: "Water",
       tier: 1,
@@ -70,6 +72,7 @@ const allFamiliars = {
     },
     "Earth Golem": {
       id: 3,
+      sl: 3,
       name: "Earth Golem",
       element: "Earth",
       tier: 1,
@@ -104,6 +107,7 @@ const allFamiliars = {
     },
     "Air Sylph": {
       id: 4,
+      sl: 4,
       name: "Air Sylph",
       element: "Air",
       tier: 1,
@@ -138,6 +142,7 @@ const allFamiliars = {
     },
     "Thunder Imp": {
       id: 5,
+      sl: 5,
       name: "Thunder Imp",
       element: "Electric",
       tier: 1,
@@ -172,6 +177,7 @@ const allFamiliars = {
     },
     "Shadow Panther": {
       id: 6,
+      sl: 6,
       name: "Shadow Panther",
       element: "Dark",
       tier: 1,
@@ -206,6 +212,7 @@ const allFamiliars = {
     },
     "Leaf Sprite": {
       id: 7,
+      sl: 7,
       name: "Leaf Sprite",
       element: "Nature",
       tier: 1,
@@ -240,6 +247,7 @@ const allFamiliars = {
     },
     "Frost Wyvern": {
       id: 8,
+      sl: 8,
       name: "Frost Wyvern",
       element: "Ice",
       tier: 1,
@@ -274,6 +282,7 @@ const allFamiliars = {
     },
     "Magma Salamander": {
       id: 9,
+      sl: 9,
       name: "Magma Salamander",
       element: "Fire",
       tier: 1,
@@ -308,6 +317,7 @@ const allFamiliars = {
     },
     "Goblin Archer": {
       id: 10,
+      sl: 10,
       name: "Goblin Archer",
       element: "Neutral",
       tier: 1,
@@ -342,6 +352,7 @@ const allFamiliars = {
     },
     Rockling: {
       id: 11,
+      sl: 11,
       name: "Rockling",
       element: "Earth",
       tier: 1,
@@ -376,6 +387,7 @@ const allFamiliars = {
     },
     "Gale Hawk": {
       id: 12,
+      sl: 12,
       name: "Gale Hawk",
       element: "Air",
       tier: 1,
@@ -410,6 +422,7 @@ const allFamiliars = {
     },
     "Icicle Sprite": {
       id: 13,
+      sl: 13,
       name: "Icicle Sprite",
       element: "Ice",
       tier: 1,
@@ -444,6 +457,7 @@ const allFamiliars = {
     },
     "Flame Sprite": {
       id: 14,
+      sl: 14,
       name: "Flame Sprite",
       element: "Fire",
       tier: 1,
@@ -481,6 +495,7 @@ const allFamiliars = {
   Tier2: {
     "Flame Dragon": {
       id: 15,
+      sl: 1,
       name: "Flame Dragon",
       element: "Fire",
       tier: 2,
@@ -515,6 +530,7 @@ const allFamiliars = {
     },
     "Frost Phoenix": {
       id: 16,
+      sl: 2,
       name: "Frost Phoenix",
       element: "Ice",
       tier: 2,
@@ -549,6 +565,7 @@ const allFamiliars = {
     },
     "Thunder Titan": {
       id: 17,
+      sl: 3,
       name: "Thunder Titan",
       element: "Electric",
       tier: 2,
@@ -583,6 +600,7 @@ const allFamiliars = {
     },
     "Mystic Unicorn": {
       id: 18,
+      sl: 4,
       name: "Mystic Unicorn",
       element: "Light",
       tier: 2,
@@ -617,6 +635,7 @@ const allFamiliars = {
     },
     "Shadow Assassin": {
       id: 19,
+      sl: 5,
       name: "Shadow Assassin",
       element: "Dark",
       tier: 2,
@@ -651,6 +670,7 @@ const allFamiliars = {
     },
     "Tidal Leviathan": {
       id: 20,
+      sl: 6,
       name: "Tidal Leviathan",
       element: "Water",
       tier: 2,
@@ -685,6 +705,7 @@ const allFamiliars = {
     },
     "Forest Guardian": {
       id: 21,
+      sl: 7,
       name: "Forest Guardian",
       element: "Nature",
       tier: 2,
@@ -719,6 +740,7 @@ const allFamiliars = {
     },
     "Gargoyle Sentinel": {
       id: 22,
+      sl: 8,
       name: "Gargoyle Sentinel",
       element: "Neutral",
       tier: 2,
@@ -753,6 +775,7 @@ const allFamiliars = {
     },
     "Arcane Sorcerer": {
       id: 23,
+      sl: 9,
       name: "Arcane Sorcerer",
       element: "Magic",
       tier: 2,
@@ -787,6 +810,7 @@ const allFamiliars = {
     },
     "Phoenix Guardian": {
       id: 24,
+      sl: 10,
       name: "Phoenix Guardian",
       element: "Light",
       tier: 2,
@@ -825,6 +849,7 @@ const allFamiliars = {
   Tier3: {
     "Sasuke Uchiha": {
       id: 25,
+      sl: 1,
       name: "Sasuke Uchiha",
       element: "Dark",
       tier: 3,
@@ -859,6 +884,7 @@ const allFamiliars = {
     },
     "Ichigo Kurosaki": {
       id: 26,
+      sl: 2,
       name: "Ichigo Kurosaki",
       element: "Light",
       tier: 3,
@@ -893,6 +919,7 @@ const allFamiliars = {
     },
     "Jin Mori": {
       id: 27,
+      sl: 3,
       name: "Jin Mori",
       element: "Neutral",
       tier: 3,
@@ -927,6 +954,7 @@ const allFamiliars = {
     },
     Ryuk: {
       id: 28,
+      sl: 4,
       name: "Ryuk",
       element: "Dark",
       tier: 3,
@@ -961,6 +989,7 @@ const allFamiliars = {
     },
     "Dark Reaper": {
       id: 29,
+      sl: 5,
       name: "Dark Reaper",
       element: "Dark",
       tier: 3,
@@ -995,6 +1024,7 @@ const allFamiliars = {
     },
     "Titanic Ogre": {
       id: 30,
+      sl: 6,
       name: "Titanic Ogre",
       element: "Earth",
       tier: 3,
@@ -1029,6 +1059,7 @@ const allFamiliars = {
     },
     "Hellfire Behemoth": {
       id: 31,
+      sl: 7,
       name: "Hellfire Behemoth",
       element: "Fire",
       tier: 3,
@@ -1063,6 +1094,7 @@ const allFamiliars = {
     },
     "Shadow Sentinel": {
       id: 32,
+      sl: 8,
       name: "Shadow Sentinel",
       element: "Dark",
       tier: 3,
@@ -1097,6 +1129,7 @@ const allFamiliars = {
     },
     "Volcanic Drake": {
       id: 33,
+      sl: 9,
       name: "Volcanic Drake",
       element: "Fire",
       tier: 3,
@@ -1131,6 +1164,7 @@ const allFamiliars = {
     },
     "Titanic Goliath": {
       id: 34,
+      sl: 10,
       name: "Titanic Goliath",
       element: "Earth",
       tier: 3,
@@ -1165,6 +1199,7 @@ const allFamiliars = {
     },
     "Dread Shadow": {
       id: 35,
+      sl: 11,
       name: "Dread Shadow",
       element: "Dark",
       tier: 3,
@@ -1199,6 +1234,7 @@ const allFamiliars = {
     },
     "Molten Gargoyle": {
       id: 36,
+      sl: 12,
       name: "Molten Gargoyle",
       element: "Fire",
       tier: 3,
@@ -1233,6 +1269,7 @@ const allFamiliars = {
     },
     "Frostbite Yeti": {
       id: 37,
+      sl: 13,
       name: "Frostbite Yeti",
       element: "Ice",
       tier: 3,
