@@ -559,6 +559,672 @@ class Ability {
     });
     // Implement additional effects for Healing Wave here
   }
+  async rockThrow(user, target) {
+    const power = 20;
+    const damage = await calculateDamage(
+      user.stats.attack,
+      target.stats.defense
+    );
+    target.stats.hp -= damage;
+    this.battleLogs.push(
+      `+ ${user.name} uses Rock Throw on ${target.name} dealing ${damage}.`
+    );
+    this.cooldowns.push({
+      name: `Rock Throw`,
+      cooldown: this.cooldownFinder("Rock Throw"),
+    });
+  }
+
+  async quake(user, target) {
+    const power = 30;
+    const damage = await calculateDamage(
+      user.stats.attack,
+      target.stats.defense
+    );
+    target.stats.hp -= damage;
+    this.battleLogs.push(
+      `+ ${user.name} uses Quake on ${target.name} dealing ${damage}.`
+    );
+    this.cooldowns.push({
+      name: `Quake`,
+      cooldown: this.cooldownFinder("Quake"),
+    });
+  }
+  async gust(user, target) {
+    const power = 15;
+    const damage = await calculateDamage(
+      user.stats.attack,
+      target.stats.defense
+    );
+    target.stats.hp -= damage;
+    this.battleLogs.push(
+      `+ ${user.name} uses Gust on ${target.name} dealing ${damage}.`
+    );
+    this.cooldowns.push({
+      name: `Gust`,
+      cooldown: this.cooldownFinder("Gust"),
+    });
+  }
+
+  async aerialSlash(user, target) {
+    const power = 25;
+    const damage = await calculateDamage(
+      user.stats.attack,
+      target.stats.defense
+    );
+    target.stats.hp -= damage;
+    this.battleLogs.push(
+      `+ ${user.name} uses Aerial Slash on ${target.name} dealing ${damage}.`
+    );
+    this.cooldowns.push({
+      name: `Aerial Slash`,
+      cooldown: this.cooldownFinder("Aerial Slash"),
+    });
+  }
+
+  async thunderbolt(user, target) {
+    const power = 25;
+    const damage = await calculateDamage(
+      user.stats.attack,
+      target.stats.defense
+    );
+    target.stats.hp -= damage;
+    this.battleLogs.push(
+      `+ ${user.name} uses Thunderbolt on ${target.name} dealing ${damage}.`
+    );
+    this.cooldowns.push({
+      name: `Thunderbolt`,
+      cooldown: this.cooldownFinder("Thunderbolt"),
+    });
+  }
+
+  async staticShock(user, target) {
+    const power = 20;
+    const damage = await calculateDamage(
+      user.stats.attack,
+      target.stats.defense
+    );
+    target.stats.hp -= damage;
+    this.battleLogs.push(
+      `+ ${user.name} uses Static Shock on ${target.name} dealing ${damage}.`
+    );
+    this.cooldowns.push({
+      name: `Static Shock`,
+      cooldown: this.cooldownFinder("Static Shock"),
+    });
+  }
+  async shadowStrike(user, target) {
+    const power = 20;
+    const damage = await calculateDamage(
+      user.stats.attack,
+      target.stats.defense
+    );
+    target.stats.hp -= damage;
+    this.battleLogs.push(
+      `+ ${user.name} uses Shadow Strike on ${target.name} dealing ${damage}.`
+    );
+    this.cooldowns.push({
+      name: `Shadow Strike`,
+      cooldown: this.cooldownFinder("Shadow Strike"),
+    });
+  }
+
+  async darkClaw(user, target) {
+    const power = 25;
+    const damage = await calculateDamage(
+      user.stats.attack,
+      target.stats.defense
+    );
+    target.stats.hp -= damage;
+    this.battleLogs.push(
+      `+ ${user.name} uses Dark Claw on ${target.name} dealing ${damage}.`
+    );
+    this.cooldowns.push({
+      name: `Dark Claw`,
+      cooldown: this.cooldownFinder("Dark Claw"),
+    });
+  }
+  async vineWhip(user, target) {
+    const power = 20;
+    const damage = await calculateDamage(
+      user.stats.attack,
+      target.stats.defense
+    );
+    target.stats.hp -= damage;
+    this.battleLogs.push(
+      `+ ${user.name} uses Vine Whip on ${target.name} dealing ${damage}.`
+    );
+    this.cooldowns.push({
+      name: `Vine Whip`,
+      cooldown: this.cooldownFinder("Vine Whip"),
+    });
+  }
+
+  async leafShield(user) {
+    user.stats.defense += 10; // Example: Increase defense by 10
+    this.battleLogs.push(
+      `+ ${user.name} uses Leaf Shield. Their defense is increased.`
+    );
+    this.cooldowns.push({
+      name: `Leaf Shield`,
+      cooldown: this.cooldownFinder("Leaf Shield"),
+    });
+  }
+  async iceBreath(user, target) {
+    const power = 25;
+    const damage = await calculateDamage(
+      user.stats.attack,
+      target.stats.defense
+    );
+    target.stats.hp -= damage;
+    this.battleLogs.push(
+      `+ ${user.name} uses Ice Breath on ${target.name} dealing ${damage}.`
+    );
+    this.cooldowns.push({
+      name: `Ice Breath`,
+      cooldown: this.cooldownFinder("Ice Breath"),
+    });
+  }
+
+  async freezingNova(user, target) {
+    const power = 30;
+    const damage = await calculateDamage(
+      user.stats.attack,
+      target.stats.defense
+    );
+    target.stats.hp -= damage;
+    this.battleLogs.push(
+      `+ ${user.name} uses Freezing Nova on ${target.name} dealing ${damage}.`
+    );
+    this.cooldowns.push({
+      name: `Frost Nova`,
+      cooldown: this.cooldownFinder("Frost Nova"),
+    });
+  }
+  async lavaSpit(user, target) {
+    const power = 20;
+    const damage = await calculateDamage(
+      user.stats.attack,
+      target.stats.defense
+    );
+    target.stats.hp -= damage;
+    this.battleLogs.push(
+      `+ ${user.name} uses Lava Spit on ${target.name} dealing ${damage}.`
+    );
+    this.cooldowns.push({
+      name: `Lava Spit`,
+      cooldown: this.cooldownFinder("Lava Spit"),
+    });
+  }
+
+  async scorchingTail(user, target) {
+    const power = 25;
+    const damage = await calculateDamage(
+      user.stats.attack,
+      target.stats.defense
+    );
+    target.stats.hp -= damage;
+    this.battleLogs.push(
+      `+ ${user.name} uses Scorching Tail on ${target.name} dealing ${damage}.`
+    );
+    this.cooldowns.push({
+      name: `Scorching Tail`,
+      cooldown: this.cooldownFinder("Scorching Tail"),
+    });
+  }
+  async arrowShot(user, target) {
+    const power = 20;
+    const damage = await calculateDamage(
+      user.stats.attack,
+      target.stats.defense
+    );
+    target.stats.hp -= damage;
+    this.battleLogs.push(
+      `+ ${user.name} uses Arrow Shot on ${target.name} dealing ${damage}.`
+    );
+    this.cooldowns.push({
+      name: `Arrow Shot`,
+      cooldown: this.cooldownFinder("Arrow Shot"),
+    });
+  }
+
+  async Strike(user, target) {
+    const power = 25;
+    const damage = await calculateDamage(
+      user.stats.attack,
+      target.stats.defense
+    );
+    target.stats.hp -= damage;
+    this.battleLogs.push(
+      `+ ${user.name} uses Strike on ${target.name} dealing ${damage}.`
+    );
+    this.cooldowns.push({
+      name: `Precision Strike`,
+      cooldown: this.cooldownFinder("Precision Strike"),
+    });
+  }
+  async rockToss(user, target) {
+    const power = 15;
+    const damage = await calculateDamage(
+      user.stats.attack,
+      target.stats.defense
+    );
+    target.stats.hp -= damage;
+    this.battleLogs.push(
+      `+ ${user.name} uses Rock Toss on ${target.name} dealing ${damage}.`
+    );
+    this.cooldowns.push({
+      name: `Rock Toss`,
+      cooldown: this.cooldownFinder("Rock Toss"),
+    });
+  }
+
+  async earthquake(user, target) {
+    const power = 30;
+    const damage = await calculateDamage(
+      user.stats.attack,
+      target.stats.defense
+    );
+    target.stats.hp -= damage;
+    this.battleLogs.push(
+      `+ ${user.name} uses Earthquake on ${target.name} dealing ${damage}.`
+    );
+    this.cooldowns.push({
+      name: `Earthquake`,
+      cooldown: this.cooldownFinder("Earthquake"),
+    });
+  }
+  async windSlash(user, target) {
+    const power = 20;
+    const damage = await calculateDamage(
+      user.stats.attack,
+      target.stats.defense
+    );
+    target.stats.hp -= damage;
+    this.battleLogs.push(
+      `+ ${user.name} uses Wind Slash on ${target.name} dealing ${damage}.`
+    );
+    this.cooldowns.push({
+      name: `Wind Slash`,
+      cooldown: this.cooldownFinder("Wind Slash"),
+    });
+  }
+
+  async aeroBurst(user, target) {
+    const power = 25;
+    const damage = await calculateDamage(
+      user.stats.attack,
+      target.stats.defense
+    );
+    target.stats.hp -= damage;
+    this.battleLogs.push(
+      `+ ${user.name} uses Aero Burst on ${target.name} dealing ${damage}.`
+    );
+    this.cooldowns.push({
+      name: `Aero Burst`,
+      cooldown: this.cooldownFinder("Aero Burst"),
+    });
+  }
+  async frostBite(user, target) {
+    const power = 20;
+    const damage = await calculateDamage(
+      user.stats.attack,
+      target.stats.defense
+    );
+    target.stats.hp -= damage;
+    this.battleLogs.push(
+      `+ ${user.name} uses Frost Bite on ${target.name} dealing ${damage}.`
+    );
+    this.cooldowns.push({
+      name: `Frost Bite`,
+      cooldown: this.cooldownFinder("Frost Bite"),
+    });
+  }
+
+  async iceShard(user, target) {
+    const power = 25;
+    const damage = await calculateDamage(
+      user.stats.attack,
+      target.stats.defense
+    );
+    target.stats.hp -= damage;
+    this.battleLogs.push(
+      `+ ${user.name} uses Ice Shard on ${target.name} dealing ${damage}.`
+    );
+    this.cooldowns.push({
+      name: `Ice Shard`,
+      cooldown: this.cooldownFinder("Ice Shard"),
+    });
+  }
+
+  async ember(user, target) {
+    const power = 20;
+    const damage = await calculateDamage(
+      user.stats.attack,
+      target.stats.defense
+    );
+    target.stats.hp -= damage;
+    this.battleLogs.push(
+      `+ ${user.name} uses Ember on ${target.name} dealing ${damage}.`
+    );
+    this.cooldowns.push({
+      name: `Ember`,
+      cooldown: this.cooldownFinder("Ember"),
+    });
+  }
+
+  async inferno(user, target) {
+    const power = 25;
+    const damage = await calculateDamage(
+      user.stats.attack,
+      target.stats.defense
+    );
+    target.stats.hp -= damage;
+    this.battleLogs.push(
+      `+ ${user.name} uses Inferno on ${target.name} dealing ${damage}.`
+    );
+    this.cooldowns.push({
+      name: `Inferno`,
+      cooldown: this.cooldownFinder("Inferno"),
+    });
+  }
+
+  //Tier 2
+  async fireThing(user, target) {
+    const power = 30;
+    const damage = await calculateDamage(
+      user.stats.attack,
+      target.stats.defense
+    );
+    target.stats.hp -= damage;
+    this.battleLogs.push(
+      `+ ${user.name} uses Fire Breath on ${target.name} dealing ${damage}.`
+    );
+    this.cooldowns.push({
+      name: `Fire Breath`,
+      cooldown: this.cooldownFinder("Fire Breath"),
+    });
+  }
+
+  async scorchingRoar(user, target) {
+    const power = 35;
+    const damage = await calculateDamage(
+      user.stats.attack,
+      target.stats.defense
+    );
+    target.stats.hp -= damage;
+    this.battleLogs.push(
+      `+ ${user.name} uses Scorching Roar on ${target.name} dealing ${damage}.`
+    );
+    this.cooldowns.push({
+      name: `Scorching Roar`,
+      cooldown: this.cooldownFinder("Scorching Roar"),
+    });
+  }
+  async blizzard(user, target) {
+    const power = 35;
+    const damage = await calculateDamage(
+      user.stats.attack,
+      target.stats.defense
+    );
+    target.stats.hp -= damage;
+    this.battleLogs.push(
+      `+ ${user.name} uses Blizzard on ${target.name} dealing ${damage}.`
+    );
+    this.cooldowns.push({
+      name: `Blizzard`,
+      cooldown: this.cooldownFinder("Blizzard"),
+    });
+  }
+
+  async iceShards(user, target) {
+    const power = 30;
+    const damage = await calculateDamage(
+      user.stats.attack,
+      target.stats.defense
+    );
+    target.stats.hp -= damage;
+    this.battleLogs.push(
+      `+ ${user.name} uses Ice Shards on ${target.name} dealing ${damage}.`
+    );
+    this.cooldowns.push({
+      name: `Ice Shards`,
+      cooldown: this.cooldownFinder("Ice Shards"),
+    });
+  }
+  async ragingThunder(user, target) {
+    const power = 40;
+    const damage = await calculateDamage(
+      user.stats.attack,
+      target.stats.defense
+    );
+    target.stats.hp -= damage;
+    this.battleLogs.push(
+      `+ ${user.name} uses ragingThunder on ${target.name} dealing ${damage}.`
+    );
+    this.cooldowns.push({
+      name: `ragingThunder`,
+      cooldown: this.cooldownFinder("ragingThunder"),
+    });
+  }
+
+  async lightningStrike(user, target) {
+    const power = 45;
+    const damage = await calculateDamage(
+      user.stats.attack,
+      target.stats.defense
+    );
+    target.stats.hp -= damage;
+    this.battleLogs.push(
+      `+ ${user.name} uses Lightning Strike on ${target.name} dealing ${damage}.`
+    );
+    this.cooldowns.push({
+      name: `Lightning Strike`,
+      cooldown: this.cooldownFinder("Lightning Strike"),
+    });
+  }
+  async divineSparkle(user, target) {
+    const power = 35;
+    const damage = await calculateDamage(
+      user.stats.attack,
+      target.stats.defense
+    );
+    target.stats.hp -= damage;
+    this.battleLogs.push(
+      `+ ${user.name} uses Divine Sparkle on ${target.name} dealing ${damage}.`
+    );
+    this.cooldowns.push({
+      name: `Divine Sparkle`,
+      cooldown: this.cooldownFinder("Divine Sparkle"),
+    });
+  }
+
+  async holyHorn(user, target) {
+    const power = 40;
+    const damage = await calculateDamage(
+      user.stats.attack,
+      target.stats.defense
+    );
+    target.stats.hp -= damage;
+    this.battleLogs.push(
+      `+ ${user.name} uses Holy Horn on ${target.name} dealing ${damage}.`
+    );
+    this.cooldowns.push({
+      name: `Holy Horn`,
+      cooldown: this.cooldownFinder("Holy Horn"),
+    });
+  }
+  async shadowFleet(user, target) {
+    const power = 40;
+    const damage = await calculateDamage(
+      user.stats.attack,
+      target.stats.defense
+    );
+    target.stats.hp -= damage;
+    this.battleLogs.push(
+      `+ ${user.name} uses Shadow Strike on ${target.name} dealing ${damage}.`
+    );
+    this.cooldowns.push({
+      name: `Shadow Strike`,
+      cooldown: this.cooldownFinder("Shadow Strike"),
+    });
+  }
+
+  async assassinate(user, target) {
+    const power = 50;
+    const damage = await calculateDamage(
+      user.stats.attack,
+      target.stats.defense
+    );
+    target.stats.hp -= damage;
+    this.battleLogs.push(
+      `+ ${user.name} uses Assassinate on ${target.name} dealing ${damage}.`
+    );
+    this.cooldowns.push({
+      name: `Assassinate`,
+      cooldown: this.cooldownFinder("Assassinate"),
+    });
+  }
+  async tsunami(user, target) {
+    const power = 40;
+    const damage = await calculateDamage(
+      user.stats.attack,
+      target.stats.defense
+    );
+    target.stats.hp -= damage;
+    this.battleLogs.push(
+      `+ ${user.name} uses Tsunami on ${target.name} dealing ${damage}.`
+    );
+    this.cooldowns.push({
+      name: `Tsunami`,
+      cooldown: this.cooldownFinder("Tsunami"),
+    });
+  }
+
+  async aquaWhirl(user, target) {
+    const power = 45;
+    const damage = await calculateDamage(
+      user.stats.attack,
+      target.stats.defense
+    );
+    target.stats.hp -= damage;
+    this.battleLogs.push(
+      `+ ${user.name} uses Aqua Whirl on ${target.name} dealing ${damage}.`
+    );
+    this.cooldowns.push({
+      name: `Aqua Whirl`,
+      cooldown: this.cooldownFinder("Aqua Whirl"),
+    });
+  }
+  async naturesWrath(user, target) {
+    const power = 35;
+    const damage = await calculateDamage(
+      user.stats.attack,
+      target.stats.defense
+    );
+    target.stats.hp -= damage;
+    this.battleLogs.push(
+      `+ ${user.name} uses Nature's Wrath on ${target.name} dealing ${damage}.`
+    );
+    this.cooldowns.push({
+      name: `Nature's Wrath`,
+      cooldown: this.cooldownFinder("Nature's Wrath"),
+    });
+  }
+
+  async forestFury(user, target) {
+    const power = 40;
+    const damage = await calculateDamage(
+      user.stats.attack,
+      target.stats.defense
+    );
+    target.stats.hp -= damage;
+    this.battleLogs.push(
+      `+ ${user.name} uses Forest Fury on ${target.name} dealing ${damage}.`
+    );
+    this.cooldowns.push({
+      name: `Forest Fury`,
+      cooldown: this.cooldownFinder("Forest Fury"),
+    });
+  }
+  async stoneBarrage(user, target) {
+    const power = 40;
+    const damage = await calculateDamage(
+      user.stats.attack,
+      target.stats.defense
+    );
+    target.stats.hp -= damage;
+    this.battleLogs.push(
+      `+ ${user.name} uses Stone Barrage on ${target.name} dealing ${damage}.`
+    );
+    this.cooldowns.push({
+      name: `Stone Barrage`,
+      cooldown: this.cooldownFinder("Stone Barrage"),
+    });
+  }
+
+  async sentinelsShield(user) {
+    user.stats.defense += 20; // Example: Increase defense by 20
+    this.battleLogs.push(
+      `+ ${user.name} uses Sentinel's Shield. Their defense is increased.`
+    );
+    this.cooldowns.push({
+      name: `Sentinel's Shield`,
+      cooldown: this.cooldownFinder("Sentinel's Shield"),
+    });
+  }
+  async arcaneBlast(user, target) {
+    const power = 45;
+    const damage = await calculateDamage(
+      user.stats.attack,
+      target.stats.defense
+    );
+    target.stats.hp -= damage;
+    this.battleLogs.push(
+      `+ ${user.name} uses Arcane Blast on ${target.name} dealing ${damage}.`
+    );
+    this.cooldowns.push({
+      name: `Arcane Blast`,
+      cooldown: this.cooldownFinder("Arcane Blast"),
+    });
+  }
+
+  async mysticShield(user) {
+    user.stats.defense += 15; // Example: Increase defense by 15
+    this.battleLogs.push(
+      `+ ${user.name} uses Mystic Shield. Their defense is increased.`
+    );
+    this.cooldowns.push({
+      name: `Mystic Shield`,
+      cooldown: this.cooldownFinder("Mystic Shield"),
+    });
+  }
+  async heavenlyFlames(user, target) {
+    const power = 40;
+    const damage = await calculateDamage(
+      user.stats.attack,
+      target.stats.defense
+    );
+    target.stats.hp -= damage;
+    this.battleLogs.push(
+      `+ ${user.name} uses Heavenly Flames on ${target.name} dealing ${damage}.`
+    );
+    this.cooldowns.push({
+      name: `Heavenly Flames`,
+      cooldown: this.cooldownFinder("Heavenly Flames"),
+    });
+  }
+
+  async sacredWing(user) {
+    user.stats.attack += 20; // Example: Increase attack by 20
+    this.battleLogs.push(
+      `+ ${user.name} uses Sacred Wing. Their attack is increased.`
+    );
+    this.cooldowns.push({
+      name: `Sacred Wing`,
+      cooldown: this.cooldownFinder("Sacred Wing"),
+    });
+  }
 
   async lightningBolt(user, target) {
     const power = 20;
