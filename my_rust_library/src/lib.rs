@@ -1,14 +1,15 @@
 use napi_derive::napi;
 #[napi]
-pub fn calculate_damage(author_atk: i32, opponent_defense: i32) -> i32 {
-    let constant_damage = 3.0;
-    let mut damage = (author_atk.sqrt()).powf((constant_damage.sqrt()).powf(((850.0 + author_atk) / (450.0 + 1.26 * opponent_defense)).sqrt()));
-    return damage as i32;
+pub fn calculate_damage(author_atk: f64, opponent_defense: f64) -> f64 {
+    let damage = (author_atk.sqrt()).powf((3.0_f64.sqrt()).powf(((850.0 + author_atk) / (450.0 + 1.26 * opponent_defense)).sqrt()));
+    damage
 }
-// #[napi]
-// pub fn add(left:i32, right: i32) -> i32 {
-//     left + right
-// }
+
+
+#[napi]
+pub fn add(left:i32, right: i32) -> i32 {
+    left + right
+}
 
 
 
@@ -21,5 +22,10 @@ mod tests {
     fn it_works() {
         let result = add(2, 2);
         assert_eq!(result, 4);
+    }
+    #[test]
+    fn test_calculate_damage() {
+        let result = calculate_damage(100, 100);
+        assert_eq!(result, 100);
     }
 }

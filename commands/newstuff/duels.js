@@ -8,13 +8,12 @@ const { mobs } = require("../adv/monsterInfo/mobs.js");
 const { cards } = require("../adv/information/cards.js"); // Import the cards data from 'cards.js'
 
 const {
-  calculate_damage,
+  calculateDamage,
 } = require("../../my_rust_library/my_rust_library.node");
 const {
   checkResults,
   getCardStats,
   getCardMoves,
-  calculateDamage,
   getPlayerMoves,
 } = require("../util/glogic.js");
 const classes = require("../../data/classes/allclasses.js");
@@ -474,7 +473,7 @@ class Duel {
       // const move = attacker.chooseMove(); // Implement this method for the player
 
       const target = this.enemyToHit.name;
-      const damage = calculate_damage(
+      const damage = calculateDamage(
         this.player.stats.attack,
         this.enemyToHit.stats.defense
       );

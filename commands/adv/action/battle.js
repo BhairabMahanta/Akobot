@@ -9,10 +9,12 @@ const { cards } = require("../information/cards.js"); // Import the cards data f
 const BossAI = require("./bossStuff.js");
 const MobAI = require("./mobStuff.js");
 const {
+  calculateDamage,
+} = require("../../../my_rust_library/my_rust_library.node");
+const {
   checkResults,
   getCardStats,
   getCardMoves,
-  calculateDamage,
   getPlayerMoves,
 } = require("../../util/glogic.js");
 const classes = require("../../../data/classes/allclasses.js");
