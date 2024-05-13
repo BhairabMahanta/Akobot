@@ -2,7 +2,7 @@ use napi_derive::napi;
 #[napi]
 pub fn calculate_damage(author_atk: f64, opponent_defense: f64) -> f64 {
     let damage = (author_atk.sqrt()).powf((3.0_f64.sqrt()).powf(((850.0 + author_atk) / (450.0 + 1.26 * opponent_defense)).sqrt()));
-    damage
+    damage.floor()
 }
 
 
