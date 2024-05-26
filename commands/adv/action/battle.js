@@ -277,13 +277,13 @@ class Battle {
         })
         .setColor(0x0099ff);
       this.battleEmbed.addFields({
-        name: `Current Turn`,
+        name: "Current Turn",
         value: `\`\`\`${this.currentTurn}\`\`\``,
         inline: false,
       });
       if (this.enemyDetails.type === "boss") {
         this.battleEmbed.addFields({
-          name: `Enemies Info:`,
+          name: "Enemies Info:",
           value: `\`\`\`ansi\n[2;31m> ${this.boss.name}\n[2;32m ${this.boss.hpBarEmoji} ${
             this.boss.stats.hp
           } HP\n[2;36m [2;34m${this.boss.attackBarEmoji} ${Math.floor(
@@ -631,7 +631,7 @@ class Battle {
           {
             label: "namename",
             description: "whatever",
-            value: `uh oh`,
+            value: "uh oh",
           },
         ];
         this.performEnemyTurn(this.message);
@@ -690,7 +690,7 @@ class Battle {
 
         return familiarSpeed;
       } else {
-        console.log(`Calculating speed for unknown character type: 0`);
+        console.log("Calculating speed for unknown character type: 0");
         return 0; // Default to 0 for unknown character types
       }
     } catch (error) {
@@ -722,7 +722,7 @@ class Battle {
 
         return familiarHp;
       } else {
-        console.log(`Calculating speed for unknown character type: 0`);
+        console.log("Calculating speed for unknown character type: 0");
         return 0; // Default to 0 for unknown character types
       }
     } catch (error) {
@@ -1109,11 +1109,11 @@ class Battle {
       console.log("thisplayeractiveQuest:", this.player.activeQuests);
 
       this.battleEmbed.setFields({
-        name: `You won the battle against the Monster, you can continue the journey where you left off (I lied  you can't)!!`,
+        name: "You won the battle against the Monster, you can continue the journey where you left off (I lied  you can't)!!",
         value: `Rewards:\n Exp: ${rewards.experience}, Gold: ${rewards.gold}`,
         inline: true,
       });
-      this.battleEmbed.setDescription(`GGs You've won`);
+      this.battleEmbed.setDescription("GGs You've won");
       this.initialMessage.edit({
         embeds: [this.battleEmbed],
         components: [],

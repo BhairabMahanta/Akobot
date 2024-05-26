@@ -15,7 +15,7 @@ module.exports = {
                 iconURL: 'https://i.imgur.com/AfFp7pu.png',
                 url: 'https://discord.js.org'
             })
-    .setTitle(`The Adventurers Guild`)
+    .setTitle("The Adventurers Guild")
     .setDescription('Please decide what would you like to browse:')
     .addFields(
        { name: '🇦', value: "Kriz the bald 34 year old Truck Driver", inline: true },

@@ -189,7 +189,7 @@ console.log('outcometext:', outcome.text);
   async editFields() {
     this.embed = new EmbedBuilder()
       .setTitle(`Proceeding with ${this.name}`)
-      .setDescription(`Have something like {dialogueindex}`)
+      .setDescription("Have something like {dialogueindex}")
       .setColor("#0099ff");
   }
 
@@ -197,12 +197,12 @@ console.log('outcometext:', outcome.text);
     if (!stuff) {
     this.embed = new EmbedBuilder()
       .setTitle(`${this.name}`)
-      .setDescription(`Do you want to start the tutorial?`)
+      .setDescription("Do you want to start the tutorial?")
       .setColor("#0099ff");
     } else {
       this.embed = new EmbedBuilder()
       .setTitle(`${this.name}`)
-      .setDescription(`Do you want to resume the tutorial where you left off?`)
+      .setDescription("Do you want to resume the tutorial where you left off?")
       .setColor("#0099ff");
     }
  this.yesNoButton = new ActionRowBuilder().addComponents(

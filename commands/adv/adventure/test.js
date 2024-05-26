@@ -84,12 +84,12 @@ module.exports = {
         },
         {
           name: "**Automate this adventure?**",
-          value: `You can automatically finish an adventure if you reach 100% discovery in that area and fulfil a few other requirements!!`,
+          value: "You can automatically finish an adventure if you reach 100% discovery in that area and fulfil a few other requirements!!",
           inline: false,
         },
         {
           name: "**Start Adventuring?**",
-          value: `To start, click on the "Lets Dive into it" button!!`,
+          value: 'To start, click on the "Lets Dive into it" button!!',
           inline: false,
         },
         {

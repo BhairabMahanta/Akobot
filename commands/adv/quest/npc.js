@@ -137,14 +137,14 @@ answerFields[0].value = answerFields[0].value.substring(0, answerFields[0].value
   async editFields() {
     this.embed = new EmbedBuilder()
       .setTitle(`Talking to ${this.name}`)
-      .setDescription(`Have something like {dialogueindex}`)
+      .setDescription("Have something like {dialogueindex}")
       .setColor("#0099ff");
   }
 
   async initiateTalk() {
     this.embed = new EmbedBuilder()
       .setTitle(`Talking to ${this.name}`)
-      .setDescription(`Have something like {dialogueindex}`)
+      .setDescription("Have something like {dialogueindex}")
       .setColor("#0099ff");
 
     await this[this.name]();

@@ -149,7 +149,7 @@ module.exports = {
                 };
 
                 const gae1_1Fields = {
-                  name: `Abilities:`,
+                  name: "Abilities:",
                   value:
                     `**${classesData[className]?.abilities
                       .slice(0, 2)
