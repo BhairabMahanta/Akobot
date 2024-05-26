@@ -138,7 +138,7 @@ client.on("messageCreate", async (message, args) => {
             inline: true,
           },
           { name: "Library", value: "Discord.js", inline: true },
-          { name: "Version", value: `v 1.0`, inline: true },
+          { name: "Version", value: "v 1.0", inline: true },
           { name: "Creator", value: "<@537619455409127442>", inline: true },
           { name: "API Latency", value: `${apiLatency}ms`, inline: true },
           { name: "Client Ping", value: `${clientPing}ms`, inline: true }

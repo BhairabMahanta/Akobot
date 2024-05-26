@@ -26,7 +26,7 @@ class Quest {
   async editFields() {
     this.embed = new EmbedBuilder()
       .setTitle(`Quest Details: ${quests[this.questName].title}`)
-      .setDescription(`Have something like {dialogueindex}`)
+      .setDescription("Have something like {dialogueindex}")
       .setColor("#0099ff");
   }
 
@@ -42,7 +42,7 @@ questDetails.rewards.forEach((reward) => {
   console.log("xp:", reward.experience);
 
     rewardFields.push({
-      name: `- **Rewards:** `, // Combine index and answer text
+      name: "- **Rewards:** ", // Combine index and answer text
       value: `- **Experience: ${reward.experience}** \n\n **Items: ${reward.items}**`, // Empty value for alternating
       inline: false,
     });

@@ -48,9 +48,9 @@ module.exports = {
       ctx.fillText(`${player.race}:`, 45, 240);
       ctx.fillText(`${player.class}:`, 45, 270);
       ctx.font = "30px Arial";
-      ctx.fillText(`Player Stats:`, 45, 310);
-      ctx.fillText(`Player Description:`, 355, 310);
-      ctx.fillText(`Player Affiliations:`, 745, 310);
+      ctx.fillText("Player Stats:", 45, 310);
+      ctx.fillText("Player Description:", 355, 310);
+      ctx.fillText("Player Affiliations:", 745, 310);
       ctx.closePath();
 
       ctx.beginPath();

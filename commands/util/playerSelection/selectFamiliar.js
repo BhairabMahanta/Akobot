@@ -104,9 +104,9 @@ module.exports = {
 
     // Create an embed
     const embed = new EmbedBuilder()
-      .setTitle(`Select up to 3 familiars:`)
+      .setTitle("Select up to 3 familiars:")
       .setDescription("Select up to 3 familiars to help you on your journey.")
-      .setFooter({ text: `By you at 6:09.6969pm` })
+      .setFooter({ text: "By you at 6:09.6969pm" })
       .setColor("#00FFFF");
 
     // Send the embed with the SelectMenu

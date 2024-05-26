@@ -59,14 +59,14 @@ module.exports = {
           } else {
             answeredUsers.push(i.user.id);
             losers.push({ loser: i.user.username, answer: selectedAnswer, timestamp: i.createdTimestamp});
-            i.reply({ content: `You are wrong noob, get good.`, ephemeral: true });
+            i.reply({ content: "You are wrong noob, get good.", ephemeral: true });
           }
 
           clickData.sort((a, b) => a.timestamp - b.timestamp);
            losers.sort((a, b) => a.timestamp - b.timestamp);
         } else {
-          console.log(`This user has already answered.`);
-          i.reply({ content: `You have already answered this question.`, ephemeral: true });
+          console.log("This user has already answered.");
+          i.reply({ content: "You have already answered this question.", ephemeral: true });
         }
       });
 
