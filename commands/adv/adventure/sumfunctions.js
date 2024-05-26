@@ -464,28 +464,28 @@ class Player {
 
 async function cycleCooldowns(array) {
   // Loop through each move and decrease its cooldown by 1
+  /*
+  switch (moveType) {
+    case 'ability':
+      move = abilities[moveName].cooldown;
+      break;
+    // case 'card':
+    //   move = cards[moveName];
+    //   break;
+    // Add case for the third file
+    // case 'thirdType':
+    //   move = thirdFile[moveName];
+    //   break;
+    default:
+      console.log('Invalid move type');
+      return;
+  }
 
-  // switch (moveType) {
-  //   case 'ability':
-  //     move = abilities[moveName].cooldown;
-  //     break;
-  //   // case 'card':
-  //   //   move = cards[moveName];
-  //   //   break;
-  //   // Add case for the third file
-  //   // case 'thirdType':
-  //   //   move = thirdFile[moveName];
-  //   //   break;
-  //   default:
-  //     console.log('Invalid move type');
-  //     return;
-  // }
-
-  // if (!move) {
-  //   console.log('Move not found');
-  //   return;
-  // }
-
+  if (!move) {
+    console.log('Move not found');
+    return;
+  }
+*/
   try {
     if (array.length === 0) {
       console.log("No moves on cooldown");

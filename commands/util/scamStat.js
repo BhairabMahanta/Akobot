@@ -49,9 +49,14 @@ module.exports = {
       // Create an action row and add the buttons
       const row = new ActionRowBuilder().addComponents(stat, dupe);
       let output = [];
-
-      for (const id of extractedIDs) {
-        output.push(`sc ${id} hp>329 def>79 spd>70\n`);
+      if (message.author.id === "502151267796123650") {
+        for (const id of extractedIDs) {
+          output.push(`sc ${id} ts>540\n`);
+        }
+      } else {
+        for (const id of extractedIDs) {
+          output.push(`sc ${id} ts>580\n`);
+        }
       }
 
       if (message.channel && !message.author.bot) {

@@ -31,11 +31,11 @@ class MobAI {
       if (move === "Basic Attack") {
         console.log("moveTrue?: ", move);
         mob.index++;
-        return await this.normalAttack(mob, target);
+        return this.normalAttack(mob, target);
       } else {
         console.log("moveFalse?: ", move);
         mob.index++;
-        return await this.abilityUse(mob, target, move);
+        return this.abilityUse(mob, target, move);
       }
     }
   }
