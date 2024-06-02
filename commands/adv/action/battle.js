@@ -8,6 +8,7 @@ const { mobs } = require("../monsterInfo/mobs.js");
 const { cards } = require("../information/cards.js"); // Import the cards data from 'cards.js'
 const BossAI = require("./bossStuff.js");
 const MobAI = require("./mobStuff.js");
+const { BuffDebuffManager } = require("./BuffDebuffManager.js");
 const {
   calculateDamage,
 } = require("../../../my_rust_library/my_rust_library.node");
@@ -102,6 +103,7 @@ class Battle {
     this.pickedChoice = false;
     this.enemyToHit = null;
     this.ability = new Ability(this);
+    this.BuffDebuffManager = new BuffDebuffManager(this.battleLogs);
   }
 
   async initialiseStuff() {
@@ -261,6 +263,15 @@ class Battle {
     //  console.log('playerSElECTFAMILOIAR:', this.player.selectedFamilar )
     // this.startBattle(this.message);
     //   }
+  }
+
+  async handleTurnEffects(turnEnder) {
+    turnEnder.debuffs.forEach((debuff) => {
+      debuff.remainingTurns--;
+      if (debuff.remainingTurns <= 0) {
+        this.removeDebuff(this.player, debuff.type);
+      }
+    });
   }
 
   async sendInitialEmbed() {

@@ -6,6 +6,7 @@ const {
   getCardMoves,
   getPlayerMoves,
 } = require("../../util/glogic.js");
+const { BuffDebuffManager } = require("./BuffDebuffManager.js");
 const abilities = require("../../../data/abilities.js");
 const {
   calculateDamage,
@@ -15,11 +16,13 @@ class Ability {
     this.battleLogs = that.battleLogs;
     this.enemyToHit = that.enemyToHit;
     this.cooldowns = that.cooldowns;
+    this.buffDebuffManager = new BuffDebuffManager(that.battleLogs);
   }
   async cooldownFinder(ability) {
     const abilityCooldown = abilities[ability].cooldown;
     return abilityCooldown;
   }
+
   //PLAYER ABILOITIES AKAI THIS WORKS BLUD
 
   async shieldBash(user, target) {
