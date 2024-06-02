@@ -39,7 +39,7 @@ class QuestLogic {
       this.embed.setTitle('Already Started!')
       this.embed.setDescription("### - You already started the quest, view your progress through a!myquests.")
       this.embed.setFields({
-        name: `Quest Name:`,
+        name: "Quest Name:",
         value: this.quests[questId].title,
         inline: true
       })

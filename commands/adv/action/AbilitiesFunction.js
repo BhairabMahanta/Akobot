@@ -42,7 +42,7 @@ class Ability {
       `${user.name} uses Shield Bash on ${target.name}. ${target.name} is slowed!`
     );
     this.cooldowns.push({
-      name: `Shield Bash`,
+      name: "Shield Bash",
       cooldown: this.cooldownFinder("Shield Bash"),
     });
 
@@ -55,7 +55,7 @@ class Ability {
       `+ ${user.name} uses Defend. Their defense is increased.`
     );
     this.cooldowns.push({
-      name: `Defend`,
+      name: "Defend",
       cooldown: this.cooldownFinder("Defend"),
     });
   }
@@ -67,7 +67,7 @@ class Ability {
       `${user.name} activates Bloodlust. Attack speed and damage increase.`
     );
     this.cooldowns.push({
-      name: `Bloodlust`,
+      name: "Bloodlust",
       cooldown: this.cooldownFinder("Bloodlust"),
     });
   }
@@ -82,7 +82,7 @@ class Ability {
       `${user.name} unleashes a wild Raging Strike on ${target.name}. It deals massive damage!`
     );
     this.cooldowns.push({
-      name: `Raging Strike`,
+      name: "Raging Strike",
       cooldown: this.cooldownFinder("Raging Strike"),
     });
   }
@@ -106,11 +106,11 @@ class Ability {
     );
     this.battleLogs.push(
       `+ ${user.name} performs an Arena Spin, hitting ${enemyNameArray.join(
-        ` ,`
+        " ,"
       )} for ${damageArray.join(" ,")} damage respectively`
     );
     this.cooldowns.push({
-      name: `Arena Spin`,
+      name: "Arena Spin",
       cooldown: this.cooldownFinder("Arena Spin"),
     });
   }
@@ -121,7 +121,7 @@ class Ability {
       `${user.name} taunts ${target.name}. ${target.name} is now focused on ${user.name}.`
     );
     this.cooldowns.push({
-      name: `Crowd Control`,
+      name: "Crowd Control",
       cooldown: this.cooldownFinder("Crowd Control"),
     });
   }
@@ -136,7 +136,7 @@ class Ability {
       `${user.name} executes a precise Precision Strike on ${target.name}. It's a critical hit!`
     );
     this.cooldowns.push({
-      name: `Precision Strike`,
+      name: "Precision Strike",
       cooldown: this.cooldownFinder("Precision Strike"),
     });
   }
@@ -147,8 +147,8 @@ class Ability {
       `${user.name} enters Honor's Resolve, gaining increased resistance to status effects.`
     );
     this.cooldowns.push({
-      name: `Honor's Resolve`,
-      cooldown: this.cooldownFinder(`Honor's Resolve`),
+      name: "Honor's Resolve",
+      cooldown: this.cooldownFinder("Honor's Resolve"),
     });
   }
 
@@ -163,7 +163,7 @@ class Ability {
       `${user.name} hurls a Fireball at ${target.name}. ${target.name} takes damage over time.`
     );
     this.cooldowns.push({
-      name: `Fireball`,
+      name: "Fireball",
       cooldown: this.cooldownFinder("Fireball"),
     });
   }
@@ -174,7 +174,7 @@ class Ability {
       `${user.name} creates an Arcane Shield, absorbing incoming magic attacks.`
     );
     this.cooldowns.push({
-      name: `Arcane Shield`,
+      name: "Arcane Shield",
       cooldown: this.cooldownFinder("Arcane Shield"),
     });
   }
@@ -200,13 +200,13 @@ class Ability {
       `+ ${
         user.name
       } casts Frost Nova freezing, and dealing ${enemyNameArray.join(
-        ` ,`
+        " ,"
       )} for ${damageArray.join(" ,")} damage respectively`
     );
     target.statusEffects.frozen = true; // Example: Freeze the target
 
     this.cooldowns.push({
-      name: `Frost Nova`,
+      name: "Frost Nova",
       cooldown: this.cooldownFinder("Frost Nova"),
     });
   }
@@ -230,14 +230,14 @@ class Ability {
     );
     this.battleLogs.push(
       `+ ${user.name} performs an Arena Spin, hitting ${enemyNameArray.join(
-        ` ,`
+        " ,"
       )} for ${damageArray.join(" ,")} damage respectively`
     );
     this.battleLogs.push(
       `${user.name} calls forth a Thunderstorm, damaging multiple opponents.`
     );
     this.cooldowns.push({
-      name: `Thunderstorm`,
+      name: "Thunderstorm",
       cooldown: this.cooldownFinder("Thunderstorm"),
     });
   }
@@ -248,7 +248,7 @@ class Ability {
       `${user.name} summons a skeletal minion to aid in battle.`
     );
     this.cooldowns.push({
-      name: `Raise Dead`,
+      name: "Raise Dead",
       cooldown: this.cooldownFinder("Raise Dead"),
     });
   }
@@ -261,7 +261,7 @@ class Ability {
       `${user.name} drains the life force from ${target.name}. ${user.name} is healed.`
     );
     this.cooldowns.push({
-      name: `Drain Life`,
+      name: "Drain Life",
       cooldown: this.cooldownFinder("Drain Life"),
     });
   }
@@ -272,7 +272,7 @@ class Ability {
       `${user.name} creates multiple illusory copies to confuse opponents.`
     );
     this.cooldowns.push({
-      name: `Mirror Image`,
+      name: "Mirror Image",
       cooldown: this.cooldownFinder("Mirror Image"),
     });
   }
@@ -283,7 +283,7 @@ class Ability {
       `${user.name} uses a Mind Trick on ${target.name}. ${target.name} is disoriented.`
     );
     this.cooldowns.push({
-      name: `Mind Trick`,
+      name: "Mind Trick",
       cooldown: this.cooldownFinder("Mind Trick"),
     });
   }
@@ -298,7 +298,7 @@ class Ability {
       `${user.name} strikes ${target.name} from behind. It's a backstab!`
     );
     this.cooldowns.push({
-      name: `Backstab`,
+      name: "Backstab",
       cooldown: this.cooldownFinder("Backstab"),
     });
   }
@@ -309,7 +309,7 @@ class Ability {
       `${user.name} teleports behind ${target.name}, gaining a positional advantage.`
     );
     this.cooldowns.push({
-      name: `Shadow Step`,
+      name: "Shadow Step",
       cooldown: this.cooldownFinder("Shadow Step"),
     });
   }
@@ -320,7 +320,7 @@ class Ability {
       `${user.name} wields two weapons simultaneously, increasing attack speed.`
     );
     this.cooldowns.push({
-      name: `Dual Wield`,
+      name: "Dual Wield",
       cooldown: this.cooldownFinder("Dual Wield"),
     });
   }
@@ -331,7 +331,7 @@ class Ability {
       `${user.name} evades incoming attacks, reducing damage taken for a short period.`
     );
     this.cooldowns.push({
-      name: `Evasion`,
+      name: "Evasion",
       cooldown: this.cooldownFinder("Evasion"),
     });
   }
@@ -342,7 +342,7 @@ class Ability {
       `${user.name} throws a Smoke Bomb, creating a cloud of smoke.`
     );
     this.cooldowns.push({
-      name: `Smoke Bomb`,
+      name: "Smoke Bomb",
       cooldown: this.cooldownFinder("Smoke Bomb"),
     });
   }
@@ -366,11 +366,11 @@ class Ability {
     );
     this.battleLogs.push(
       `+ ${user.name} performs Shuriken Barrage, hitting ${enemyNameArray.join(
-        ` ,`
+        " ,"
       )} for ${damageArray.join(" ,")} damage respectively`
     );
     this.cooldowns.push({
-      name: `Shuriken Barrage`,
+      name: "Shuriken Barrage",
       cooldown: this.cooldownFinder("Shuriken Barrage"),
     });
   }
@@ -381,7 +381,7 @@ class Ability {
       `${user.name} uses Charming Presence. ${target.name} is charmed and becomes passive.`
     );
     this.cooldowns.push({
-      name: `Charming Presence`,
+      name: "Charming Presence",
       cooldown: this.cooldownFinder("Charming Presence"),
     });
   }
@@ -392,7 +392,7 @@ class Ability {
       `${user.name} performs an Acrobatic Flourish, increasing evasion.`
     );
     this.cooldowns.push({
-      name: `Acrobatic Flourish`,
+      name: "Acrobatic Flourish",
       cooldown: this.cooldownFinder("Acrobatic Flourish"),
     });
   }
@@ -404,7 +404,7 @@ class Ability {
       `${user.name} uses Healing Light on ${target.name}. ${target.name} is healed.`
     );
     this.cooldowns.push({
-      name: `Healing Light`,
+      name: "Healing Light",
       cooldown: this.cooldownFinder("Healing Light"),
     });
   }
@@ -415,7 +415,7 @@ class Ability {
       `${user.name} provides a shield of Divine Protection, absorbing incoming damage.`
     );
     this.cooldowns.push({
-      name: `Divine Protection`,
+      name: "Divine Protection",
       cooldown: this.cooldownFinder("Divine Protection"),
     });
   }
@@ -515,7 +515,7 @@ class Ability {
       `+ ${user.name} uses Flame Strike on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `Flame Strike`,
+      name: "Flame Strike",
       cooldown: this.cooldownFinder("Flame Strike"),
     });
     // Implement additional effects for Flame Strike here
@@ -529,7 +529,7 @@ class Ability {
       `+ ${user.name} uses Dragon Claw on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `Dragon Claw`,
+      name: "Dragon Claw",
       cooldown: this.cooldownFinder("Dragon Claw"),
     });
     // Implement additional effects for Dragon Claw here
@@ -543,7 +543,7 @@ class Ability {
       `+ ${user.name} uses Aqua Blast on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `Aqua Blast`,
+      name: "Aqua Blast",
       cooldown: this.cooldownFinder("Aqua Blast"),
     });
     // Implement additional effects for Aqua Blast here
@@ -557,7 +557,7 @@ class Ability {
       `+ ${user.name} uses Healing Wave and heals for ${healingAmount}.`
     );
     this.cooldowns.push({
-      name: `Healing Wave`,
+      name: "Healing Wave",
       cooldown: this.cooldownFinder("Healing Wave"),
     });
     // Implement additional effects for Healing Wave here
@@ -573,7 +573,7 @@ class Ability {
       `+ ${user.name} uses Rock Throw on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `Rock Throw`,
+      name: "Rock Throw",
       cooldown: this.cooldownFinder("Rock Throw"),
     });
   }
@@ -589,7 +589,7 @@ class Ability {
       `+ ${user.name} uses Quake on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `Quake`,
+      name: "Quake",
       cooldown: this.cooldownFinder("Quake"),
     });
   }
@@ -604,7 +604,7 @@ class Ability {
       `+ ${user.name} uses Gust on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `Gust`,
+      name: "Gust",
       cooldown: this.cooldownFinder("Gust"),
     });
   }
@@ -620,7 +620,7 @@ class Ability {
       `+ ${user.name} uses Aerial Slash on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `Aerial Slash`,
+      name: "Aerial Slash",
       cooldown: this.cooldownFinder("Aerial Slash"),
     });
   }
@@ -636,7 +636,7 @@ class Ability {
       `+ ${user.name} uses Thunderbolt on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `Thunderbolt`,
+      name: "Thunderbolt",
       cooldown: this.cooldownFinder("Thunderbolt"),
     });
   }
@@ -652,7 +652,7 @@ class Ability {
       `+ ${user.name} uses Static Shock on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `Static Shock`,
+      name: "Static Shock",
       cooldown: this.cooldownFinder("Static Shock"),
     });
   }
@@ -667,7 +667,7 @@ class Ability {
       `+ ${user.name} uses Shadow Strike on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `Shadow Strike`,
+      name: "Shadow Strike",
       cooldown: this.cooldownFinder("Shadow Strike"),
     });
   }
@@ -683,7 +683,7 @@ class Ability {
       `+ ${user.name} uses Dark Claw on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `Dark Claw`,
+      name: "Dark Claw",
       cooldown: this.cooldownFinder("Dark Claw"),
     });
   }
@@ -698,7 +698,7 @@ class Ability {
       `+ ${user.name} uses Vine Whip on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `Vine Whip`,
+      name: "Vine Whip",
       cooldown: this.cooldownFinder("Vine Whip"),
     });
   }
@@ -709,7 +709,7 @@ class Ability {
       `+ ${user.name} uses Leaf Shield. Their defense is increased.`
     );
     this.cooldowns.push({
-      name: `Leaf Shield`,
+      name: "Leaf Shield",
       cooldown: this.cooldownFinder("Leaf Shield"),
     });
   }
@@ -724,7 +724,7 @@ class Ability {
       `+ ${user.name} uses Ice Breath on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `Ice Breath`,
+      name: "Ice Breath",
       cooldown: this.cooldownFinder("Ice Breath"),
     });
   }
@@ -740,7 +740,7 @@ class Ability {
       `+ ${user.name} uses Freezing Nova on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `Frost Nova`,
+      name: "Frost Nova",
       cooldown: this.cooldownFinder("Frost Nova"),
     });
   }
@@ -755,7 +755,7 @@ class Ability {
       `+ ${user.name} uses Lava Spit on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `Lava Spit`,
+      name: "Lava Spit",
       cooldown: this.cooldownFinder("Lava Spit"),
     });
   }
@@ -771,7 +771,7 @@ class Ability {
       `+ ${user.name} uses Scorching Tail on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `Scorching Tail`,
+      name: "Scorching Tail",
       cooldown: this.cooldownFinder("Scorching Tail"),
     });
   }
@@ -786,7 +786,7 @@ class Ability {
       `+ ${user.name} uses Arrow Shot on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `Arrow Shot`,
+      name: "Arrow Shot",
       cooldown: this.cooldownFinder("Arrow Shot"),
     });
   }
@@ -802,7 +802,7 @@ class Ability {
       `+ ${user.name} uses Strike on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `Precision Strike`,
+      name: "Precision Strike",
       cooldown: this.cooldownFinder("Precision Strike"),
     });
   }
@@ -817,7 +817,7 @@ class Ability {
       `+ ${user.name} uses Rock Toss on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `Rock Toss`,
+      name: "Rock Toss",
       cooldown: this.cooldownFinder("Rock Toss"),
     });
   }
@@ -833,7 +833,7 @@ class Ability {
       `+ ${user.name} uses Earthquake on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `Earthquake`,
+      name: "Earthquake",
       cooldown: this.cooldownFinder("Earthquake"),
     });
   }
@@ -848,7 +848,7 @@ class Ability {
       `+ ${user.name} uses Wind Slash on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `Wind Slash`,
+      name: "Wind Slash",
       cooldown: this.cooldownFinder("Wind Slash"),
     });
   }
@@ -864,7 +864,7 @@ class Ability {
       `+ ${user.name} uses Aero Burst on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `Aero Burst`,
+      name: "Aero Burst",
       cooldown: this.cooldownFinder("Aero Burst"),
     });
   }
@@ -879,7 +879,7 @@ class Ability {
       `+ ${user.name} uses Frost Bite on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `Frost Bite`,
+      name: "Frost Bite",
       cooldown: this.cooldownFinder("Frost Bite"),
     });
   }
@@ -895,7 +895,7 @@ class Ability {
       `+ ${user.name} uses Ice Shard on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `Ice Shard`,
+      name: "Ice Shard",
       cooldown: this.cooldownFinder("Ice Shard"),
     });
   }
@@ -911,7 +911,7 @@ class Ability {
       `+ ${user.name} uses Ember on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `Ember`,
+      name: "Ember",
       cooldown: this.cooldownFinder("Ember"),
     });
   }
@@ -927,7 +927,7 @@ class Ability {
       `+ ${user.name} uses Inferno on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `Inferno`,
+      name: "Inferno",
       cooldown: this.cooldownFinder("Inferno"),
     });
   }
@@ -944,7 +944,7 @@ class Ability {
       `+ ${user.name} uses Fire Breath on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `Fire Breath`,
+      name: "Fire Breath",
       cooldown: this.cooldownFinder("Fire Breath"),
     });
   }
@@ -960,7 +960,7 @@ class Ability {
       `+ ${user.name} uses Scorching Roar on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `Scorching Roar`,
+      name: "Scorching Roar",
       cooldown: this.cooldownFinder("Scorching Roar"),
     });
   }
@@ -975,7 +975,7 @@ class Ability {
       `+ ${user.name} uses Blizzard on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `Blizzard`,
+      name: "Blizzard",
       cooldown: this.cooldownFinder("Blizzard"),
     });
   }
@@ -991,7 +991,7 @@ class Ability {
       `+ ${user.name} uses Ice Shards on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `Ice Shards`,
+      name: "Ice Shards",
       cooldown: this.cooldownFinder("Ice Shards"),
     });
   }
@@ -1006,7 +1006,7 @@ class Ability {
       `+ ${user.name} uses ragingThunder on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `ragingThunder`,
+      name: "ragingThunder",
       cooldown: this.cooldownFinder("ragingThunder"),
     });
   }
@@ -1022,7 +1022,7 @@ class Ability {
       `+ ${user.name} uses Lightning Strike on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `Lightning Strike`,
+      name: "Lightning Strike",
       cooldown: this.cooldownFinder("Lightning Strike"),
     });
   }
@@ -1037,7 +1037,7 @@ class Ability {
       `+ ${user.name} uses Divine Sparkle on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `Divine Sparkle`,
+      name: "Divine Sparkle",
       cooldown: this.cooldownFinder("Divine Sparkle"),
     });
   }
@@ -1053,7 +1053,7 @@ class Ability {
       `+ ${user.name} uses Holy Horn on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `Holy Horn`,
+      name: "Holy Horn",
       cooldown: this.cooldownFinder("Holy Horn"),
     });
   }
@@ -1068,7 +1068,7 @@ class Ability {
       `+ ${user.name} uses Shadow Strike on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `Shadow Strike`,
+      name: "Shadow Strike",
       cooldown: this.cooldownFinder("Shadow Strike"),
     });
   }
@@ -1084,7 +1084,7 @@ class Ability {
       `+ ${user.name} uses Assassinate on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `Assassinate`,
+      name: "Assassinate",
       cooldown: this.cooldownFinder("Assassinate"),
     });
   }
@@ -1099,7 +1099,7 @@ class Ability {
       `+ ${user.name} uses Tsunami on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `Tsunami`,
+      name: "Tsunami",
       cooldown: this.cooldownFinder("Tsunami"),
     });
   }
@@ -1115,7 +1115,7 @@ class Ability {
       `+ ${user.name} uses Aqua Whirl on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `Aqua Whirl`,
+      name: "Aqua Whirl",
       cooldown: this.cooldownFinder("Aqua Whirl"),
     });
   }
@@ -1130,7 +1130,7 @@ class Ability {
       `+ ${user.name} uses Nature's Wrath on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `Nature's Wrath`,
+      name: "Nature's Wrath",
       cooldown: this.cooldownFinder("Nature's Wrath"),
     });
   }
@@ -1146,7 +1146,7 @@ class Ability {
       `+ ${user.name} uses Forest Fury on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `Forest Fury`,
+      name: "Forest Fury",
       cooldown: this.cooldownFinder("Forest Fury"),
     });
   }
@@ -1161,7 +1161,7 @@ class Ability {
       `+ ${user.name} uses Stone Barrage on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `Stone Barrage`,
+      name: "Stone Barrage",
       cooldown: this.cooldownFinder("Stone Barrage"),
     });
   }
@@ -1172,7 +1172,7 @@ class Ability {
       `+ ${user.name} uses Sentinel's Shield. Their defense is increased.`
     );
     this.cooldowns.push({
-      name: `Sentinel's Shield`,
+      name: "Sentinel's Shield",
       cooldown: this.cooldownFinder("Sentinel's Shield"),
     });
   }
@@ -1187,7 +1187,7 @@ class Ability {
       `+ ${user.name} uses Arcane Blast on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `Arcane Blast`,
+      name: "Arcane Blast",
       cooldown: this.cooldownFinder("Arcane Blast"),
     });
   }
@@ -1198,7 +1198,7 @@ class Ability {
       `+ ${user.name} uses Mystic Shield. Their defense is increased.`
     );
     this.cooldowns.push({
-      name: `Mystic Shield`,
+      name: "Mystic Shield",
       cooldown: this.cooldownFinder("Mystic Shield"),
     });
   }
@@ -1213,7 +1213,7 @@ class Ability {
       `+ ${user.name} uses Heavenly Flames on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `Heavenly Flames`,
+      name: "Heavenly Flames",
       cooldown: this.cooldownFinder("Heavenly Flames"),
     });
   }
@@ -1224,7 +1224,7 @@ class Ability {
       `+ ${user.name} uses Sacred Wing. Their attack is increased.`
     );
     this.cooldowns.push({
-      name: `Sacred Wing`,
+      name: "Sacred Wing",
       cooldown: this.cooldownFinder("Sacred Wing"),
     });
   }
@@ -1237,7 +1237,7 @@ class Ability {
       `+ ${user.name} uses Lightning Bolt on ${target.name} dealing ${damage}.`
     );
     this.cooldowns.push({
-      name: `Lightning Bolt`,
+      name: "Lightning Bolt",
       cooldown: this.cooldownFinder("Lightning Bolt"),
     });
     // Implement additional effects for Lightning Bolt here

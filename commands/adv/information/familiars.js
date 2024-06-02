@@ -52,19 +52,19 @@ module.exports = {
     console.log("done here2");
     const actionRow = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
-        .setCustomId(`fam_first`)
+        .setCustomId("fam_first")
         .setLabel("◀️")
         .setStyle("Secondary"),
       new ButtonBuilder()
-        .setCustomId(`fam_prev`)
+        .setCustomId("fam_prev")
         .setLabel("←")
         .setStyle("Primary"),
       new ButtonBuilder()
-        .setCustomId(`fam_next`)
+        .setCustomId("fam_next")
         .setLabel("→")
         .setStyle("Primary"),
       new ButtonBuilder()
-        .setCustomId(`fam_last`)
+        .setCustomId("fam_last")
         .setLabel("▶️")
         .setStyle("Secondary")
     );

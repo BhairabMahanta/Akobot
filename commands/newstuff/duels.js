@@ -183,7 +183,7 @@ class Duel {
     let selectedValue;
     // Create the embed for the adventure command
     this.battleEmbed = new EmbedBuilder()
-      .setTitle(`PLAYOFFS!`)
+      .setTitle("PLAYOFFS!")
       .setDescription(
         `**${this.opponent.name} do you accept the challenge?**\n\n**${this.player.name}** has challenged you to a duel! Do you accept the challenge?`
       );
@@ -219,8 +219,8 @@ class Duel {
           console.log("bro clicked fr??:", selectedValue);
           const selectedValueName = selectedValue.replace("klik_", "");
           if (selectedValueName === "decline") {
-            const battleEmbed = new EmbedBuilder().setTitle(`PLAYOFFS!`);
-            battleEmbed.setDescription(`bro declined the duel, idot.`);
+            const battleEmbed = new EmbedBuilder().setTitle("PLAYOFFS!");
+            battleEmbed.setDescription("bro declined the duel, idot.");
             gaeMessage.edit({ embeds: [battleEmbed], components: [] });
             this.continue = false;
           }
@@ -599,7 +599,7 @@ class Duel {
       } else if (character === this.opponent) {
         return this.opponent.stats.speed;
       } else {
-        console.log(`Calculating speed for unknown character type: 0`);
+        console.log("Calculating speed for unknown character type: 0");
         return 0; // Default to 0 for unknown character types
       }
     } catch (error) {
@@ -1184,7 +1184,7 @@ class Duel {
     }
     if (this.alivePlayerTeam.length === 0) {
       const battleEmbed = new EmbedBuilder().setTitle(
-        `The battle has been concluded!!`
+        "The battle has been concluded!!"
       );
       battleEmbed.setFields({
         name: `GGs ${this.opponent.name}You've won!!`,
@@ -1203,7 +1203,7 @@ class Duel {
       this.message.channel.send({ embeds: [battleEmbed] });
     } else if (this.aliveOpponentTeam.length === 0) {
       const battleEmbed = new EmbedBuilder().setTitle(
-        `The battle has been concluded!!`
+        "The battle has been concluded!!"
       );
       battleEmbed.setFields({
         name: `GGs ${this.player.name}You've won!!`,

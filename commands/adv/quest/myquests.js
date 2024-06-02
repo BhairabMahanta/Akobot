@@ -398,7 +398,7 @@ module.exports = {
         await interaction.deferUpdate();
         embed.setTitle("Started Quest!");
         embed.setDescription(
-          `### You can view quest details and real time information through "a!myquest" `
+          '### You can view quest details and real time information through "a!myquest" '
         );
         sentMessage.edit({ embeds: [embed] });
         const startQuest = new QuestLogic(
