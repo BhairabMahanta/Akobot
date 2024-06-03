@@ -275,6 +275,7 @@ class Battle {
       turnEnder.statuses.debuffs[i].remainingTurns--;
       if (turnEnder.statuses.debuffs[i].remainingTurns <= 0) {
         turnEnder.statuses.debuffs.splice(i, 1); // Remove the expired debuff from the array
+        console.log(`Debuff removed from ${turnEnder.name}`);
       }
     }
 
@@ -283,15 +284,22 @@ class Battle {
       turnEnder.statuses.buffs[i].remainingTurns--;
       if (turnEnder.statuses.buffs[i].remainingTurns <= 0) {
         turnEnder.statuses.buffs.splice(i, 1); // Remove the expired buff from the array
+        console.log(`Buff removed from ${turnEnder.name}`);
       }
     }
   }
 
   async sendInitialEmbed() {
     try {
-      // const filledBars = Math.floor(atkBar / 10);
-      //  const emptyBars = 10 - filledBars;
-      //  const attackBarString = `${'⚔️'.repeat(filledBars)}${' '.repeat(emptyBars)}`;
+      const iconMap = {
+        increase_attack_and_speed: "🗡️💨",
+        increase_attack: "🗡️",
+        increase_defense: "🛡️",
+        increase_speed: "💨",
+        decrease_attack: "💔",
+        decrease_defense: "🌬️",
+        decrease_speed: "🍃",
+      };
       console.log(this.player.name, "-inside", this.player.attackBarEmoji);
       this.battleEmbed = new EmbedBuilder()
         .setTitle(`Battle VS ${this.enemyDetails.name}`)
@@ -300,6 +308,30 @@ class Battle {
           text: "You can run if you want lol no issues",
         })
         .setColor(0x0099ff);
+
+      if (this.battleLogs.length > 6 && this.battleLogs.length <= 7) {
+        this.battleLogs.shift();
+      } else if (this.battleLogs.length > 7 && this.battleLogs.length <= 8) {
+        this.battleLogs.shift();
+        this.battleLogs.shift();
+      } else if (this.battleLogs.length > 8) {
+        this.battleLogs.shift();
+        this.battleLogs.shift();
+        this.battleLogs.shift();
+      }
+      console.log("battleLogsLengthAfterr:", this.battleLogs.length);
+
+      if (this.battleLogs.length > 0) {
+        this.battleEmbed.setDescription(
+          `**Battle Logs:**\n\`\`\`diff\n+ ${this.battleLogs.join("\n")}\`\`\``
+        );
+      } else {
+        this.battleEmbed.addFields({
+          name: "Battle Logs",
+          value: "No battle logs yet.",
+          inline: false,
+        });
+      }
       this.battleEmbed.addFields({
         name: "Current Turn",
         value: `\`\`\`${this.currentTurn}\`\`\``,
@@ -318,11 +350,25 @@ class Battle {
       } else if (this.enemyDetails.type === "mob") {
         let mobInfo = ""; // Initialize an empty string to store the info
         for (const mob of this.mobInfo) {
+          let buffIcons = "";
+          let debuffIcons = "";
+          for (const buff of mob.statuses.buffs) {
+            if (iconMap[buff.type]) {
+              buffIcons += iconMap[buff.type];
+            }
+          }
+          for (const buff of mob.statuses.debuffs) {
+            if (iconMap[buff.type]) {
+              debuffIcons += iconMap[buff.type];
+            }
+          }
           mobInfo += `[2;37m ${mob.name}: ⚔️ ${mob.stats.attack} 🛡️ ${
             mob.stats.defense
           } 💨 ${mob.stats.speed} 🔮 ${mob.stats.magic}\n[2;32m ${mob.hpBarEmoji} ${
             mob.stats.hp
-          } ♥️\n[2;36m [2;34m${mob.attackBarEmoji} ${Math.floor(mob.atkBar)} 🙋\n\n`;
+          } ♥️ \n[2;36m [2;34m${mob.attackBarEmoji} ${Math.floor(
+            mob.atkBar
+          )} [2;34mb&d ${buffIcons}${debuffIcons}\n\n`;
         }
 
         this.battleEmbed.addFields({
@@ -335,23 +381,46 @@ class Battle {
         let playerAndFamiliarsInfo = ""; // Initialize an empty string to store the info
 
         for (const familiar of this.familiarInfo) {
+          let buffIcons = "";
+          let debuffIcons = "";
+          for (const buff of familiar.statuses.buffs) {
+            if (iconMap[buff.type]) {
+              buffIcons += iconMap[buff.type];
+            }
+          }
+          for (const buff of familiar.statuses.debuffs) {
+            if (iconMap[buff.type]) {
+              debuffIcons += iconMap[buff.type];
+            }
+          }
           playerAndFamiliarsInfo += `[2;37m ${familiar.name}: ⚔️${
             familiar.stats.attack
           } 🛡️${familiar.stats.defense} 💨${familiar.stats.speed}\n[2;32m ${
             familiar.hpBarEmoji
-          } ${familiar.stats.hp} ♥️\n[2;36m [2;34m${familiar.attackBarEmoji} ${Math.floor(
+          } ${familiar.stats.hp} ♥️ \n[2;36m [2;34m${familiar.attackBarEmoji} ${Math.floor(
             familiar.atkBar
-          )} 🙋\n\n`;
+          )} [2;34mb&d ${buffIcons}${debuffIcons}\n\n`;
         }
-
+        let buffIcons = "";
+        let debuffIcons = "";
+        for (const buff of this.player.statuses.buffs) {
+          if (iconMap[buff.type]) {
+            buffIcons += iconMap[buff.type];
+          }
+        }
+        for (const buff of this.player.statuses.debuffs) {
+          if (iconMap[buff.type]) {
+            debuffIcons += iconMap[buff.type];
+          }
+        }
         // Add the player's HP and AttackBar to the info
         playerAndFamiliarsInfo += `[2;37m ${this.playerName}: ⚔️${
           this.player.stats.attack
         } 🛡️${this.player.stats.defense} 💨${this.player.stats.speed} 🔮${
           this.player.stats.magic
-        }\n[2;32m ${this.player.hpBarEmoji} ${this.player.stats.hp} ♥️\n[2;36m [2;34m${
+        }\n[2;32m ${this.player.hpBarEmoji} ${this.player.stats.hp} ♥️ \n[2;36m [2;34m${
           this.player.attackBarEmoji
-        } ${Math.floor(this.player.atkBar)} 🙋`;
+        } ${Math.floor(this.player.atkBar)} [2;34mb&d ${buffIcons}${debuffIcons}`;
 
         this.battleEmbed.addFields({
           name: "Your Team Info:",
@@ -359,32 +428,7 @@ class Battle {
           inline: false,
         });
       }
-      console.log("battleLOgsLengthBefore", this.battleLogs.length);
-      if (this.battleLogs.length > 6 && this.battleLogs.length <= 7) {
-        this.battleLogs.shift();
-      } else if (this.battleLogs.length > 7 && this.battleLogs.length <= 8) {
-        this.battleLogs.shift();
-        this.battleLogs.shift();
-      } else if (this.battleLogs.length > 8) {
-        this.battleLogs.shift();
-        this.battleLogs.shift();
-        this.battleLogs.shift();
-      }
-      console.log("battleLogsLengthAfterr:", this.battleLogs.length);
 
-      if (this.battleLogs.length > 0) {
-        this.battleEmbed.addFields({
-          name: "Battle Logs",
-          value: "```diff\n" + this.battleLogs.join("\n") + "```",
-          inline: false,
-        });
-      } else {
-        this.battleEmbed.addFields({
-          name: "Battle Logs",
-          value: "No battle logs yet.",
-          inline: false,
-        });
-      }
       return this.battleEmbed;
       // return await message.channel.send({ embeds: [initialEmbed], components: [buttonRow] });
     } catch (error) {
@@ -488,16 +532,16 @@ class Battle {
                 "player_ability_",
                 ""
               );
-              console.log("abilityName:a", abilityName);
+
               const abilityNameCamel = await this.toCamelCase(abilityName);
-              console.log("abilityName:a", abilityNameCamel);
+
               // Check if the abilityName exists as a method in the Ability class
               if (typeof this.ability[abilityNameCamel] === "function") {
                 const method = this.ability[abilityNameCamel];
 
                 if (method) {
                   const functionAsString = method.toString();
-                  console.log("functionAsString:", functionAsString);
+                  // console.log("functionAsString:", functionAsString);
                   const parameterNames = functionAsString
                     .replace(/[/][/].*$/gm, "") // remove inline comments
                     .replace(/\s+/g, "") // remove white spaces
@@ -794,16 +838,16 @@ class Battle {
     try {
       const emoji = "■";
       let emptyBars = 0;
-      if (atkBar > 113) {
+      if (atkBar >= 100) {
         console.log("atkBar:", atkBar);
-        atkBar = 113;
+        atkBar = 100;
       }
-      const filledBars = Math.floor(atkBar / 5);
-      emptyBars = Math.floor(21 - filledBars);
+      const filledBars = Math.floor(atkBar / 10);
+      emptyBars = Math.floor(10 - filledBars);
 
-      if (atkBar > 100) {
-        emptyBars = Math.floor(22 - filledBars);
-      }
+      // if (atkBar > 100) {
+      //   emptyBars = Math.floor(12 - filledBars);
+      // }
       const attackBarString = `${emoji.repeat(filledBars)}${" ".repeat(
         emptyBars
       )}`;
@@ -816,11 +860,11 @@ class Battle {
   async generateHPBarEmoji(currentHP, maxHP) {
     const emoji = "■";
     let filledBars;
-    filledBars = Math.floor((currentHP / maxHP) * 21);
+    filledBars = Math.floor((currentHP / maxHP) * 17);
     if (currentHP < 0) {
       filledBars = 0;
     }
-    const emptyBars = Math.floor(21 - filledBars);
+    const emptyBars = Math.floor(17 - filledBars);
 
     let hpBarString = emoji.repeat(filledBars);
     if (emptyBars > 0) {

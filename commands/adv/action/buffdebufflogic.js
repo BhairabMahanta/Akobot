@@ -43,9 +43,33 @@ class BuffDebuffLogic {
     // Initialize any necessary properties
   }
 
-  // Method to apply a buff
-  async increaseAttack(target) {
-    // Apply the Attack Buff to the target
+  async increaseAttack(target, turnLimit, buffDetails) {
+    // Check if the target has buff blocker
+    if (target.hasBuffBlocker) {
+      this.battleLogs.push(
+        `${target.name} could not receive the attack buff due to buff blocker.`
+      );
+      return;
+    }
+
+    // Create the buff object
+    const buff = {
+      type: "increase_attack",
+      name: buffDetails.name,
+      remainingTurns: turnLimit,
+      boostAmount: buffDetails.amount,
+      isPercentage: buffDetails.isPercentage,
+    };
+
+    // Apply the buff to the target
+    if (!target.statuses) {
+      target.statuses = { buffs: [], debuffs: [] };
+    }
+    target.statuses.buffs.push(buff);
+
+    this.battleLogs.push(
+      `${target.name} received ${buffDetails.name} for ${turnLimit} turns.`
+    );
   }
 
   // Method to remove a buff
@@ -63,3 +87,4 @@ class BuffDebuffLogic {
     // Remove the Attack Break debuff from the target
   }
 }
+module.exports = { BuffDebuffLogic };

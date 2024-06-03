@@ -60,8 +60,24 @@ class Ability {
     });
   }
 
-  async bloodlust(user) {
-    user.stats.attackSpeed += 20; // Example: Increase attack speed by 20
+  async bloodlust(user, target) {
+    const buffType = "increase_attack_and_speed";
+    const buffName = "Bloodlust";
+    const buffDetails = {
+      name: "Bloodlust",
+      unique: true,
+      speed_amount: 20,
+      attack_amount: 15,
+      turnLimit: 3,
+    };
+    this.buffDebuffManager.applyBuff(
+      user,
+      target,
+      buffType,
+      buffName,
+      buffDetails
+    );
+    user.stats.spd += 20; // Example: Increase attack speed by 20
     user.stats.attack += 15; // Example: Increase attack damage by 15
     this.battleLogs.push(
       `${user.name} activates Bloodlust. Attack speed and damage increase.`
@@ -1286,7 +1302,7 @@ class Ability {
 
   async venomStrike(user, target) {
     const damage = await calculateDamage(
-      user.stats.magic * 1.2,
+      user.stats.magic,
       target.stats.defense
     );
     target.stats.hp -= damage;

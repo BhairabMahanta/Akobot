@@ -715,16 +715,16 @@ class Duel {
     try {
       const emoji = "■";
       let emptyBars = 0;
-      if (atkBar > 113) {
+      if (atkBar >= 100) {
         console.log("atkBar:", atkBar);
-        atkBar = 113;
+        atkBar = 100;
       }
-      const filledBars = Math.floor(atkBar / 5);
-      emptyBars = Math.floor(21 - filledBars);
+      const filledBars = Math.floor(atkBar / 10);
+      emptyBars = Math.floor(10 - filledBars);
 
-      if (atkBar > 100) {
-        emptyBars = Math.floor(22 - filledBars);
-      }
+      // if (atkBar > 100) {
+      //   emptyBars = Math.floor(12 - filledBars);
+      // }
       const attackBarString = `${emoji.repeat(filledBars)}${" ".repeat(
         emptyBars
       )}`;
@@ -732,16 +732,16 @@ class Duel {
     } catch (error) {
       console.log("errorHere:", error);
     }
-  } //
+  }
 
   async generateHPBarEmoji(currentHP, maxHP) {
     const emoji = "■";
     let filledBars;
-    filledBars = Math.floor((currentHP / maxHP) * 21);
+    filledBars = Math.floor((currentHP / maxHP) * 17);
     if (currentHP < 0) {
       filledBars = 0;
     }
-    const emptyBars = Math.floor(21 - filledBars);
+    const emptyBars = Math.floor(17 - filledBars);
 
     let hpBarString = emoji.repeat(filledBars);
     if (emptyBars > 0) {
@@ -749,7 +749,7 @@ class Duel {
     }
 
     return `[${hpBarString}]`;
-  } //
+  }
 
   async getNextTurn() {
     let nextTurn = null;
@@ -798,11 +798,38 @@ class Duel {
       // console.log(this.player.name, "-inside", this.player.attackBarEmoji);
       this.battleEmbed = new EmbedBuilder()
         .setTitle(`${this.player.name} VS ${this.opponent.name}`)
-        .setDescription(`**Current Turn:** \`\`${this.currentTurn}\`\``)
         .setFooter({
           text: `Team Turn: ${this.teamTurn}'s Team!`,
         })
         .setColor(0x0099ff);
+      if (this.battleLogs.length > 6 && this.battleLogs.length <= 7) {
+        this.battleLogs.shift();
+      } else if (this.battleLogs.length > 7 && this.battleLogs.length <= 8) {
+        this.battleLogs.shift();
+        this.battleLogs.shift();
+      } else if (this.battleLogs.length > 8) {
+        this.battleLogs.shift();
+        this.battleLogs.shift();
+        this.battleLogs.shift();
+      }
+      console.log("battleLogsLengthAfterr:", this.battleLogs.length);
+
+      if (this.battleLogs.length > 0) {
+        this.battleEmbed.setDescription(
+          `**Battle Logs:**\n\`\`\`diff\n+ ${this.battleLogs.join("\n")}\`\`\``
+        );
+      } else {
+        this.battleEmbed.addFields({
+          name: "Battle Logs",
+          value: "No battle logs yet.",
+          inline: false,
+        });
+      }
+      this.battleEmbed.addFields({
+        name: "Current Turn",
+        value: `\`\`\`${this.currentTurn}\`\`\``,
+        inline: false,
+      });
       let playerAndFamiliarsInfo = ""; // Initialize an empty string to store the info
 
       for (const familiar of this.allyFamiliars) {
@@ -856,32 +883,6 @@ class Duel {
         inline: false,
       });
 
-      // console.log("battleLOgsLengthBefore", this.battleLogs.length);
-      if (this.battleLogs.length > 6 && this.battleLogs.length <= 7) {
-        this.battleLogs.shift();
-      } else if (this.battleLogs.length > 7 && this.battleLogs.length <= 8) {
-        this.battleLogs.shift();
-        this.battleLogs.shift();
-      } else if (this.battleLogs.length > 8) {
-        this.battleLogs.shift();
-        this.battleLogs.shift();
-        this.battleLogs.shift();
-      }
-      // console.log("battleLogsLengthAfterr:", this.battleLogs.length);
-
-      if (this.battleLogs.length > 0) {
-        this.battleEmbed.addFields({
-          name: "Battle Logs",
-          value: "```diff\n" + this.battleLogs.join("\n") + "```",
-          inline: false,
-        });
-      } else {
-        this.battleEmbed.addFields({
-          name: "Battle Logs",
-          value: "No battle logs yet.",
-          inline: false,
-        });
-      }
       return this.battleEmbed;
       // return await message.channel.send({ embeds: [initialEmbed], components: [buttonRow] });
     } catch (error) {

@@ -132,9 +132,6 @@ module.exports = {
     collector.on("collect", async (interaction) => {
       try {
         const selectedValues = interaction.values;
-
-        console.log("Selected values:", selectedValues);
-
         // Update the selectedFamiliars array
         selectedFamiliars = selectedValues;
 
