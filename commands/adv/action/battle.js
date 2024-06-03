@@ -103,7 +103,7 @@ class Battle {
     this.pickedChoice = false;
     this.enemyToHit = null;
     this.ability = new Ability(this);
-    this.BuffDebuffManager = new BuffDebuffManager(this.battleLogs);
+    this.buffDebuffManager = new BuffDebuffManager(this);
   }
 
   async initialiseStuff() {
@@ -186,6 +186,10 @@ class Battle {
         character.atkBar = 0;
         character.attackBarEmoji = [];
         character.hpBarEmoji = [];
+        character.statuses = {
+          buffs: [],
+          debuffs: [],
+        };
         //   console.log(character.name, '-', character.attackBarEmoji), '-', character.hpBarEmoji;
       }
 
@@ -266,12 +270,21 @@ class Battle {
   }
 
   async handleTurnEffects(turnEnder) {
-    turnEnder.debuffs.forEach((debuff) => {
-      debuff.remainingTurns--;
-      if (debuff.remainingTurns <= 0) {
-        this.removeDebuff(this.player, debuff.type);
+    // Handle debuffs
+    for (let i = turnEnder.statuses.debuffs.length - 1; i >= 0; i--) {
+      turnEnder.statuses.debuffs[i].remainingTurns--;
+      if (turnEnder.statuses.debuffs[i].remainingTurns <= 0) {
+        turnEnder.statuses.debuffs.splice(i, 1); // Remove the expired debuff from the array
       }
-    });
+    }
+
+    // Handle buffs
+    for (let i = turnEnder.statuses.buffs.length - 1; i >= 0; i--) {
+      turnEnder.statuses.buffs[i].remainingTurns--;
+      if (turnEnder.statuses.buffs[i].remainingTurns <= 0) {
+        turnEnder.statuses.buffs.splice(i, 1); // Remove the expired buff from the array
+      }
+    }
   }
 
   async sendInitialEmbed() {

@@ -16,7 +16,7 @@ class Ability {
     this.battleLogs = that.battleLogs;
     this.enemyToHit = that.enemyToHit;
     this.cooldowns = that.cooldowns;
-    this.buffDebuffManager = new BuffDebuffManager(that.battleLogs);
+    this.buffDebuffManager = new BuffDebuffManager(that);
   }
   async cooldownFinder(ability) {
     const abilityCooldown = abilities[ability].cooldown;

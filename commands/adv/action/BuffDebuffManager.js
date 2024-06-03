@@ -1,12 +1,14 @@
 class BuffDebuffManager {
-  constructor(battleLogs) {
-    this.battleLogs = battleLogs;
+  constructor(that) {
+    this.battleLogs = that.battleLogs;
   }
 
   async applyDebuff(target, user, debuffType, debuffName, turnLimit) {
     // Check if the target has immunity
     if (target.hasImmunity) {
-      this.battleLogs.push(`${target.name} is immune to debuffs.`);
+      this.battleLogs.push(
+        `${target.name} is immune to ${debuffType} debuffs.`
+      );
       return;
     }
 
@@ -16,27 +18,30 @@ class BuffDebuffManager {
       name: debuffName,
       remainingTurns: turnLimit,
     };
-    target.debuffs.push(debuff);
+    target.statuses.debuffs.push(debuff);
     this.battleLogs.push(
       `${user} applied ${debuffName} to ${target.name} for ${turnLimit} turns.`
     );
   }
 
+  // Method to remove a debuff
   async removeDebuff(target, debuffType, user, isTrue) {
-    target.debuffs = await target.debuffs.filter(
+    target.statuses.debuffs = await target.statuses.debuffs.filter(
       (debuff) => debuff.type !== debuffType
     );
     if (isTrue === true) {
       this.battleLogs.push(
-        `${user} removed ${debuffType}  removed from ${target.name}.`
+        `${user} removed ${debuffType} debuff from ${target.name}.`
       );
     }
   }
+
+  // Method to apply a buff
   async applyBuff(target, user, buffType, buffName, turnLimit) {
     // Apply the buff
     if (target.hasBuffBlocker) {
       this.battleLogs.push(
-        `${target.name} could not get the ${buffName} buffs.`
+        `${target.name} could not receive the ${buffName} buff.`
       );
       return;
     }
@@ -45,7 +50,7 @@ class BuffDebuffManager {
       name: buffName,
       remainingTurns: turnLimit,
     };
-    target.buffs.push(buff);
+    target.statuses.buffs.push(buff);
     this.battleLogs.push(
       `${user} applied ${buffName} to ${target.name} for ${turnLimit} turns.`
     );
@@ -53,7 +58,9 @@ class BuffDebuffManager {
 
   // Method to remove a buff
   async removeBuff(target, buffType, user, isTrue) {
-    target.buffs = await target.buffs.filter((buff) => buff.type !== buffType);
+    target.statuses.buffs = await target.statuses.buffs.filter(
+      (buff) => buff.type !== buffType
+    );
     if (isTrue === true) {
       this.battleLogs.push(
         `${user} removed ${buffType} buff from ${target.name}.`
