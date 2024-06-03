@@ -231,6 +231,8 @@ class Duel {
           if (this.continue) {
             console.log("continue hogaya");
             this.startBattle(this.message);
+          } else {
+            return;
           }
         }
       }

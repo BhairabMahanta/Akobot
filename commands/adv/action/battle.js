@@ -282,6 +282,7 @@ class Battle {
     // Handle buffs
     for (let i = turnEnder.statuses.buffs.length - 1; i >= 0; i--) {
       turnEnder.statuses.buffs[i].remainingTurns--;
+      console.log(`turn buff stuff ${turnEnder.statuses.buffs}`);
       if (turnEnder.statuses.buffs[i].remainingTurns <= 0) {
         turnEnder.statuses.buffs.splice(i, 1); // Remove the expired buff from the array
         console.log(`Buff removed from ${turnEnder.name}`);
@@ -948,6 +949,7 @@ class Battle {
       console.log(
         `${this.currentTurn} attacks ${target} for ${damage} damage using gayness`
       );
+      await this.handleTurnEffects(this.player);
       // this.getNextTurn()
       // console.log('currentTurn:', this.currentTurn);
     } else if (this.playerFamiliar.includes(this.currentTurn)) {
@@ -971,6 +973,7 @@ class Battle {
           console.log(
             `${this.currentTurn} attacks ${target} for ${damage} damage using an attack`
           );
+          await this.handleTurnEffects(familiar);
           break; // Exit the loop once the attacking familiar is found
         }
       }
@@ -1034,6 +1037,7 @@ class Battle {
 
         // console.log('currentTurn:', this.currentTurn);
       }
+      await this.handleTurnEffects(enemies);
     }
     if (this.currentTurn != this.boss.name) {
       console.log("notmy turn bitches");
@@ -1078,6 +1082,7 @@ class Battle {
       );
       await this.getNextTurn();
       console.log("currentTurnForDragonafter;", this.currentTurn);
+      await this.handleTurnEffects(this.boss);
       //  const updatedEmbed = await this.sendInitialEmbed(message);
       // this.initialMessage.edit({ embeds: [updatedEmbed], components: await this.getDuelActionRow() });
 
