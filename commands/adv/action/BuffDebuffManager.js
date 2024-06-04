@@ -45,11 +45,24 @@ class BuffDebuffManager {
       );
       return;
     }
-    const buff = {
-      type: buffType,
-      name: buffName,
-      remainingTurns: buffDetails.turnLimit,
-    };
+    let buff = {};
+    if (buffDetails.unique === true) {
+      buff = {
+        type: buffType,
+        name: buffName,
+        remainingTurns: buffDetails.turnLimit,
+        value_amount: buffDetails.value_amount,
+        flat: buffDetails.flat || false,
+      };
+    } else {
+      buff = {
+        type: buffType,
+        name: buffName,
+        remainingTurns: buffDetails.turnLimit,
+        value_amount: buffDetails.value_amount,
+        flat: buffDetails.flat || false,
+      };
+    }
     user.statuses.buffs.push(buff);
     console.log(`'user:`, user);
     // this.battleLogs.push(

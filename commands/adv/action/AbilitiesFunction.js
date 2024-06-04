@@ -7,6 +7,7 @@ const {
   getPlayerMoves,
 } = require("../../util/glogic.js");
 const { BuffDebuffManager } = require("./BuffDebuffManager.js");
+const { BuffDebuffLogic } = require("./buffdebufflogic.js");
 const abilities = require("../../../data/abilities.js");
 const {
   calculateDamage,
@@ -17,6 +18,7 @@ class Ability {
     this.enemyToHit = that.enemyToHit;
     this.cooldowns = that.cooldowns;
     this.buffDebuffManager = new BuffDebuffManager(that);
+    this.buffDebuffLogic = new BuffDebuffLogic(that);
   }
   async cooldownFinder(ability) {
     const abilityCooldown = abilities[ability].cooldown;
@@ -66,9 +68,9 @@ class Ability {
     const buffDetails = {
       name: "Bloodlust",
       unique: true,
-      speed_amount: 20,
-      attack_amount: 15,
+      value_amount: { attack: 15, speed: 20 },
       turnLimit: 3,
+      flat: true,
     };
     this.buffDebuffManager.applyBuff(
       user,
@@ -77,8 +79,8 @@ class Ability {
       buffName,
       buffDetails
     );
-    user.stats.spd += 20; // Example: Increase attack speed by 20
-    user.stats.attack += 15; // Example: Increase attack damage by 15
+    await this.buffDebuffLogic.increaseAttackNSpeed(user, buffDetails);
+
     this.battleLogs.push(
       `${user.name} activates Bloodlust. Attack speed and damage increase.`
     );

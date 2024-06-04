@@ -42,34 +42,72 @@ class BuffDebuffLogic {
     this.battleLogs = that.battleLogs;
     // Initialize any necessary properties
   }
+  async overLogic(turnEnder, buff) {
+    // remove the buff's effect if right before it's pushed out may be naturally or cleansed
+    if (buff.flat) {
+      turnEnder.stats.attack += buff.attack_amount;
+      turnEnder.stats.speed += buff.speed_amount;
+    } else {
+      turnEnder.stats.attack +=
+        turnEnder.stats.attack * (buff.attack_amount / 100);
+      turnEnder.stats.speed +=
+        turnEnder.stats.speed * (buff.speed_amount / 100);
+    }
+  }
+  async increaseAttackNSpeed(target, buffDetails) {
+    // if (target.statuses.buffs.some(buff => buff.name === buffDetails.name)) {
+    //   this.battleLogs.push(`${target.name} already has the ${buffDetails.name} buff.`);
+    //   return;
+    // }
+    if (buffDetails.unique === true && buffDetails.targets > 1) {
+      for (const unit of target) {
+        const buff = {
+          type: "increase_attack_and_speed",
+          name: buffDetails.name,
+          remainingTurns: buffDetails.turnLimit,
+          attack_amount: buffDetails.value_amount.attack,
+          speed_amount: buffDetails.value_amount.speed,
+          flat: buffDetails.flat || false,
+        };
 
-  async increaseAttack(target, turnLimit, buffDetails) {
-    // Check if the target has buff blocker
-    if (target.hasBuffBlocker) {
+        if (buff.flat) {
+          unit.stats.attack += buff.attack_amount;
+          unit.stats.speed += buff.speed_amount;
+        } else {
+          unit.stats.attack += unit.stats.attack * (buff.attack_amount / 100);
+          unit.stats.speed += unit.stats.speed * (buff.speed_amount / 100);
+        }
+
+        this.battleLogs.push(
+          `${unit.name} received ${
+            buffDetails.name
+          } buff, increasing attack by ${buff.value}${buff.flat ? "" : "%"}.`
+        );
+      }
+    } else {
+      const buff = {
+        type: "increase_attack_and_speed",
+        name: buffDetails.name,
+        remainingTurns: buffDetails.turnLimit,
+        attack_amount: buffDetails.value_amount.attack,
+        speed_amount: buffDetails.value_amount.speed,
+        flat: buffDetails.flat || false,
+      };
+
+      if (buff.flat) {
+        target.stats.attack += buff.attack_amount;
+        target.stats.speed += buff.speed_amount;
+      } else {
+        target.stats.attack += target.stats.attack * (buff.attack_amount / 100);
+        target.stats.speed += target.stats.speed * (buff.speed_amount / 100);
+      }
+
       this.battleLogs.push(
-        `${target.name} could not receive the attack buff due to buff blocker.`
+        `${target.name} received ${
+          buffDetails.name
+        } buff, increasing attack by ${buff.value}${buff.flat ? "" : "%"}.`
       );
-      return;
     }
-
-    // Create the buff object
-    const buff = {
-      type: "increase_attack",
-      name: buffDetails.name,
-      remainingTurns: turnLimit,
-      boostAmount: buffDetails.amount,
-      isPercentage: buffDetails.isPercentage,
-    };
-
-    // Apply the buff to the target
-    if (!target.statuses) {
-      target.statuses = { buffs: [], debuffs: [] };
-    }
-    target.statuses.buffs.push(buff);
-
-    this.battleLogs.push(
-      `${target.name} received ${buffDetails.name} for ${turnLimit} turns.`
-    );
   }
 
   // Method to remove a buff

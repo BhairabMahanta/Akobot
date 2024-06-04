@@ -24,6 +24,7 @@ const {
   Ability,
   // eslint-disable-next-line no-undef
 } = require("./AbilitiesFunction.js");
+const { BuffDebuffLogic } = require("./buffdebufflogic.js");
 let initialMessage = null;
 const {
   EmbedBuilder,
@@ -104,6 +105,7 @@ class Battle {
     this.enemyToHit = null;
     this.ability = new Ability(this);
     this.buffDebuffManager = new BuffDebuffManager(this);
+    this.buffDebuffLogic = new BuffDebuffLogic(this);
   }
 
   async initialiseStuff() {
@@ -274,6 +276,7 @@ class Battle {
     for (let i = turnEnder.statuses.debuffs.length - 1; i >= 0; i--) {
       turnEnder.statuses.debuffs[i].remainingTurns--;
       if (turnEnder.statuses.debuffs[i].remainingTurns <= 0) {
+        this.buffDebuffLogic.overLogic(turnEnder);
         turnEnder.statuses.debuffs.splice(i, 1); // Remove the expired debuff from the array
         console.log(`Debuff removed from ${turnEnder.name}`);
       }
@@ -284,7 +287,8 @@ class Battle {
       turnEnder.statuses.buffs[i].remainingTurns--;
       console.log(`turn buff stuff ${turnEnder.statuses.buffs}`);
       if (turnEnder.statuses.buffs[i].remainingTurns <= 0) {
-        turnEnder.statuses.buffs.splice(i, 1); // Remove the expired buff from the array
+        this.buffDebuffLogic.overLogic(turnEnder, turnEnder.statuses.buffs[i]);
+
         console.log(`Buff removed from ${turnEnder.name}`);
       }
     }
@@ -369,7 +373,7 @@ class Battle {
             mob.stats.hp
           } ♥️ \n[2;36m [2;34m${mob.attackBarEmoji} ${Math.floor(
             mob.atkBar
-          )} [2;34mb&d ${buffIcons}${debuffIcons}\n\n`;
+          )} [2;34mb&d [${buffIcons}${debuffIcons}}\n\n`;
         }
 
         this.battleEmbed.addFields({
@@ -400,7 +404,7 @@ class Battle {
             familiar.hpBarEmoji
           } ${familiar.stats.hp} ♥️ \n[2;36m [2;34m${familiar.attackBarEmoji} ${Math.floor(
             familiar.atkBar
-          )} [2;34mb&d ${buffIcons}${debuffIcons}\n\n`;
+          )} [2;34mb&d [${buffIcons}${debuffIcons}]\n\n`;
         }
         let buffIcons = "";
         let debuffIcons = "";
@@ -421,7 +425,7 @@ class Battle {
           this.player.stats.magic
         }\n[2;32m ${this.player.hpBarEmoji} ${this.player.stats.hp} ♥️ \n[2;36m [2;34m${
           this.player.attackBarEmoji
-        } ${Math.floor(this.player.atkBar)} [2;34mb&d ${buffIcons}${debuffIcons}`;
+        } ${Math.floor(this.player.atkBar)} [2;34mb&d [${buffIcons}${debuffIcons}]`;
 
         this.battleEmbed.addFields({
           name: "Your Team Info:",

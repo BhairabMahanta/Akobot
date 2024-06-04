@@ -163,6 +163,10 @@ class Duel {
         character.atkBar = 0;
         character.attackBarEmoji = [];
         character.hpBarEmoji = [];
+        character.statuses = {
+          buffs: [],
+          debuffs: [],
+        };
         //   console.log(character.name, "-", character.atkBar),
         //     "-",
         //     character.hpBarEmoji;
@@ -174,6 +178,26 @@ class Duel {
         "Please select a class, your race and also select your familiars!"
       );
       console.log("The error is here:", error);
+    }
+  }
+  async handleTurnEffects(turnEnder) {
+    // Handle debuffs
+    for (let i = turnEnder.statuses.debuffs.length - 1; i >= 0; i--) {
+      turnEnder.statuses.debuffs[i].remainingTurns--;
+      if (turnEnder.statuses.debuffs[i].remainingTurns <= 0) {
+        turnEnder.statuses.debuffs.splice(i, 1); // Remove the expired debuff from the array
+        console.log(`Debuff removed from ${turnEnder.name}`);
+      }
+    }
+
+    // Handle buffs
+    for (let i = turnEnder.statuses.buffs.length - 1; i >= 0; i--) {
+      turnEnder.statuses.buffs[i].remainingTurns--;
+      console.log(`turn buff stuff ${turnEnder.statuses.buffs}`);
+      if (turnEnder.statuses.buffs[i].remainingTurns <= 0) {
+        turnEnder.statuses.buffs.splice(i, 1); // Remove the expired buff from the array
+        console.log(`Buff removed from ${turnEnder.name}`);
+      }
     }
   }
 
