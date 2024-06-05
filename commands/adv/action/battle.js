@@ -106,6 +106,7 @@ class Battle {
     this.ability = new Ability(this);
     this.buffDebuffManager = new BuffDebuffManager(this);
     this.buffDebuffLogic = new BuffDebuffLogic(this);
+    this.dodge = { option: null };
   }
 
   async initialiseStuff() {
@@ -276,8 +277,13 @@ class Battle {
     for (let i = turnEnder.statuses.debuffs.length - 1; i >= 0; i--) {
       turnEnder.statuses.debuffs[i].remainingTurns--;
       if (turnEnder.statuses.debuffs[i].remainingTurns <= 0) {
-        this.buffDebuffLogic.overLogic(turnEnder);
-        turnEnder.statuses.debuffs.splice(i, 1); // Remove the expired debuff from the array
+        this.buffDebuffLogic.overLogic(
+          turnEnder,
+          turnEnder.statuses.buffs[i],
+          i,
+          true
+        );
+
         console.log(`Debuff removed from ${turnEnder.name}`);
       }
     }
@@ -287,7 +293,12 @@ class Battle {
       turnEnder.statuses.buffs[i].remainingTurns--;
       console.log(`turn buff stuff ${turnEnder.statuses.buffs}`);
       if (turnEnder.statuses.buffs[i].remainingTurns <= 0) {
-        this.buffDebuffLogic.overLogic(turnEnder, turnEnder.statuses.buffs[i]);
+        this.buffDebuffLogic.overLogic(
+          turnEnder,
+          turnEnder.statuses.buffs[i],
+          i,
+          false
+        );
 
         console.log(`Buff removed from ${turnEnder.name}`);
       }
@@ -610,12 +621,39 @@ class Battle {
               console.log("ErrorFamiliar:", error);
             }
           }
+        } else if (selectedClassValue === "cooldowns") {
+          const cooldownDescriptions = this.cooldowns.map(
+            (cooldown) => `**${cooldown.name}**: ${cooldown.turns} turns left`
+          );
+          i.followUp({
+            content: `**Cooldowns**\n${cooldownDescriptions.join("\n")}`,
+            ephemeral: true,
+          });
         } else {
           i.followUp({
             content: "Please pick an enemy to hit using the Select Menu",
             ephemeral: true,
           });
         }
+      } else if (i.customId === "action_dodge") {
+        //it needs to have like 4 possibilities wehre 1 is the lower probability i.e dodge and increase player's attack bar by 20, 2nd is just dodge, 3rd is not being able to dodge entirely but reduce the damage by 50% and 4th is just take the hit and 5th is take 1.5x damage
+        const dodgeOptions = [
+          "dodge_and_increase_attack_bar",
+          "dodge",
+          "reduce_damage",
+          "take_hit",
+          "take_1.5x_damage",
+        ];
+        const randomDodge =
+          dodgeOptions[Math.floor(Math.random() * dodgeOptions.length)];
+        this.dodge.option = randomDodge;
+
+        this.performTurn(message);
+        await cycleCooldowns(this.cooldowns);
+        await this.getNextTurn();
+        await this.performEnemyTurn(message);
+        console.log("currentTurn:", this.currentTurn);
+        this.printBattleResult();
       }
     });
   }
@@ -646,8 +684,18 @@ class Battle {
             }
           })
           .filter(Boolean); // Remove undefined items
+        const cooldownDescriptions =
+          this.cooldowns.length > 0
+            ? "Click here to see your cooldowns"
+            : "There are no cooldowns currently.";
+        this.abilityOptions.push({
+          label: "Cooldowns",
+          description: cooldownDescriptions,
+          value: "cooldowns",
+        });
         // If there are no abilities available, add a failsafe option
-        if (this.abilityOptions.length === 0) {
+
+        if (this.abilityOptions.length === 1) {
           this.abilityOptions.push({
             label: "Cooldown",
             description: "Your abilities are on cooldown",
@@ -684,8 +732,19 @@ class Battle {
             }
           })
           .filter(Boolean); // Remove undefined items
+        // Sort cooldowns by lowest cooldown first and add cooldowns option
+
+        const cooldownDescriptions =
+          this.cooldowns.length > 0
+            ? "Click here to see your cooldowns"
+            : "There are no cooldowns currently.";
+        this.abilityOptions.push({
+          label: "Cooldowns",
+          description: cooldownDescriptions,
+          value: "cooldowns",
+        });
         // If there are no abilities available, add a failsafe option
-        if (this.abilityOptions.length === 0) {
+        if (this.abilityOptions.length === 1) {
           this.abilityOptions.push({
             label: "Cooldown",
             description: "Your abilities are on cooldown",
@@ -996,7 +1055,7 @@ class Battle {
         this.currentTurn != this.boss.name
       ) {
         console.log("enemy:", enemies);
-
+        let damage;
         let isTargetingPlayer;
         // If the current turn is the environment, let it make a move
         // const move = this.environment.makeMove();
@@ -1015,27 +1074,59 @@ class Battle {
 
         const target = targetInfo.name;
         console.log("TARGETNAME:", target);
-        let damage = await this.mobAIClass.move(enemies, targetInfo);
-        // const damage = calculateDamage(this.boss.stats.attack, targetInfo.stats.defense);
-        if (isNaN(damage)) {
+        if (this.dodge.option === "dodge_and_increase_attack_bar") {
           damage = 0;
-          var noLogs = true;
-        }
-        // Update HP and battle logs
-        targetInfo.stats.hp -= damage;
-        console.log("My turn now bitches");
-        if (!noLogs) {
+          await this.getNextTurn();
+          target.atkBar += 20;
           this.battleLogs.push(
-            `- ${this.currentTurn} attacks ${target} for ${damage} damage using cum!\n ============================================`
+            `- ${target} swiftly dodges the attack increasing 20 attack bar!!\n ============================================`
           );
-        } // message.channel.send(`\`\`\`${logsString}\`\`\``);
-        console.log("loglength:", this.battleLogs.length);
-        console.log(
-          `${this.currentTurn} attacks ${target} for ${damage} damage using cum!`
-        );
-        await this.getNextTurn();
-        console.log("currentTurnForDragonafter;", this.currentTurn);
+        } else if (this.dodge.option === "dodge") {
+          damage = 0;
+          await this.getNextTurn();
+          this.battleLogs.push(
+            `- ${target} barely dodges the attack!\n ============================================`
+          );
+        } else if (this.dodge.option === "reduce_damage") {
+          damage = await this.mobAIClass.move(enemies, targetInfo);
+          // const damage = calculateDamage(this.boss.stats.attack, targetInfo.stats.defense);
+          const damageReductionPercentage = Math.random() * (40 - 15) + 15;
+          const reducedDamage = Math.floor(
+            damage * (1 - damageReductionPercentage / 100)
+          );
+          targetInfo.stats.hp -= reducedDamage;
 
+          this.battleLogs.push(
+            `- ${
+              this.currentTurn
+            } attacks ${target} for ${reducedDamage}. Reduced ${
+              damage - reducedDamage
+            } damage!!\n ============================================`
+          );
+        } else if (this.dodge.option === "take_hit") {
+          damage = await this.mobAIClass.move(enemies, targetInfo);
+          // const damage = calculateDamage(this.boss.stats.attack, targetInfo.stats.defense);
+          if (isNaN(damage)) {
+            damage = 0;
+            var noLogs = true;
+          }
+          // Update HP and battle logs
+          targetInfo.stats.hp -= damage;
+          if (!noLogs) {
+            this.battleLogs.push(
+              `- ${this.currentTurn} attacks ${target} for ${damage} damage using basic attack!\n ============================================`
+            );
+          }
+        } else if (this.dodge.option === "take_1.5x_damage") {
+          damage = await this.mobAIClass.move(enemies, targetInfo);
+          const damageReductionPercentage = Math.random() * (40 - 15) + 15;
+          const increasedDamage = Math.floor(
+            damage * (1 - damageReductionPercentage / 100)
+          );
+          targetInfo.stats.hp -= increasedDamage + damage;
+        }
+
+        await this.getNextTurn();
         //  const updatedEmbed = await this.sendInitialEmbed(message);
         // this.initialMessage.edit({ embeds: [updatedEmbed], components: await this.getDuelActionRow() });
 

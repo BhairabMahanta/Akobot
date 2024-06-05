@@ -69,7 +69,7 @@ class Ability {
       name: "Bloodlust",
       unique: true,
       value_amount: { attack: 15, speed: 20 },
-      turnLimit: 3,
+      turnLimit: 1,
       flat: true,
     };
     this.buffDebuffManager.applyBuff(

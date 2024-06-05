@@ -42,16 +42,26 @@ class BuffDebuffLogic {
     this.battleLogs = that.battleLogs;
     // Initialize any necessary properties
   }
-  async overLogic(turnEnder, buff) {
+  async overLogic(turnEnder, buff, i, what) {
     // remove the buff's effect if right before it's pushed out may be naturally or cleansed
-    if (buff.flat) {
-      turnEnder.stats.attack += buff.attack_amount;
-      turnEnder.stats.speed += buff.speed_amount;
+    const types = buff.type.split("_and_");
+    types.forEach((type) => {
+      if (type.startsWith("increase_") || type.startsWith("decrease_")) {
+        type.split("_")[1];
+      }
+      console.log("type:", type);
+      if (buff.flat) {
+        turnEnder.stats[type] -= buff.value_amount[type];
+      } else {
+        turnEnder.stats[type] -= turnEnder.stats[type] * (buff.value / 100);
+      }
+    });
+    console.log("what:", what);
+    if (what === true) {
+      console.log("what:", what);
+      turnEnder.statuses.debuffs.splice(i, 1); // Remove the expired debuff from the array
     } else {
-      turnEnder.stats.attack +=
-        turnEnder.stats.attack * (buff.attack_amount / 100);
-      turnEnder.stats.speed +=
-        turnEnder.stats.speed * (buff.speed_amount / 100);
+      turnEnder.statuses.buffs.splice(i, 1); // Remove the expired buff from the array
     }
   }
   async increaseAttackNSpeed(target, buffDetails) {
