@@ -13,9 +13,28 @@ const collection = db.collection("akaillection");
 const classesData = require("../../../data/classes/allclasses.js");
 const racesData = require("../../../data/races/races.js");
 const abilitiesData = require("../../../data/abilities.js");
-
+let selectMenu;
+let raceOptions;
+let classOptions;
+let classRow;
+let raceRow;
 let playerData = null;
-
+let selectedRaceValue;
+let selectedClassValue;
+const selectButton = new ButtonBuilder() // Add a new button for selecting
+  .setCustomId("select_race_button")
+  .setLabel("Select")
+  .setStyle("Success");
+const selectRow = new ActionRowBuilder().addComponents(
+  selectButton // Add the new "Select" button
+);
+const selectButton2 = new ButtonBuilder() // Add a new button for selecting
+  .setCustomId("select_class_button")
+  .setLabel("Select")
+  .setStyle("Success");
+const selectRow2 = new ActionRowBuilder().addComponents(
+  selectButton2 // Add the new "Select" button
+);
 module.exports = {
   name: "selectAll",
   description: "Select your race, class, and up to 3 familiars!",
@@ -24,6 +43,27 @@ module.exports = {
     const { db } = client;
     const filter = { _id: message.author.id };
     playerData = await collection.findOne(filter);
+
+    classOptions = Object.keys(classesData).map((className) => ({
+      label: className,
+      value: `class-${className}`,
+    }));
+
+    const classSelectMenu = new StringSelectMenuBuilder()
+      .setCustomId("class_select")
+      .setPlaceholder("Select your class")
+      .addOptions(classOptions);
+    classRow = new ActionRowBuilder().addComponents(classSelectMenu);
+
+    raceOptions = Object.keys(racesData).map((raceName) => ({
+      label: raceName,
+      value: `race-${raceName}`,
+    }));
+    const raceSelectMenu = new StringSelectMenuBuilder()
+      .setCustomId("race_select")
+      .setPlaceholder("Select your race")
+      .addOptions(raceOptions);
+    raceRow = new ActionRowBuilder().addComponents(raceSelectMenu);
 
     // Initial Select Menu for selecting between Race, Class, and Familiar
     const initialSelectMenu = new StringSelectMenuBuilder()
@@ -50,6 +90,10 @@ module.exports = {
       [
         "initial_select",
         "race_select",
+        "select_race_button",
+        "select_class_button",
+        "select_race",
+        "select_class",
         "class_select",
         "familiar_select",
       ].includes(i.customId) && i.user.id === message.author.id;
@@ -62,6 +106,13 @@ module.exports = {
     collector.on("collect", async (i) => {
       try {
         await i.deferUpdate();
+        let selectedFamiliars = [];
+
+        let abilityOne;
+        let abilityTwo;
+        console.log("Interaction custom ID:", i.customId);
+        let updateEmbed;
+
         if (i.customId === "initial_select") {
           const selectedOption = i.values[0];
           if (selectedOption === "select_race") {
@@ -71,6 +122,193 @@ module.exports = {
           } else if (selectedOption === "select_familiar") {
             await handleSelectFamiliar(i, sentMessage);
           }
+        } else if (i.customId.startsWith("race_select")) {
+          selectedRaceValue = i.values[0]; // Get the selected value // gae shit
+          console.log(
+            "Selected race value from race_select:",
+            selectedRaceValue
+          );
+          if (selectedRaceValue.startsWith("race-")) {
+            console.log("bro clicked:", i.user.id);
+
+            const raceNAme = selectedRaceValue.replace("race-", "");
+            console.log("classnamebrovalue:", raceNAme);
+            console.log("classdescription:", racesData[raceNAme]?.description);
+            console.log(
+              "abilitiesdescription:",
+              racesData[raceNAme]?.abilities[0],
+              ", ",
+              racesData[raceNAme]?.abilities[1]
+            );
+            const gae1Fields = {
+              name: `Class: ${raceNAme}`,
+              value:
+                racesData[raceNAme]?.description || "Description not available",
+              inline: false,
+            };
+
+            const gae1_1Fields = {
+              name: "Abilities:",
+              value:
+                `**${racesData[raceNAme]?.abilities
+                  .slice(0, 2)
+                  .join(", ")}**` || "weak, no ability",
+              inline: false,
+            };
+            abilityOne = racesData[raceNAme]?.abilities[0];
+            abilityTwo = racesData[raceNAme]?.abilities[1];
+            const abilityDescFieldOne = {
+              name: `${racesData[raceNAme]?.abilities[0]}:`,
+              value:
+                `**${abilitiesData[abilityOne]?.description}**` ||
+                "weak, no ability",
+              inline: false,
+            };
+            const abilityDescFieldTwo = {
+              name: `${racesData[raceNAme]?.abilities[1]}:`,
+              value:
+                `**${abilitiesData[abilityTwo]?.description}**` ||
+                "weak, no ability",
+              inline: false,
+            };
+            updateEmbed = new EmbedBuilder()
+              .setTitle(`Pick ${raceNAme} Race?`)
+              .setDescription(
+                "Use the buttons to navigate through the options."
+              )
+              .addFields(
+                gae1Fields,
+                gae1_1Fields,
+                abilityDescFieldOne,
+                abilityDescFieldTwo
+              );
+          }
+          await sentMessage.edit({
+            embeds: [updateEmbed],
+            components: [selectRow, raceRow, initialRow],
+          });
+        } else if (i.customId === "select_race_button") {
+          if (selectedRaceValue.startsWith("race-")) {
+            const raceName = selectedRaceValue.replace("race-", "");
+
+            playerData.race = raceName;
+            await updateRace("asdhadad", raceName);
+            await message.channel.send(
+              `You've selected the class: ${raceName}`
+            );
+            sentMessage.edit({ components: [initialRow] });
+          }
+        } else if (i.customId.startsWith("class_select")) {
+          selectedClassValue = i.values[0]; // Get the selected value // gae shit
+
+          if (selectedClassValue.startsWith("class-")) {
+            console.log("bro clicked:", i.user.id);
+
+            const className = selectedClassValue.replace("class-", "");
+            console.log("classnamebrovalue:", className);
+            console.log(
+              "classdescription:",
+              classesData[className]?.description
+            );
+            console.log(
+              "abilitiesdescription:",
+              classesData[className]?.abilities[0],
+              ", ",
+              classesData[className]?.abilities[1]
+            );
+            const gae1Fields = {
+              name: `Class: ${className}`,
+              value:
+                classesData[className]?.description ||
+                "Description not available",
+              inline: false,
+            };
+
+            const gae1_1Fields = {
+              name: "Abilities:",
+              value:
+                `**${classesData[className]?.abilities
+                  .slice(0, 2)
+                  .join(", ")}**` || "weak, no ability",
+              inline: false,
+            };
+            abilityOne = classesData[className]?.abilities[0];
+            abilityTwo = classesData[className]?.abilities[1];
+            const abilityDescFieldOne = {
+              name: `${classesData[className]?.abilities[0]}:`,
+              value:
+                `**${abilitiesData[abilityOne]?.description}**` ||
+                "weak, no ability",
+              inline: false,
+            };
+            const abilityDescFieldTwo = {
+              name: `${classesData[className]?.abilities[1]}:`,
+              value:
+                `**${abilitiesData[abilityTwo]?.description}**` ||
+                "weak, no ability",
+              inline: false,
+            };
+            updateEmbed = new EmbedBuilder()
+              .setTitle(`Pick ${className} Class?`)
+              .setDescription(
+                "Use the buttons to navigate through the options."
+              )
+              .addFields(
+                gae1Fields,
+                gae1_1Fields,
+                abilityDescFieldOne,
+                abilityDescFieldTwo
+              );
+          }
+          await sentMessage.edit({
+            embeds: [updateEmbed],
+            components: [selectRow2, classRow, initialRow],
+          });
+        } else if (i.customId === "select_class_button") {
+          console.log("selectedClassValue:", selectedClassValue);
+          if (selectedClassValue.startsWith("class-")) {
+            // <-- Corrected condition here
+            const className = selectedClassValue.replace("class-", "");
+
+            // Update user data with selected race
+            console.log("playerData:", playerData);
+            playerData.class = className;
+            await updateClass("asdhadad", className);
+
+            await message.channel.send(
+              `You've selected the class: ${className}`
+            );
+
+            sentMessage.edit({ components: [initialRow] });
+          }
+        } else if (i.customId === "select_familiars") {
+          const selectedValues = interaction.values;
+          // Update the selectedFamiliars array
+          selectedFamiliars = selectedValues;
+
+          // Update the SelectMenu options
+          selectMenu.setOptions(
+            familiars.map((familiar, interaction) => {
+              const isSelected = selectedValues.includes(familiar);
+              return { label: familiar, value: familiar, default: false };
+            })
+          );
+          console.log("selectedFamiliars:", selectedFamiliars);
+          const selectedFamiliarsArray = [];
+          selectedFamiliarsArray.push(selectedFamiliars);
+          console.log("sfArray:", selectedFamiliarsArray);
+          // Update the embed
+          updateEmbed.setDescription(
+            "You have selected the following familiars:\n" +
+              selectedFamiliars.join("\n")
+          );
+          // players[playerId].selectedFamiliars.name = selectedFamiliars;
+          await updateFamiliar("adyuga", selectedFamiliarsArray);
+
+          interaction.update({
+            embeds: [updateEmbed],
+            components: [new ActionRowBuilder().addComponents(initialEmbed)],
+          });
         }
       } catch (error) {
         console.error("An error occurred:", error);
@@ -81,15 +319,15 @@ module.exports = {
     });
 
     async function handleSelectRace(interaction, sentMessage) {
-      const raceOptions = Object.keys(racesData).map((raceName) => ({
-        label: raceName,
-        value: `race-${raceName}`,
-      }));
-
-      const raceSelectMenu = new StringSelectMenuBuilder()
-        .setCustomId("race_select")
-        .setPlaceholder("Select your race")
-        .addOptions(raceOptions);
+      const raceFields = raceOptions.map((raceOption) => {
+        const raceName = raceOption.value.replace("race-", "");
+        return {
+          name: `Race: ${raceName}`,
+          value:
+            racesData[raceName]?.description || "Description not available",
+          inline: false,
+        };
+      });
 
       const switchSelectMenu = new StringSelectMenuBuilder()
         .setCustomId("initial_select")
@@ -99,35 +337,25 @@ module.exports = {
           { label: "Select Familiar", value: "select_familiar" },
         ]);
 
-      const raceRow = new ActionRowBuilder().addComponents(raceSelectMenu);
       const switchRow = new ActionRowBuilder().addComponents(switchSelectMenu);
 
       const raceEmbed = new EmbedBuilder()
-        .setTitle("Select Your Race")
-        .setDescription("Choose a race to start your journey.");
+        .setTitle("Pick a Race to advance forward!")
+        .setDescription("Use the buttons to navigate through the options.")
+        .addFields(...raceFields);
 
       await sentMessage.edit({
         embeds: [raceEmbed],
         components: [raceRow, switchRow],
       });
 
-      const raceFilter = (i) =>
+      /* const raceFilter = (i) =>
         i.customId === "race_select" && i.user.id === message.author.id;
 
       const raceCollector = sentMessage.createMessageComponentCollector({
         raceFilter,
         time: 300000,
-      });
-
-      raceCollector.on("collect", async (interaction) => {
-        const selectedRace = interaction.values[0].replace("race-", "");
-        playerData.race = selectedRace;
-        await collection.updateOne(filter, { $set: { race: selectedRace } });
-        await interaction.update({
-          content: `You've selected the race: ${selectedRace}`,
-          components: [],
-        });
-      });
+      });*/
     }
 
     async function handleSelectClass(interaction, sentMessage) {
@@ -136,10 +364,16 @@ module.exports = {
         value: `class-${className}`,
       }));
 
-      const classSelectMenu = new StringSelectMenuBuilder()
-        .setCustomId("class_select")
-        .setPlaceholder("Select your class")
-        .addOptions(classOptions);
+      const classFields = classOptions.map((classOption) => {
+        const className = classOption.value.replace("class-", "");
+        return {
+          name: `Class: ${className}`,
+          value:
+            classesData[className]?.description || "Description not available",
+          inline: false,
+        };
+      });
+      console.log("workingb");
 
       const switchSelectMenu = new StringSelectMenuBuilder()
         .setCustomId("initial_select")
@@ -149,34 +383,16 @@ module.exports = {
           { label: "Select Familiar", value: "select_familiar" },
         ]);
 
-      const classRow = new ActionRowBuilder().addComponents(classSelectMenu);
       const switchRow = new ActionRowBuilder().addComponents(switchSelectMenu);
 
       const classEmbed = new EmbedBuilder()
         .setTitle("Select Your Class")
-        .setDescription("Choose a class to start your journey.");
+        .setDescription("Use the buttons to navigate through the options.")
+        .addFields(...classFields);
 
       await sentMessage.edit({
         embeds: [classEmbed],
         components: [classRow, switchRow],
-      });
-
-      const classFilter = (i) =>
-        i.customId === "class_select" && i.user.id === message.author.id;
-
-      const classCollector = sentMessage.createMessageComponentCollector({
-        classFilter,
-        time: 300000,
-      });
-
-      classCollector.on("collect", async (interaction) => {
-        const selectedClass = interaction.values[0].replace("class-", "");
-        playerData.class = selectedClass;
-        await collection.updateOne(filter, { $set: { class: selectedClass } });
-        await interaction.update({
-          content: `You've selected the class: ${selectedClass}`,
-          components: [],
-        });
       });
     }
 
@@ -188,18 +404,49 @@ module.exports = {
         message.channel.send("You have no familiars to select.");
         return;
       }
+      const options = familiars.map((familiar) => {
+        if (familiar) {
+          // ability.execute(this.currentTurn, this.boss.name)
+          console.log("execuTE:", familiar);
+          return {
+            label: familiar,
+            value: familiar,
+          };
+        }
+      });
+      console.log("Options:", options);
 
-      const options = familiars.map((familiar) => ({
-        label: familiar,
-        value: familiar,
-      }));
+      if (familiars.length < 2) {
+        // Create a SelectMenu with all of the familiars
+        selectMenu = new StringSelectMenuBuilder()
+          .setCustomId("select_familiars")
+          .setMinValues(1)
+          .setPlaceholder("Select up to 3 familiars")
+          .addOptions(options);
+        console.log("selectMenu:", selectMenu);
+      } else if (familiars.length < 3 && familiars.length > 1) {
+        // Create a SelectMenu with all of the familiars
+        selectMenu = new StringSelectMenuBuilder()
+          .setCustomId("select_familiars")
+          .setMinValues(1)
+          .setMaxValues(2)
+          .setPlaceholder("Select up to 3 familiars")
+          .addOptions(options);
+        console.log("selectMenu:", selectMenu);
+      } else {
+        // Create a SelectMenu with all of the familiars
+        selectMenu = new StringSelectMenuBuilder()
+          .setCustomId("select_familiars")
+          .setMinValues(1)
+          .setMaxValues(3)
+          .setPlaceholder("Select up to 3 familiars")
+          .addOptions(options);
+        console.log("selectMenu:", selectMenu);
+      }
 
-      let selectMenu = new StringSelectMenuBuilder()
-        .setCustomId("familiar_select")
-        .setMinValues(1)
-        .setMaxValues(Math.min(familiars.length, 3))
-        .setPlaceholder("Select up to 3 familiars")
-        .addOptions(options);
+      // Create a row for the SelectMenu
+      const row = new ActionRowBuilder().addComponents(selectMenu);
+      console.log("row:", row);
 
       const switchSelectMenu = new StringSelectMenuBuilder()
         .setCustomId("initial_select")
@@ -209,7 +456,6 @@ module.exports = {
           { label: "Select Class", value: "select_class" },
         ]);
 
-      const row = new ActionRowBuilder().addComponents(selectMenu);
       const switchRow = new ActionRowBuilder().addComponents(switchSelectMenu);
 
       const embed = new EmbedBuilder()
@@ -221,56 +467,55 @@ module.exports = {
         embeds: [embed],
         components: [row, switchRow],
       });
-
-      const filterr = (interaction) => {
-        return (
-          interaction.customId === "familiar_select" &&
-          interaction.user.id === message.author.id
-        );
-      };
-
-      const collector = sentMessage.createMessageComponentCollector({
-        filterr,
-        time: 300000,
-      });
-
-      let selectedFamiliars = [];
-
-      collector.on("collect", async (interaction) => {
-        const selectedValues = interaction.values;
-        selectedFamiliars = selectedValues;
-
-        embed.setDescription(
-          "You have selected the following familiars:\n" +
-            selectedFamiliars.join("\n")
-        );
-
-        await updateClass(message.author.id, selectedFamiliars);
-
-        interaction.update({
-          embeds: [embed],
-          components: [
-            new ActionRowBuilder().addComponents(selectMenu),
-            switchRow,
-          ],
-        });
-      });
-
-      collector.on("end", () => {
-        if (sentMessage) {
-          sentMessage.edit({ components: [] });
+    }
+    async function updateFamiliar(playerIdee, className) {
+      const selektFam = className;
+      console.log("selectfam:", selektFam);
+      /*
+       
+      */
+      // Find the document with the _id `playerId`
+      try {
+        if (!playerData.selectedFamiliars) {
+          // If the quest array doesn't exist, create it as an empty array
+          playerData.selectedFamiliars = { name: selektFam.flat() };
+        } else if (playerData.selectedFamiliars.name) {
+          playerData.selectedFamiliars.name = selektFam.flat();
         }
-      });
-
-      async function updateClass(playerId, selectedFamiliars) {
-        try {
-          const updateData = {
-            selectedFamiliars: selectedFamiliars,
+        if (playerData) {
+          const updates = {
+            $set: { selectedFamiliars: playerData.selectedFamiliars },
           };
-          await collection.updateOne({ _id: playerId }, { $set: updateData });
-        } catch (error) {
-          console.error("Error updating player data:", error);
+          console.log("rewards.xpereince:", playerData.selectedFamiliars);
+          // Update the player's document with the xpUpdate object
+          await collection.updateOne(filter, updates);
         }
+      } catch (error) {
+        console.error("An error occurred:", error);
+        message.channel.send(
+          "An error occurred while processing your selection."
+        );
+      }
+    }
+
+    async function updateRace(playerId, className) {
+      if (playerData) {
+        const updates = {
+          $set: { race: className },
+        };
+        console.log("rewards.xpereince:", className);
+        // Update the player's document with the xpUpdate object
+        await collection.updateOne(filter, updates);
+      }
+    }
+    async function updateClass(playerId, className) {
+      if (playerData) {
+        const updates = {
+          $set: { class: className },
+        };
+        console.log("rewards.xpereince:", className);
+        // Update the player's document with the xpUpdate object
+        await collection.updateOne(filter, updates);
       }
     }
   },

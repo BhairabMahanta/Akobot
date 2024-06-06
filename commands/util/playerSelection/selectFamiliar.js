@@ -153,14 +153,7 @@ module.exports = {
         );
         // players[playerId].selectedFamiliars.name = selectedFamiliars;
         await updateClass(playerId, selectedFamiliarsArray);
-        // Save the updated data back to the file
-        // fs.writeFile('./data/players.json', JSON.stringify(players, null, 2), 'utf8', (writeErr) => {
-        //   if (writeErr) {
-        //     console.error('Error writing updated player data:', writeErr);
-        //   }
-        // });
 
-        // Send the updated embed with the SelectMenu
         interaction.update({
           embeds: [embed],
           components: [new ActionRowBuilder().addComponents(selectMenu)],
