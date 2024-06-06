@@ -6,7 +6,8 @@ const { cycleCooldowns } = require("../adv/adventure/sumfunctions.js");
 const { bosses } = require("../adv/monsterInfo/bosses.js");
 const { mobs } = require("../adv/monsterInfo/mobs.js");
 const { cards } = require("../adv/information/cards.js"); // Import the cards data from 'cards.js'
-
+const { BuffDebuffLogic } = require("../adv/action/buffdebufflogic.js");
+const { BuffDebuffManager } = require("../adv/action/BuffDebuffManager.js");
 const {
   calculateDamage,
 } = require("../../my_rust_library/my_rust_library.node");
@@ -64,6 +65,9 @@ class Duel {
     this.sendFollowUp = true;
     this.teamTurn = null;
     this.ability = new Ability(this);
+    this.buffDebuffManager = new BuffDebuffManager(this);
+    this.buffDebuffLogic = new BuffDebuffLogic(this);
+    this.dodge = { option: null };
   }
   async initialiseStuff() {
     console.log("initialised");
@@ -180,12 +184,19 @@ class Duel {
       console.log("The error is here:", error);
     }
   }
+
   async handleTurnEffects(turnEnder) {
     // Handle debuffs
     for (let i = turnEnder.statuses.debuffs.length - 1; i >= 0; i--) {
       turnEnder.statuses.debuffs[i].remainingTurns--;
       if (turnEnder.statuses.debuffs[i].remainingTurns <= 0) {
-        turnEnder.statuses.debuffs.splice(i, 1); // Remove the expired debuff from the array
+        this.buffDebuffLogic.overLogic(
+          turnEnder,
+          turnEnder.statuses.buffs[i],
+          i,
+          true
+        );
+
         console.log(`Debuff removed from ${turnEnder.name}`);
       }
     }
@@ -195,7 +206,13 @@ class Duel {
       turnEnder.statuses.buffs[i].remainingTurns--;
       console.log(`turn buff stuff ${turnEnder.statuses.buffs}`);
       if (turnEnder.statuses.buffs[i].remainingTurns <= 0) {
-        turnEnder.statuses.buffs.splice(i, 1); // Remove the expired buff from the array
+        this.buffDebuffLogic.overLogic(
+          turnEnder,
+          turnEnder.statuses.buffs[i],
+          i,
+          false
+        );
+
         console.log(`Buff removed from ${turnEnder.name}`);
       }
     }
@@ -503,16 +520,7 @@ class Duel {
         this.player.stats.attack,
         this.enemyToHit.stats.defense
       );
-      // .then((result) => {
-      //   console.log("Damage:", result);
-      //   // Do something with the calculated damage
-      // })
-      // .catch((error) => {
-      //   console.error("Error:", error);
-      //   // Handle the error
-      // });
 
-      // Update HP and battle logs
       this.enemyToHit.stats.hp -= damage;
       this.battleLogs.push(
         `+ ${this.currentTurn} attacks ${target} for ${damage} damage.`
@@ -521,8 +529,7 @@ class Duel {
       console.log(
         `${this.currentTurn} attacks ${target} for ${damage} damage.`
       );
-      // this.getNextTurn()
-      // console.log('currentTurn:', this.currentTurn);
+      await this.handleTurnEffects(this.player);
     } else if (this.currentTurn === this.opponent.name) {
       // const move = attacker.chooseMove(); // Implement this method for the player
 
@@ -541,8 +548,7 @@ class Duel {
       console.log(
         `${this.currentTurn} attacks ${target} for ${damage} damage.`
       );
-      // this.getNextTurn()
-      // console.log('currentTurn:', this.currentTurn);
+      await this.handleTurnEffects(this.opponent);
     } else if (
       this.enemyFamiliars.some(
         (familiar) => familiar.name === this.currentTurn
@@ -569,6 +575,7 @@ class Duel {
 
           // Update HP and battle logs
           this.enemyToHit.stats.hp -= damage;
+          await this.handleTurnEffects(familiar);
           this.battleLogs.push(
             `+ ${this.currentTurn} attacks ${target} for ${damage} damage using an attack`
           );
@@ -593,6 +600,7 @@ class Duel {
 
           // Update HP and battle logs
           this.enemyToHit.stats.hp -= damage;
+          await this.handleTurnEffects(familiar);
           this.battleLogs.push(
             `+ ${this.currentTurn} attacks ${target} for ${damage} damage using an attack`
           );

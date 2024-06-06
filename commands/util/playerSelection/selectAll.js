@@ -508,6 +508,7 @@ module.exports = {
           playerData.selectedFamiliars.name = selektFam.flat();
         }
         if (playerData) {
+          console.log("playerData:", playerData);
           const updates = {
             $set: { selectedFamiliars: playerData.selectedFamiliars },
           };
