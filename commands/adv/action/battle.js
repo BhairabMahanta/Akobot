@@ -534,9 +534,30 @@ class Battle {
         this.pickedChoice = true;
         // Continue with your code logic after selecting an enemy
       } else if (i.customId === "starter") {
-        const selectedClassValue = i.values[0]; // Get the selected value // gae shit
-        console.log("selectedValues", selectedClassValue);
-        if (this.pickedChoice || this.aliveEnemies.length === 1) {
+        const selectedClassValue = i.values[0];
+        if (selectedClassValue === "cooldowns") {
+          console.log("check cooldowns", this.cooldowns);
+
+          // Filter out cooldowns that are zero and await the cooldown promises
+          const filteredCooldowns = await Promise.all(
+            this.cooldowns.filter(
+              async (cooldown) => (await cooldown.cooldown) > 0
+            )
+          );
+
+          // Map the filtered cooldowns to descriptions
+          const cooldownDescriptions = await Promise.all(
+            filteredCooldowns.map(
+              async (cooldown) =>
+                `**${cooldown.name}**: ${await cooldown.cooldown} turns left`
+            )
+          );
+
+          i.followUp({
+            content: `**Cooldowns**\n${cooldownDescriptions.join("\n")}`,
+            ephemeral: true,
+          });
+        } else if (this.pickedChoice || this.aliveEnemies.length === 1) {
           this.pickedChoice = true;
 
           if (this.aliveEnemies.length === 1) {
@@ -621,14 +642,6 @@ class Battle {
               console.log("ErrorFamiliar:", error);
             }
           }
-        } else if (selectedClassValue === "cooldowns") {
-          const cooldownDescriptions = this.cooldowns.map(
-            (cooldown) => `**${cooldown.name}**: ${cooldown.turns} turns left`
-          );
-          i.followUp({
-            content: `**Cooldowns**\n${cooldownDescriptions.join("\n")}`,
-            ephemeral: true,
-          });
         } else {
           i.followUp({
             content: "Please pick an enemy to hit using the Select Menu",
