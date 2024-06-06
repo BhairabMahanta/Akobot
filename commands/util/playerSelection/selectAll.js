@@ -18,6 +18,7 @@ let raceOptions;
 let classOptions;
 let classRow;
 let raceRow;
+let familiars;
 let playerData = null;
 let selectedRaceValue;
 let selectedClassValue;
@@ -106,8 +107,6 @@ module.exports = {
     collector.on("collect", async (i) => {
       try {
         await i.deferUpdate();
-        let selectedFamiliars = [];
-
         let abilityOne;
         let abilityTwo;
         console.log("Interaction custom ID:", i.customId);
@@ -281,34 +280,6 @@ module.exports = {
 
             sentMessage.edit({ components: [initialRow] });
           }
-        } else if (i.customId === "select_familiars") {
-          const selectedValues = interaction.values;
-          // Update the selectedFamiliars array
-          selectedFamiliars = selectedValues;
-
-          // Update the SelectMenu options
-          selectMenu.setOptions(
-            familiars.map((familiar, interaction) => {
-              const isSelected = selectedValues.includes(familiar);
-              return { label: familiar, value: familiar, default: false };
-            })
-          );
-          console.log("selectedFamiliars:", selectedFamiliars);
-          const selectedFamiliarsArray = [];
-          selectedFamiliarsArray.push(selectedFamiliars);
-          console.log("sfArray:", selectedFamiliarsArray);
-          // Update the embed
-          updateEmbed.setDescription(
-            "You have selected the following familiars:\n" +
-              selectedFamiliars.join("\n")
-          );
-          // players[playerId].selectedFamiliars.name = selectedFamiliars;
-          await updateFamiliar("adyuga", selectedFamiliarsArray);
-
-          interaction.update({
-            embeds: [updateEmbed],
-            components: [new ActionRowBuilder().addComponents(initialEmbed)],
-          });
         }
       } catch (error) {
         console.error("An error occurred:", error);
@@ -397,7 +368,8 @@ module.exports = {
     }
 
     async function handleSelectFamiliar(interaction, sentMessage) {
-      const familiars = playerData.cards.name;
+      let messageja;
+      familiars = playerData.cards.name;
 
       if (familiars.length === 0) {
         console.log("You have no familiars to select.");
@@ -407,14 +379,12 @@ module.exports = {
       const options = familiars.map((familiar) => {
         if (familiar) {
           // ability.execute(this.currentTurn, this.boss.name)
-          console.log("execuTE:", familiar);
           return {
             label: familiar,
             value: familiar,
           };
         }
       });
-      console.log("Options:", options);
 
       if (familiars.length < 2) {
         // Create a SelectMenu with all of the familiars
@@ -423,7 +393,6 @@ module.exports = {
           .setMinValues(1)
           .setPlaceholder("Select up to 3 familiars")
           .addOptions(options);
-        console.log("selectMenu:", selectMenu);
       } else if (familiars.length < 3 && familiars.length > 1) {
         // Create a SelectMenu with all of the familiars
         selectMenu = new StringSelectMenuBuilder()
@@ -432,7 +401,6 @@ module.exports = {
           .setMaxValues(2)
           .setPlaceholder("Select up to 3 familiars")
           .addOptions(options);
-        console.log("selectMenu:", selectMenu);
       } else {
         // Create a SelectMenu with all of the familiars
         selectMenu = new StringSelectMenuBuilder()
@@ -441,12 +409,10 @@ module.exports = {
           .setMaxValues(3)
           .setPlaceholder("Select up to 3 familiars")
           .addOptions(options);
-        console.log("selectMenu:", selectMenu);
       }
 
       // Create a row for the SelectMenu
       const row = new ActionRowBuilder().addComponents(selectMenu);
-      console.log("row:", row);
 
       const switchSelectMenu = new StringSelectMenuBuilder()
         .setCustomId("initial_select")
@@ -458,14 +424,73 @@ module.exports = {
 
       const switchRow = new ActionRowBuilder().addComponents(switchSelectMenu);
 
-      const embed = new EmbedBuilder()
+      let embed = new EmbedBuilder()
         .setTitle("Select up to 3 familiars:")
         .setDescription("Select up to 3 familiars to help you on your journey.")
         .setColor("#00FFFF");
 
       await sentMessage.edit({
+        components: [switchRow],
+      });
+      messageja = await message.channel.send({
         embeds: [embed],
-        components: [row, switchRow],
+        components: [row],
+      });
+
+      // Handle SelectMenu interactions
+      const filterr = (interaction) => {
+        return (
+          interaction.customId === "select_familiars" &&
+          interaction.user.id === message.author.id
+        );
+      };
+
+      const collector = messageja.createMessageComponentCollector({
+        filterr,
+        time: 60000,
+      });
+
+      collector.on("collect", async (interaction) => {
+        try {
+          let selectedFamiliars = [];
+          const selectedValues = interaction.values;
+          // Update the selectedFamiliars array
+          selectedFamiliars = selectedValues;
+
+          // Update the SelectMenu options
+          selectMenu.setOptions(
+            familiars.map((familiar, interaction) => {
+              const isSelected = selectedValues.includes(familiar);
+              return { label: familiar, value: familiar, default: false };
+            })
+          );
+          console.log("selectedFamiliars:", selectedFamiliars);
+          const selectedFamiliarsArray = [];
+          selectedFamiliarsArray.push(selectedFamiliars);
+          console.log("sfArray:", selectedFamiliarsArray);
+
+          message.channel.send(
+            `You have selected: ${selectedFamiliars.join(
+              ", "
+            )} as your familiars!`
+          );
+          // players[playerId].selectedFamiliars.name = selectedFamiliars;
+          await updateFamiliar("adyuga", selectedFamiliarsArray);
+
+          interaction.update({
+            embeds: [embed],
+            components: [new ActionRowBuilder().addComponents(selectMenu)],
+          });
+          setTimeout(() => {
+            messageja.delete();
+          }, 5000);
+        } catch (err) {
+          console.error("Error updating player data:", err);
+        }
+      });
+
+      collector.on("end", () => {
+        // Update the player's data with the selected familiars
       });
     }
     async function updateFamiliar(playerIdee, className) {
