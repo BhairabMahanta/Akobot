@@ -888,7 +888,7 @@ class Duel {
       this.battleEmbed.addFields({
         name: `${this.player.name}'s Team Info`,
         value: `\`\`\`ansi\n${playerAndFamiliarsInfo}\`\`\``,
-        inline: false,
+        inline: true,
       });
       let opponentAndFamiliarsInfo = ""; // Initialize an empty string to store the info
 
@@ -914,7 +914,7 @@ class Duel {
       this.battleEmbed.addFields({
         name: `${this.opponent.name}'s Team Info:`,
         value: `\`\`\`ansi\n${opponentAndFamiliarsInfo}\`\`\``,
-        inline: false,
+        inline: true,
       });
 
       return this.battleEmbed;
