@@ -67,7 +67,7 @@ class Duel {
     this.ability = new Ability(this);
     this.buffDebuffManager = new BuffDebuffManager(this);
     this.buffDebuffLogic = new BuffDebuffLogic(this);
-    this.dodge = { option: null };
+    this.dodge = { option: null, id: null };
   }
   async initialiseStuff() {
     console.log("initialised");
@@ -507,6 +507,7 @@ class Duel {
   } //
 
   async performTurn() {
+    let damage = 0;
     // const attacker = this.currentTurn;
     // this.getNextTurn()
     console.log("currentTurn:", this.currentTurn);
@@ -516,39 +517,147 @@ class Duel {
       // const move = attacker.chooseMove(); // Implement this method for the player
 
       const target = this.enemyToHit.name;
-      const damage = calculateDamage(
-        this.player.stats.attack,
-        this.enemyToHit.stats.defense
-      );
-
-      this.enemyToHit.stats.hp -= damage;
-      this.battleLogs.push(
-        `+ ${this.currentTurn} attacks ${target} for ${damage} damage.`
-      );
-      // console.log("loglength:", this.battleLogs.length);
-      console.log(
-        `${this.currentTurn} attacks ${target} for ${damage} damage.`
-      );
-      await this.handleTurnEffects(this.player);
+      if (this.dodge.id === this.opponent._id) {
+        if (this.dodge.option === "dodge_and_increase_attack_bar") {
+          damage = 0;
+          this.enemyToHit.stats.hp -= damage;
+          await this.handleTurnEffects(this.player);
+          this.dodge = { option: null, id: null };
+          this.enemyToHit.atkBar += 20;
+          this.battleLogs.push(
+            `- ${target} swiftly dodges the attack increasing 20 attack bar!!\n ============================================`
+          );
+        } else if (this.dodge.option === "dodge") {
+          damage = 0;
+          this.enemyToHit.stats.hp -= damage;
+          await this.handleTurnEffects(this.player);
+          this.dodge = { option: null, id: null };
+          this.battleLogs.push(
+            `- ${target} barely dodges the attack!\n ============================================`
+          );
+        } else if (this.dodge.option === "reduce_damage") {
+          damage = calculateDamage(
+            this.player.stats.attack,
+            this.enemyToHit.stats.defense
+          );
+          const damageReductionPercentage = Math.random() * (40 - 15) + 15;
+          const reducedDamage = Math.floor(
+            damage * (1 - damageReductionPercentage / 100)
+          );
+          this.enemyToHit.stats.hp -= reducedDamage;
+          await this.handleTurnEffects(this.player);
+          this.dodge = { option: null, id: null };
+          this.battleLogs.push(
+            `- ${
+              this.currentTurn
+            } attacks ${target} for ${reducedDamage}. Reduced ${
+              damage - reducedDamage
+            } damage!!\n ============================================`
+          );
+        } else if (this.dodge.option === "take_hit") {
+          damage = calculateDamage(
+            this.player.stats.attack,
+            this.enemyToHit.stats.defense
+          );
+          this.dodge = { option: null, id: null };
+          this.enemyToHit.stats.hp -= damage;
+          this.battleLogs.push(
+            `+ ${this.currentTurn} attacks ${target} for ${damage} damage. Failed to dodge!`
+          );
+          await this.handleTurnEffects(this.player);
+        } else if (this.dodge.option === "take_1.5x_damage") {
+          damage = calculateDamage(
+            this.player.stats.attack,
+            this.enemyToHit.stats.defense
+          );
+          const damageReductionPercentage = Math.random() * (40 - 15) + 15;
+          const increasedDamage = Math.floor(
+            damage * (1 - damageReductionPercentage / 100)
+          );
+          this.enemyToHit.stats.hp -= increasedDamage + damage;
+          this.battleLogs.push(
+            `+ ${this.currentTurn} attacks ${target} for ${damage} damage and ${increasedDamage}. ${this.enemyToHit.name} slipped and fell while trying to dodge!`
+          );
+          await this.handleTurnEffects(this.player);
+          this.dodge = { option: null, id: null };
+        }
+      }
     } else if (this.currentTurn === this.opponent.name) {
       // const move = attacker.chooseMove(); // Implement this method for the player
 
       const target = this.enemyToHit.name;
-      const damage = await calculateDamage(
-        this.opponent.stats.attack,
-        this.enemyToHit.stats.defense
-      );
 
-      // Update HP and battle logs
-      this.enemyToHit.stats.hp -= damage;
-      this.battleLogs.push(
-        `+ ${this.currentTurn} attacks ${target} for ${damage} damage.`
-      );
-      // console.log("loglength:", this.battleLogs.length);
-      console.log(
-        `${this.currentTurn} attacks ${target} for ${damage} damage.`
-      );
-      await this.handleTurnEffects(this.opponent);
+      if (this.dodge.id === this.player.id) {
+        damage = await calculateDamage(
+          this.opponent.stats.attack,
+          this.enemyToHit.stats.defense
+        );
+
+        if (this.dodge.option === "dodge_and_increase_attack_bar") {
+          damage = 0;
+          this.enemyToHit.stats.hp -= damage;
+          await this.handleTurnEffects(this.opponent);
+          this.dodge = { option: null, id: null };
+          this.enemyToHit.atkBar += 20;
+          this.battleLogs.push(
+            `- ${target} swiftly dodges the attack increasing 20 attack bar!!\n ============================================`
+          );
+        } else if (this.dodge.option === "dodge") {
+          damage = 0;
+          this.enemyToHit.stats.hp -= damage;
+          await this.handleTurnEffects(this.opponent);
+          this.dodge = { option: null, id: null };
+          this.battleLogs.push(
+            `- ${target} barely dodges the attack!\n ============================================`
+          );
+        } else if (this.dodge.option === "reduce_damage") {
+          damage = calculateDamage(
+            this.opponent.stats.attack,
+            this.enemyToHit.stats.defense
+          );
+          const damageReductionPercentage = Math.random() * (40 - 15) + 15;
+          const reducedDamage = Math.floor(
+            damage * (1 - damageReductionPercentage / 100)
+          );
+          this.enemyToHit.stats.hp -= reducedDamage;
+          await this.handleTurnEffects(this.opponent);
+          this.dodge = { option: null, id: null };
+          this.battleLogs.push(
+            `- ${
+              this.currentTurn
+            } attacks ${target} for ${reducedDamage}. Reduced ${
+              damage - reducedDamage
+            } damage!!\n ============================================`
+          );
+        } else if (this.dodge.option === "take_hit") {
+          damage = calculateDamage(
+            this.opponent.stats.attack,
+            this.enemyToHit.stats.defense
+          );
+
+          this.enemyToHit.stats.hp -= damage;
+          this.battleLogs.push(
+            `+ ${this.currentTurn} attacks ${target} for ${damage} damage. Failed to dodge!`
+          );
+          await this.handleTurnEffects(this.opponent);
+          this.dodge = { option: null, id: null };
+        } else if (this.dodge.option === "take_1.5x_damage") {
+          damage = calculateDamage(
+            this.opponent.stats.attack,
+            this.enemyToHit.stats.defense
+          );
+          const damageReductionPercentage = Math.random() * (40 - 15) + 15;
+          const increasedDamage = Math.floor(
+            damage * (1 - damageReductionPercentage / 100)
+          );
+          this.enemyToHit.stats.hp -= increasedDamage + damage;
+          this.battleLogs.push(
+            `+ ${this.currentTurn} attacks ${target} for ${damage} damage and ${increasedDamage}. ${this.enemyToHit.name} slipped and fell while trying to dodge!`
+          );
+          await this.handleTurnEffects(this.opponent);
+          this.dodge = { option: null, id: null };
+        }
+      }
     } else if (
       this.enemyFamiliars.some(
         (familiar) => familiar.name === this.currentTurn
@@ -558,7 +667,6 @@ class Duel {
       const target = this.enemyToHit.name;
       console.log("target:", target);
       // Implement target selection logic
-      let damage = 0;
 
       // Loop through the familiars to find the attacking familiar
       for (const familiar of this.enemyFamiliars) {
@@ -568,6 +676,7 @@ class Duel {
           this.currentTurnId === this.opponent._id
         ) {
           // Calculate damage for the attacking familiar
+
           damage = await calculateDamage(
             familiar.stats.attack,
             this.enemyToHit.stats.defense
@@ -1174,6 +1283,24 @@ class Duel {
             ephemeral: true,
           });
         }
+      } else if (i.customId === "action_dodge") {
+        //it needs to have like 4 possibilities wehre 1 is the lower probability i.e dodge and increase player's attack bar by 20, 2nd is just dodge, 3rd is not being able to dodge entirely but reduce the damage by 50% and 4th is just take the hit and 5th is take 1.5x damage
+        const dodgeOptions = [
+          "dodge_and_increase_attack_bar",
+          "dodge",
+          "reduce_damage",
+          "take_hit",
+          "take_1.5x_damage",
+        ];
+        const randomDodge =
+          dodgeOptions[Math.floor(Math.random() * dodgeOptions.length)];
+        this.dodge.option = randomDodge;
+        this.dodge.id = i.user.id;
+        await cycleCooldowns(this.cooldowns);
+        await this.getNextTurn();
+        // await this.performEnemyTurn(message);
+        console.log("currentTurn:", this.currentTurn);
+        this.printBattleResult();
       }
     });
   }
