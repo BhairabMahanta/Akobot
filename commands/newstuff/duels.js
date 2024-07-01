@@ -581,6 +581,21 @@ class Duel {
           await this.handleTurnEffects(this.player);
           this.dodge = { option: null, id: null };
         }
+      } else {
+        damage = await calculateDamage(
+          this.player.stats.attack,
+          this.enemyToHit.stats.defense
+        );
+
+        // Update HP and battle logs
+        this.enemyToHit.stats.hp -= damage;
+        await this.handleTurnEffects(this.player);
+        this.battleLogs.push(
+          `+ ${this.currentTurn} attacks ${target} for ${damage} damage using an attack`
+        );
+        console.log(
+          `${this.currentTurn} attacks ${target} for ${damage} damage using an attack`
+        );
       }
     } else if (this.currentTurn === this.opponent.name) {
       // const move = attacker.chooseMove(); // Implement this method for the player
@@ -588,11 +603,6 @@ class Duel {
       const target = this.enemyToHit.name;
 
       if (this.dodge.id === this.player.id) {
-        damage = await calculateDamage(
-          this.opponent.stats.attack,
-          this.enemyToHit.stats.defense
-        );
-
         if (this.dodge.option === "dodge_and_increase_attack_bar") {
           damage = 0;
           this.enemyToHit.stats.hp -= damage;
@@ -657,6 +667,18 @@ class Duel {
           await this.handleTurnEffects(this.opponent);
           this.dodge = { option: null, id: null };
         }
+      } else {
+        damage = await calculateDamage(
+          this.opponent.stats.attack,
+          this.enemyToHit.stats.defense
+        );
+
+        // Update HP and battle logs
+        this.enemyToHit.stats.hp -= damage;
+        await this.handleTurnEffects(this.opponent);
+        this.battleLogs.push(
+          `+ ${this.currentTurn} attacks ${target} for ${damage} damage using an attack`
+        );
       }
     } else if (
       this.enemyFamiliars.some(
@@ -677,20 +699,85 @@ class Duel {
         ) {
           // Calculate damage for the attacking familiar
 
-          damage = await calculateDamage(
-            familiar.stats.attack,
-            this.enemyToHit.stats.defense
-          );
+          if (this.dodge.id === this.player.id) {
+            if (this.dodge.option === "dodge_and_increase_attack_bar") {
+              damage = 0;
+              this.enemyToHit.stats.hp -= damage;
+              await this.handleTurnEffects(familiar);
+              this.dodge = { option: null, id: null };
+              this.enemyToHit.atkBar += 20;
+              this.battleLogs.push(
+                `- ${target} swiftly dodges the attack increasing 20 attack bar!!\n ============================================`
+              );
+            } else if (this.dodge.option === "dodge") {
+              damage = 0;
+              this.enemyToHit.stats.hp -= damage;
+              await this.handleTurnEffects(familiar);
+              this.dodge = { option: null, id: null };
+              this.battleLogs.push(
+                `- ${target} barely dodges the attack!\n ============================================`
+              );
+            } else if (this.dodge.option === "reduce_damage") {
+              damage = calculateDamage(
+                this.opponent.stats.attack,
+                this.enemyToHit.stats.defense
+              );
+              const damageReductionPercentage = Math.random() * (40 - 15) + 15;
+              const reducedDamage = Math.floor(
+                damage * (1 - damageReductionPercentage / 100)
+              );
+              this.enemyToHit.stats.hp -= reducedDamage;
+              await this.handleTurnEffects(familiar);
+              this.dodge = { option: null, id: null };
+              this.battleLogs.push(
+                `- ${
+                  this.currentTurn
+                } attacks ${target} for ${reducedDamage}. Reduced ${
+                  damage - reducedDamage
+                } damage!!\n ============================================`
+              );
+            } else if (this.dodge.option === "take_hit") {
+              damage = await calculateDamage(
+                familiar.stats.attack,
+                this.enemyToHit.stats.defense
+              );
 
-          // Update HP and battle logs
-          this.enemyToHit.stats.hp -= damage;
-          await this.handleTurnEffects(familiar);
-          this.battleLogs.push(
-            `+ ${this.currentTurn} attacks ${target} for ${damage} damage using an attack`
-          );
-          console.log(
-            `${this.currentTurn} attacks ${target} for ${damage} damage using an attack`
-          );
+              this.enemyToHit.stats.hp -= damage;
+              this.battleLogs.push(
+                `+ ${this.currentTurn} attacks ${target} for ${damage} damage. Failed to dodge!`
+              );
+              await this.handleTurnEffects(familiar);
+              this.dodge = { option: null, id: null };
+            } else if (this.dodge.option === "take_1.5x_damage") {
+              damage = await calculateDamage(
+                familiar.stats.attack,
+                this.enemyToHit.stats.defense
+              );
+              const damageReductionPercentage = Math.random() * (40 - 15) + 15;
+              const increasedDamage = Math.floor(
+                damage * (1 - damageReductionPercentage / 100)
+              );
+              this.enemyToHit.stats.hp -= increasedDamage + damage;
+              this.battleLogs.push(
+                `+ ${this.currentTurn} attacks ${target} for ${damage} damage and ${increasedDamage}. ${this.enemyToHit.name} slipped and fell while trying to dodge!`
+              );
+              await this.handleTurnEffects(familiar);
+              this.dodge = { option: null, id: null };
+            }
+          } else {
+            damage = await calculateDamage(
+              familiar.stats.attack,
+              this.enemyToHit.stats.defense
+            );
+
+            // Update HP and battle logs
+            this.enemyToHit.stats.hp -= damage;
+            await this.handleTurnEffects(familiar);
+            this.battleLogs.push(
+              `+ ${this.currentTurn} attacks ${target} for ${damage} damage using an attack`
+            );
+          }
+
           break; // Exit the loop once the attacking familiar is found
         }
       }
@@ -702,20 +789,86 @@ class Duel {
           this.currentTurnId === this.player._id
         ) {
           // Calculate damage for the attacking familiar
-          damage = await calculateDamage(
-            familiar.stats.attack,
-            this.enemyToHit.stats.defense
-          );
 
-          // Update HP and battle logs
-          this.enemyToHit.stats.hp -= damage;
-          await this.handleTurnEffects(familiar);
-          this.battleLogs.push(
-            `+ ${this.currentTurn} attacks ${target} for ${damage} damage using an attack`
-          );
-          console.log(
-            `${this.currentTurn} attacks ${target} for ${damage} damage using an attack`
-          );
+          if (this.dodge.id === this.opponent._id) {
+            if (this.dodge.option === "dodge_and_increase_attack_bar") {
+              damage = 0;
+              this.enemyToHit.stats.hp -= damage;
+              await this.handleTurnEffects(familiar);
+              this.dodge = { option: null, id: null };
+              this.enemyToHit.atkBar += 20;
+              this.battleLogs.push(
+                `- ${target} swiftly dodges the attack increasing 20 attack bar!!\n ============================================`
+              );
+            } else if (this.dodge.option === "dodge") {
+              damage = 0;
+              this.enemyToHit.stats.hp -= damage;
+              await this.handleTurnEffects(familiar);
+              this.dodge = { option: null, id: null };
+              this.battleLogs.push(
+                `- ${target} barely dodges the attack!\n ============================================`
+              );
+            } else if (this.dodge.option === "reduce_damage") {
+              damage = calculateDamage(
+                this.opponent.stats.attack,
+                this.enemyToHit.stats.defense
+              );
+              const damageReductionPercentage = Math.random() * (40 - 15) + 15;
+              const reducedDamage = Math.floor(
+                damage * (1 - damageReductionPercentage / 100)
+              );
+              this.enemyToHit.stats.hp -= reducedDamage;
+              await this.handleTurnEffects(familiar);
+              this.dodge = { option: null, id: null };
+              this.battleLogs.push(
+                `- ${
+                  this.currentTurn
+                } attacks ${target} for ${reducedDamage}. Reduced ${
+                  damage - reducedDamage
+                } damage!!\n ============================================`
+              );
+            } else if (this.dodge.option === "take_hit") {
+              damage = await calculateDamage(
+                familiar.stats.attack,
+                this.enemyToHit.stats.defense
+              );
+
+              this.enemyToHit.stats.hp -= damage;
+              this.battleLogs.push(
+                `+ ${this.currentTurn} attacks ${target} for ${damage} damage. Failed to dodge!`
+              );
+              await this.handleTurnEffects(familiar);
+              this.dodge = { option: null, id: null };
+            } else if (this.dodge.option === "take_1.5x_damage") {
+              damage = await calculateDamage(
+                familiar.stats.attack,
+                this.enemyToHit.stats.defense
+              );
+              const damageReductionPercentage = Math.random() * (40 - 15) + 15;
+              const increasedDamage = Math.floor(
+                damage * (1 - damageReductionPercentage / 100)
+              );
+              this.enemyToHit.stats.hp -= increasedDamage + damage;
+              this.battleLogs.push(
+                `+ ${this.currentTurn} attacks ${target} for ${damage} damage and ${increasedDamage}. ${this.enemyToHit.name} slipped and fell while trying to dodge!`
+              );
+              await this.handleTurnEffects(familiar);
+              this.dodge = { option: null, id: null };
+            }
+          } else {
+            damage = await calculateDamage(
+              familiar.stats.attack,
+              this.enemyToHit.stats.defense
+            );
+
+            // Update HP and battle logs
+            this.enemyToHit.stats.hp -= damage;
+            await this.handleTurnEffects(familiar);
+            this.battleLogs.push(
+              `+ ${this.currentTurn} attacks ${target} for ${damage} damage using an attack`
+            );
+          }
+
           break; // Exit the loop once the attacking familiar is found
         }
       }
