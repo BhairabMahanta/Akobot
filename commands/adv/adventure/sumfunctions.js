@@ -70,102 +70,6 @@ class GameImage {
     });
   }
 
-  async generateRandomElements(
-    monsterProbability,
-    npcProbability,
-    maxElements
-  ) {
-    let monsterCount = 0;
-    let npcCount = 0;
-    console.log("imagew,h:", this.imgW, this.imgH);
-
-    for (let i = this.elements.length; i < maxElements; i++) {
-      const row = Math.floor(Math.random() * (this.imgH - 50)) + 50;
-      const col = Math.floor(Math.random() * (this.imgW - 50)) + 50;
-
-      if (this.getRandomBoolean(monsterProbability) && monsterCount < 7) {
-        this.elements.push({ name: `monster${i}`, x: col, y: row });
-        this.monsterArray.push({ name: `monster${i}`, x: col, y: row });
-        monsterCount++;
-      } else if (this.getRandomBoolean(npcProbability) && npcCount < 5) {
-        this.elements.push({ name: `npc${i}`, x: col, y: row });
-        this.npcArray.push({ name: `npc${i}`, x: col, y: row });
-        npcCount++;
-      }
-
-      if (monsterCount > 2 && npcCount > 2) {
-        break;
-      }
-    }
-  }
-  async generateAreaElements(areaName) {
-    // Fetch area data from area.js based on areaName
-    const areaData = areas[areaName];
-
-    // Initialize counts for monsters and NPCs
-    let monsterCount = 0;
-    let npcCount = 0;
-    const maxElements = 10;
-
-    // Loop through the area data and generate elements
-    for (let i = this.elements.length; i < maxElements; i++) {
-      // const row = Math.floor(Math.random() * (this.imgH - 50)) + 50;
-      // const col = Math.floor(Math.random() * (this.imgW - 50)) + 50;
-
-      // Generate monsters
-      if (monsterCount < areaData.monsters.length) {
-        const monster = areaData.monsters[monsterCount];
-        this.elements.push({
-          name: monster.name,
-          x: monster.position.x,
-          y: monster.position.y,
-          area: areaName, // Store the area name with the element
-          type: monster.type,
-          hasAllies: monster.hasAllies,
-          waves: monster.waves,
-          rewards: monster.rewards,
-        });
-        this.monsterArray.push({
-          name: monster.name,
-          x: monster.position.x,
-          y: monster.position.y,
-          area: areaName,
-          amt: monster.amount,
-          type: monster.type,
-          hasAllies: monster.hasAllies,
-          waves: monster.waves,
-          rewards: monster.rewards,
-        });
-        monsterCount++;
-      }
-
-      // Generate NPCs
-      if (npcCount < areaData.npcs.length) {
-        const npc = areaData.npcs[npcCount];
-        this.elements.push({
-          name: npc.name,
-          x: npc.position.x,
-          y: npc.position.y,
-          area: areaName, // Store the area name with the element
-        });
-        this.npcArray.push({
-          name: npc.name,
-          x: npc.position.x,
-          y: npc.position.y,
-          area: areaName, // Store the area name with the element
-        });
-        npcCount++;
-      }
-
-      // Break if we've generated enough monsters and NPCs
-      if (
-        monsterCount >= areaData.monsters.length &&
-        npcCount >= areaData.npcs.length
-      ) {
-        break;
-      }
-    }
-  }
   async forLoop() {
     const attackRadius = 40; // Adjust the radius as needed
 
@@ -409,9 +313,48 @@ class GameImage {
       });
     }
   }
-  // Method to deactivate an element
+  // Method to deactivate an element// Method to mark an element as deactivated
+  async deactivateElement(elementName) {
+    const element = this.elements.find((el) => el.name === elementName);
+    if (element) {
+      element.active = false;
+    }
+  }
+
+  // Method to filter out deactivated elements
   async deactivatedElements() {
-    this.isActive = false;
+    this.elements = this.elements.filter((element) => element.active);
+    this.monsterArray = this.monsterArray.filter((element) => element.active);
+    this.npcArray = this.npcArray.filter((element) => element.active);
+  }
+
+  async generateRandomElements(
+    monsterProbability,
+    npcProbability,
+    maxElements
+  ) {
+    let monsterCount = 0;
+    let npcCount = 0;
+    console.log("imagew,h:", this.imgW, this.imgH);
+
+    for (let i = this.elements.length; i < maxElements; i++) {
+      const row = Math.floor(Math.random() * (this.imgH - 50)) + 50;
+      const col = Math.floor(Math.random() * (this.imgW - 50)) + 50;
+
+      if (this.getRandomBoolean(monsterProbability) && monsterCount < 7) {
+        this.elements.push({ name: `monster${i}`, x: col, y: row });
+        this.monsterArray.push({ name: `monster${i}`, x: col, y: row });
+        monsterCount++;
+      } else if (this.getRandomBoolean(npcProbability) && npcCount < 5) {
+        this.elements.push({ name: `npc${i}`, x: col, y: row });
+        this.npcArray.push({ name: `npc${i}`, x: col, y: row });
+        npcCount++;
+      }
+
+      if (monsterCount > 2 && npcCount > 2) {
+        break;
+      }
+    }
   }
 
   // Method to check if the element is active

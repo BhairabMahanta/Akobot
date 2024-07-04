@@ -171,10 +171,8 @@ class Duel {
           buffs: [],
           debuffs: [],
         };
-        //   console.log(character.name, "-", character.atkBar),
-        //     "-",
-        //     character.hpBarEmoji;
       }
+      //find character with fastest speed and then use that to determine this.teamturn
 
       this.aliveCharacters = this.aliveCharacters.flat();
     } catch (error) {

@@ -57,4 +57,74 @@
     }
   }
 
+
+   async generateAreaElements(areaName) {
+    // Fetch area data from area.js based on areaName
+    const areaData = areas[areaName];
+
+    // Initialize counts for monsters and NPCs
+    let monsterCount = 0;
+    let npcCount = 0;
+    const maxElements = 10;
+
+    // Loop through the area data and generate elements
+    for (let i = this.elements.length; i < maxElements; i++) {
+      // const row = Math.floor(Math.random() * (this.imgH - 50)) + 50;
+      // const col = Math.floor(Math.random() * (this.imgW - 50)) + 50;
+
+      // Generate monsters
+      if (monsterCount < areaData.monsters.length) {
+        const monster = areaData.monsters[monsterCount];
+        this.elements.push({
+          name: monster.name,
+          x: monster.position.x,
+          y: monster.position.y,
+          area: areaName, // Store the area name with the element
+          type: monster.type,
+          hasAllies: monster.hasAllies,
+          waves: monster.waves,
+          rewards: monster.rewards,
+        });
+        this.monsterArray.push({
+          name: monster.name,
+          x: monster.position.x,
+          y: monster.position.y,
+          area: areaName,
+          amt: monster.amount,
+          type: monster.type,
+          hasAllies: monster.hasAllies,
+          waves: monster.waves,
+          rewards: monster.rewards,
+        });
+        monsterCount++;
+      }
+
+      // Generate NPCs
+      if (npcCount < areaData.npcs.length) {
+        const npc = areaData.npcs[npcCount];
+        this.elements.push({
+          name: npc.name,
+          x: npc.position.x,
+          y: npc.position.y,
+          area: areaName, // Store the area name with the element
+        });
+        this.npcArray.push({
+          name: npc.name,
+          x: npc.position.x,
+          y: npc.position.y,
+          area: areaName, // Store the area name with the element
+        });
+        npcCount++;
+      }
+
+      // Break if we've generated enough monsters and NPCs
+      if (
+        monsterCount >= areaData.monsters.length &&
+        npcCount >= areaData.npcs.length
+      ) {
+        break;
+      }
+    }
+  }
+
   */
