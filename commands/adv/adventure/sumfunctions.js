@@ -9,6 +9,8 @@ const { areas } = require("../information/areas.js");
 const firstArea = require("../maps/tutorialmap/mapstart.json");
 const sharp = require("sharp");
 const fs = require("fs");
+// Load all familiars data from your module
+const { allFamiliars } = require("../information/allfamilliars.js");
 const path = require("path");
 const { mongoClient } = require("../../../data/mongo/mongo.js");
 const db = mongoClient.db("Akaimnky");
@@ -484,10 +486,55 @@ async function deactivatedElements(playerId, elements, monsterArray, npcArray) {
   return { elements, monsterArray, npcArray };
 }
 
+const GACHA_TYPES = {
+  COMMON_TOKEN: "commonScroll",
+  RARE_TOKEN: "rareScroll",
+  LEGENDARY_TOKEN: "legendaryScroll",
+};
+
+const DROP_RATES = {
+  commonScroll: { tier1: 80, tier2: 18, tier3: 2 },
+  rareScroll: { tier1: 50, tier2: 40, tier3: 10 },
+  legendaryScroll: { tier1: 20, tier2: 50, tier3: 30 },
+};
+
+async function pullGacha(playerId, gachaType) {
+  console.log("allfamiliars:", allFamiliars);
+  const rates = DROP_RATES[gachaType];
+  const tier = getTier(rates);
+  const tieraaa = `Tier${tier}`;
+  const characters = Object.keys(allFamiliars[tieraaa]);
+  console.log("characters:", allFamiliars[tieraaa]);
+  const selectedCharacter =
+    characters[Math.floor(Math.random() * characters.length)];
+
+  const filter = { _id: playerId };
+  const update = { $addToSet: { "cards.name": selectedCharacter } };
+
+  await collection.updateOne(filter, update);
+  console.log(`Player received: ${allFamiliars[tieraaa][selectedCharacter]}`);
+  return allFamiliars[tieraaa][selectedCharacter];
+}
+
+function getTier(rates) {
+  const rand = Math.random() * 100;
+  if (rand < rates.tier1) return 1;
+  if (rand < rates.tier1 + rates.tier2) return 2;
+  return 3;
+}
+
+// async function execute(client, message, args, interaction) {
+//   const playerId = message.author.id;
+//   const gachaType = GACHA_TYPES.COMMON_SCROLL;
+//   const character = await pullGacha(playerId, gachaType);
+//   console.log(`Player received: ${character}`);
+// }
+
 module.exports = {
   GameImage,
-  Player,
   cycleCooldowns,
   deactivateElement,
   deactivatedElements,
+  pullGacha,
+  GACHA_TYPES,
 };
