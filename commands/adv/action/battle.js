@@ -2,7 +2,11 @@ const { mongoClient } = require("../../../data/mongo/mongo.js");
 const db = mongoClient.db("Akaimnky");
 const collection = db.collection("akaillection");
 const { quests } = require("../quest/quests.js");
-const { cycleCooldowns } = require("../adventure/sumfunctions.js");
+const {
+  cycleCooldowns,
+  deactivateElement,
+  deactivatedElements,
+} = require("../adventure/sumfunctions.js");
 const { bosses } = require("../monsterInfo/bosses.js");
 const { mobs } = require("../monsterInfo/mobs.js");
 const { cards } = require("../information/cards.js"); // Import the cards data from 'cards.js'
@@ -1296,6 +1300,8 @@ class Battle {
         inline: true,
       });
       this.battleEmbed.setDescription("GGs You've won");
+      //       const reActivateTime = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours from now
+      // await deactivateElement(playerId, 'monster1', gameImage.elements, reActivateTime);
       this.initialMessage.edit({
         embeds: [this.battleEmbed],
         components: [],

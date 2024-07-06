@@ -2,7 +2,11 @@ const { mongoClient } = require("../../data/mongo/mongo.js");
 const db = mongoClient.db("Akaimnky");
 const collection = db.collection("akaillection");
 const { quests } = require("../adv/quest/quests.js");
-const { cycleCooldowns } = require("../adv/adventure/sumfunctions.js");
+const {
+  cycleCooldowns,
+  deactivateElement,
+  deactivatedElements,
+} = require("../adv/adventure/sumfunctions.js");
 const { bosses } = require("../adv/monsterInfo/bosses.js");
 const { mobs } = require("../adv/monsterInfo/mobs.js");
 const { cards } = require("../adv/information/cards.js"); // Import the cards data from 'cards.js'

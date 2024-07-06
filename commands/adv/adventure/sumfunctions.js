@@ -15,6 +15,7 @@ const db = mongoClient.db("Akaimnky");
 const collection = db.collection("akaillection");
 const { cards } = require("../information/cards.js"); // Import the cards data from 'cards.js'
 const abilities = require("../../../data/abilities.js");
+const DeactivatedElement = require("../../../data/mongo/elementSchema.js");
 
 class GameImage {
   constructor(imgH, imgW, player, message) {
@@ -97,9 +98,7 @@ class GameImage {
             return distA - distB;
           });
         }
-        //  console.log('ELEMENT ARRAY BANJA PLS', this.elementArray)
-        //  console.log('LOOP WALA:', this.whichMon)
-        //  console.log('isTrue:', this.isTrue)
+
         break;
       }
     }
@@ -115,6 +114,7 @@ class GameImage {
       if (!this.generatedRandomElements2) {
         // Add elements to the image
         this.generatedRandomElements2 = true;
+        await this.deactivatedElements();
         for (const element of this.elements) {
           console.log("element:", element);
           const elementName = element.name;
@@ -257,7 +257,6 @@ class GameImage {
         break;
       }
     }
-    console.log("BROCHANGED ELEMENTS WTFFF");
 
     //}
 
@@ -289,8 +288,6 @@ class GameImage {
         element.name === this.whichMon &&
         hasTalkButton
       ) {
-        console.log("whichMonNpcTwo:", this.whichMon);
-        console.log("element2:", element.name);
         nowBattling.setFooter({ text: "You moved out of NPC's range." });
         initialMessage.edit({
           embeds: [nowBattling],
@@ -313,19 +310,18 @@ class GameImage {
       });
     }
   }
-  // Method to deactivate an element// Method to mark an element as deactivated
-  async deactivateElement(elementName) {
-    const element = this.elements.find((el) => el.name === elementName);
-    if (element) {
-      element.active = false;
-    }
-  }
 
   // Method to filter out deactivated elements
   async deactivatedElements() {
-    this.elements = this.elements.filter((element) => element.active);
-    this.monsterArray = this.monsterArray.filter((element) => element.active);
-    this.npcArray = this.npcArray.filter((element) => element.active);
+    const result = await deactivatedElements(
+      this.playerId,
+      this.elements,
+      this.monsterArray,
+      this.npcArray
+    );
+    this.elements = result.elements;
+    this.monsterArray = result.monsterArray;
+    this.npcArray = result.npcArray;
   }
 
   async generateRandomElements(
@@ -373,38 +369,6 @@ class GameImage {
   }
 }
 
-class Player {
-  constructor(name, health) {
-    this.name = name;
-    this.health = health;
-    this.inventory = [];
-  }
-
-  // Method to take damage
-  takeDamage(damage) {
-    this.health -= damage;
-    if (this.health <= 0) {
-      console.log(`${this.name} has been defeated.`);
-      // Implement logic for player defeat, e.g., respawn or game over
-    }
-  }
-
-  // Method to add an item to the player's inventory
-  addItemToInventory(item) {
-    this.inventory.push(item);
-  }
-
-  // Method to use an item from the player's inventory
-  useItem(item) {
-    if (this.inventory.includes(item)) {
-      // Implement logic for using the item, e.g., healing or special ability
-      console.log(`${this.name} used ${item}.`);
-    } else {
-      console.log(`${this.name} doesn't have ${item}.`);
-    }
-  }
-}
-
 async function cycleCooldowns(array) {
   // Loop through each move and decrease its cooldown by 1
   /*
@@ -448,9 +412,82 @@ async function cycleCooldowns(array) {
     console.error("There isnt any moves on cooldown", error);
   }
 }
+async function deactivateElement(
+  playerId,
+  elementName,
+  elements,
+  reActivateTime
+) {
+  const element = elements.find((el) => el.name === elementName);
+  if (element) {
+    element.active = false;
+
+    // Add the element to the deactivated elements in the database
+    await DeactivatedElement.updateOne(
+      { playerId: playerId },
+      {
+        $addToSet: {
+          deactivatedElements: {
+            name: elementName,
+            reActivateTime: reActivateTime,
+          },
+        },
+      },
+      { upsert: true }
+    );
+  }
+}
+async function deactivatedElements(playerId, elements, monsterArray, npcArray) {
+  // Fetch deactivated elements from the database
+  const deactivatedData = await DeactivatedElement.findOne({
+    playerId: playerId,
+  });
+  const currentDate = new Date();
+
+  if (deactivatedData) {
+    const reactivatedElements = deactivatedData.deactivatedElements.filter(
+      (element) => element.reActivateTime <= currentDate
+    );
+
+    // Remove reactivated elements from the database
+    if (reactivatedElements.length > 0) {
+      await DeactivatedElement.updateOne(
+        { playerId: playerId },
+        {
+          $pull: {
+            deactivatedElements: {
+              name: { $in: reactivatedElements.map((e) => e.name) },
+            },
+          },
+        }
+      );
+    }
+
+    const deactivatedElementNames = deactivatedData.deactivatedElements
+      .filter((element) => element.reActivateTime > currentDate)
+      .map((element) => element.name);
+
+    elements = elements.filter(
+      (element) =>
+        !deactivatedElementNames.includes(element.name) && element.active
+    );
+    monsterArray = monsterArray.filter(
+      (element) =>
+        !deactivatedElementNames.includes(element.name) && element.active
+    );
+    npcArray = npcArray.filter(
+      (element) =>
+        !deactivatedElementNames.includes(element.name) && element.active
+    );
+  }
+
+  return { elements, monsterArray, npcArray };
+}
 
 module.exports = {
   GameImage,
   Player,
   cycleCooldowns,
+  deactivateElement,
+  deactivatedElements,
 };
