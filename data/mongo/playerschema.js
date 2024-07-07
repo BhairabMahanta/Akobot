@@ -9,6 +9,11 @@ const playerSchema = new Schema(
     inventory: {
       active: [String],
       backpack: [String],
+      tokens: {
+        commonScroll: Number,
+        rareScroll: Number,
+        legendaryScroll: Number,
+      },
     },
     stats: {
       attack: Number,
