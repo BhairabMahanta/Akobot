@@ -6,6 +6,7 @@ const {
   getCardMoves,
   getPlayerMoves,
 } = require("../../util/glogic.js");
+const { critOrNot } = require("../adventure/sumfunctions.js");
 const { BuffDebuffManager } = require("./BuffDebuffManager.js");
 const { BuffDebuffLogic } = require("./buffdebufflogic.js");
 const abilities = require("../../../data/abilities.js");
@@ -27,7 +28,9 @@ class Ability {
 
   //PLAYER ABILOITIES AKAI THIS WORKS BLUD
   async shieldBash(user, target) {
-    const damage = await calculateDamage(
+    const damage = await critOrNot(
+      user.stats.critRate,
+      user.stats.critDamage,
       user.stats.attack,
       target.stats.defense
     );
@@ -66,8 +69,6 @@ class Ability {
       turnLimit: 2, // Lasts for 2 turns
       flat: true,
     };
-
-    console.log(`${user} uses Defend. Their defense is increased.`);
     this.buffDebuffManager.applyBuff(user, user, buffDetails);
     await this.buffDebuffLogic.increaseWhat(user, buffDetails);
 
@@ -97,13 +98,15 @@ class Ability {
   }
 
   async ragingStrike(user, target) {
-    const damage = await calculateDamage(
-      user.stats.attack * 2,
+    const damage = await critOrNot(
+      user.stats.critRate + 50,
+      user.stats.critDamage,
+      user.stats.attack,
       target.stats.defense
     );
     target.stats.hp -= damage;
     this.battleLogs.push(
-      `${user.name} unleashes a wild Raging Strike on ${target.name}. It deals massive damage!`
+      `${user.name} unleashes a wild Raging Strike on ${target.name}. It deals ${damage} damage!`
     );
     this.cooldowns.push({
       name: "Raging Strike",
@@ -112,27 +115,15 @@ class Ability {
   }
 
   async arenaSpin(user, target, specialContext) {
-    let damageArray = [];
-    let enemyNameArray = [];
-    // Use Promise.all with map instead of forEach
-    await Promise.all(
-      specialContext.map(async (targeta) => {
-        console.log("target:", targeta.stats.defense);
-        console.log("length", specialContext.length);
-        const damage = await calculateDamage(
-          user.stats.attack,
-          targeta.stats.defense
-        );
-        targeta.stats.hp -= damage * (1 / specialContext.length);
-        damageArray.push(damage * (1 / specialContext.length));
-        enemyNameArray.push(targeta.name);
-      })
-    );
+    const { damageArray, enemyNameArray } =
+      await this.buffDebuffLogic.aoeDamage(user, target, specialContext);
+
     this.battleLogs.push(
       `+ ${user.name} performs an Arena Spin, hitting ${enemyNameArray.join(
         " ,"
       )} for ${damageArray.join(" ,")} damage respectively`
     );
+
     this.cooldowns.push({
       name: "Arena Spin",
       cooldown: this.cooldownFinder("Arena Spin"),
@@ -140,7 +131,7 @@ class Ability {
   }
 
   async crowdControl(user, target) {
-    const debuffType = "taunt";
+    const debuffType = "apply_taunt";
     const debuffDetails = {
       name: "Crowd Control",
       debuffType: debuffType,
@@ -153,6 +144,7 @@ class Ability {
       `${user} taunts ${target}. ${target} is now focused on ${user}.`
     );
     this.buffDebuffManager.applyDebuff(user, target, debuffDetails);
+    await this.buffDebuffLogic.applyWhat(target, debuffDetails);
 
     this.cooldowns.push({
       name: "Crowd Control",
@@ -161,8 +153,10 @@ class Ability {
   }
 
   async precisionStrike(user, target) {
-    const criticalDamage = calculateDamage(
-      user.stats.attack * 1.5,
+    const criticalDamage = critOrNot(
+      100, //in place of crit rate
+      user.stats.critDamage + 15,
+      user.stats.attack * 1.2,
       target.stats.defense
     );
     target.stats.hp -= criticalDamage;
@@ -176,26 +170,49 @@ class Ability {
   }
 
   async honorsResolve(user) {
-    user.statusEffects.resistance += 20; // Example: Increase status effect resistance by 20%
-    this.battleLogs.push(
-      `${user.name} enters Honor's Resolve, gaining increased resistance to status effects.`
-    );
+    const buffType = "apply_immunity";
+    const buffDetails = {
+      name: "Honor's Resolve",
+      buffType: buffType,
+      unique: true,
+      targets: user,
+      turnLimit: 2, // Lasts for 2 turns
+    };
+    this.buffDebuffManager.applyBuff(user, user, buffDetails);
+    await this.buffDebuffLogic.applyWhat(user, buffDetails);
+
     this.cooldowns.push({
       name: "Honor's Resolve",
       cooldown: this.cooldownFinder("Honor's Resolve"),
     });
   }
 
-  async fireball(user, target) {
-    const damageOverTime = calculateAbilityDamage(
-      user.stats.magic,
-      target.stats.defense,
-      3
+  async fireball(user, target, specialContext) {
+    // Calculate initial damage
+    const damage = critOrNot(
+      user.stats.critRate,
+      user.stats.critDamage,
+      user.stats.attack,
+      target.stats.defense
     );
-    target.stats.hp -= damageOverTime;
+    target.stats.hp -= damage;
+
+    // Apply DoT debuff
+    const debuffDetails = {
+      name: "Fireball",
+      debuffType: "apply_dot",
+      unique: true,
+      value_amount: 10, // Example DoT damage per turn
+      targets: target,
+      turnLimit: 3, // Lasts for 3 turns
+    };
+
+    await this.buffDebuffLogic.applyWhat(user, target, debuffDetails);
+    await this.buffDebuffManager.applyDebuff(user, target, debuffDetails);
     this.battleLogs.push(
-      `${user.name} hurls a Fireball at ${target.name}. ${target.name} takes damage over time.`
+      `${user.name} hurls a Fireball at ${target.name}, dealing ${damage} damage and causing burn damage over time.`
     );
+
     this.cooldowns.push({
       name: "Fireball",
       cooldown: this.cooldownFinder("Fireball"),
@@ -203,10 +220,22 @@ class Ability {
   }
 
   async arcaneShield(user) {
-    user.statusEffects.shield = true; // Example: Apply a shield status effect
-    this.battleLogs.push(
-      `${user.name} creates an Arcane Shield, absorbing incoming magic attacks.`
+    const buffType = "apply_shield";
+    const buffDetails = {
+      name: "Arcane Shield",
+      buffType: buffType,
+      unique: true,
+      value_amount: { shield: 50 }, // Absorb 50 points of magic damage
+      targets: user,
+      turnLimit: 3, // Lasts for 3 turns
+    };
+
+    console.log(
+      `${user} creates an Arcane Shield, absorbing incoming magic attacks.`
     );
+    this.buffDebuffManager.applyBuff(user, user, buffDetails);
+    await this.buffDebuffLogic.applyWhat(user, buffDetails);
+
     this.cooldowns.push({
       name: "Arcane Shield",
       cooldown: this.cooldownFinder("Arcane Shield"),
@@ -214,30 +243,26 @@ class Ability {
   }
 
   async frostNova(user, target, specialContext) {
-    let damageArray = [];
-    let enemyNameArray = [];
-    // Use Promise.all with map instead of forEach
-    await Promise.all(
-      specialContext.map(async (targeta) => {
-        console.log("target:", targeta.stats.defense);
-        console.log("length", specialContext.length);
-        const damage = await calculateDamage(
-          user.stats.attack,
-          targeta.stats.defense
-        );
-        targeta.stats.hp -= damage * (1 / specialContext.length);
-        damageArray.push(damage * (1 / specialContext.length));
-        enemyNameArray.push(targeta.name);
-      })
-    );
+    const debuffType = "apply_freeze";
+    const debuffDetails = {
+      name: "Frost Nova",
+      debuffType: debuffType,
+      unique: true,
+      value_amount: { speed: -30 }, // Reduce speed by 30%
+      targets: specialContext,
+      turnLimit: 2, // Lasts for 2 turns
+    };
+
+    const { damageArray, enemyNameArray } =
+      await this.buffDebuffLogic.aoeDamage(user, target, specialContext);
+
+    this.buffDebuffManager.applyDebuff(user, specialContext, debuffDetails);
+    await this.buffDebuffLogic.decreaseWhat(target, debuffDetails);
     this.battleLogs.push(
-      `+ ${
-        user.name
-      } casts Frost Nova freezing, and dealing ${enemyNameArray.join(
+      `+ ${user.name} performs frostNova, hitting ${enemyNameArray.join(
         " ,"
       )} for ${damageArray.join(" ,")} damage respectively`
     );
-    target.statusEffects.frozen = true; // Example: Freeze the target
 
     this.cooldowns.push({
       name: "Frost Nova",
@@ -246,29 +271,13 @@ class Ability {
   }
 
   async thunderstorm(user, target, specialContext) {
-    let damageArray = [];
-    let enemyNameArray = [];
-    // Use Promise.all with map instead of forEach
-    await Promise.all(
-      specialContext.map(async (targeta) => {
-        console.log("target:", targeta.stats.defense);
-        console.log("length", specialContext.length);
-        const damage = await calculateDamage(
-          user.stats.attack,
-          targeta.stats.defense
-        );
-        targeta.stats.hp -= damage * (1 / specialContext.length);
-        damageArray.push(damage * (1 / specialContext.length));
-        enemyNameArray.push(targeta.name);
-      })
-    );
+    const { damageArray, enemyNameArray } =
+      await this.buffDebuffLogic.aoeDamage(user, target, specialContext);
+
     this.battleLogs.push(
-      `+ ${user.name} performs an Arena Spin, hitting ${enemyNameArray.join(
+      `+ ${user.name} calls forth a Thunderstorm, hitting ${enemyNameArray.join(
         " ,"
       )} for ${damageArray.join(" ,")} damage respectively`
-    );
-    this.battleLogs.push(
-      `${user.name} calls forth a Thunderstorm, damaging multiple opponents.`
     );
     this.cooldowns.push({
       name: "Thunderstorm",
@@ -277,10 +286,9 @@ class Ability {
   }
 
   async raiseDead(user) {
-    // Implement logic for summoning a skeletal minion here
-    this.battleLogs.push(
-      `${user.name} summons a skeletal minion to aid in battle.`
-    );
+    console.log(`${user} summons a skeletal minion to aid in battle.`);
+    this.minionManager.summonMinion(user, "Skeletal Minion");
+
     this.cooldowns.push({
       name: "Raise Dead",
       cooldown: this.cooldownFinder("Raise Dead"),
@@ -288,11 +296,18 @@ class Ability {
   }
 
   async drainLife(user, target) {
-    const drainAmount = calculateAbilityDamage(user.stats.magic, 25); // Example: Drain Life heals for 25 HP
+    const drainAmount = critOrNot(
+      user.stats.critRate,
+      user.stats.critDamage,
+      user.stats.attack,
+      target.stats.defense
+    ); // Example: Drain Life heals for 25 HP
     target.stats.hp -= drainAmount;
-    user.stats.hp += drainAmount;
+    user.stats.hp += drainAmount * 0.4;
     this.battleLogs.push(
-      `${user.name} drains the life force from ${target.name}. ${user.name} is healed.`
+      `${user.name} deals ${drainAmount} damage draining ${
+        drainAmount * 0.4
+      } hp from ${target.name}.`
     );
     this.cooldowns.push({
       name: "Drain Life",
@@ -301,10 +316,22 @@ class Ability {
   }
 
   async mirrorImage(user) {
-    // Implement logic for creating illusory copies here
-    this.battleLogs.push(
-      `${user.name} creates multiple illusory copies to confuse opponents.`
+    const buffType = "apply_evasion";
+    const buffDetails = {
+      name: "Mirror Image",
+      buffType: buffType,
+      unique: true,
+      value_amount: { evasion: 30 }, // Example evasion value
+      targets: user,
+      turnLimit: 3, // Lasts for 3 turns
+    };
+
+    console.log(
+      `${user.name} creates multiple illusory copies, increasing evasion.`
     );
+    this.buffDebuffManager.applyBuff(user, user, buffDetails);
+    await this.buffDebuffLogic.applyWhat(user, buffDetails);
+
     this.cooldowns.push({
       name: "Mirror Image",
       cooldown: this.cooldownFinder("Mirror Image"),
@@ -312,10 +339,22 @@ class Ability {
   }
 
   async mindTrick(user, target) {
-    // Implement logic for disorienting the target here
-    this.battleLogs.push(
+    const debuffType = "apply_disorientation";
+    const debuffDetails = {
+      name: "Mind Trick",
+      debuffType: debuffType,
+      unique: true,
+      value_amount: { accuracy: -20 }, // Example disorientation value
+      targets: target,
+      turnLimit: 3, // Lasts for 3 turns
+    };
+
+    console.log(
       `${user.name} uses a Mind Trick on ${target.name}. ${target.name} is disoriented.`
     );
+    this.buffDebuffManager.applyDebuff(user, target, debuffDetails);
+    await this.buffDebuffLogic.applyWhat(user, debuffDetails);
+
     this.cooldowns.push({
       name: "Mind Trick",
       cooldown: this.cooldownFinder("Mind Trick"),
@@ -323,13 +362,15 @@ class Ability {
   }
 
   async backstab(user, target) {
-    const backstabDamage = calculateDamage(
-      user.stats.attack * 2,
-      target.stats.defense
-    ); // Example: Backstab deals double damage
-    target.stats.hp -= backstabDamage;
+    const damage = await critOrNot(
+      user.stats.critRate,
+      user.stats.critDamage,
+      user.stats.attack,
+      target.stats.defense * 0.75
+    );
+    target.stats.hp -= damage;
     this.battleLogs.push(
-      `${user.name} strikes ${target.name} from behind. It's a backstab!`
+      `${user.name} strikes ${target.name} from behind. It's a backstab! It deals ${damage} damage.`
     );
     this.cooldowns.push({
       name: "Backstab",
@@ -338,10 +379,28 @@ class Ability {
   }
 
   async shadowStep(user, target) {
-    // Implement logic for teleporting behind the target here
-    this.battleLogs.push(
-      `${user.name} teleports behind ${target.name}, gaining a positional advantage.`
+    const damage = critOrNot(
+      user.stats.critRate + 10,
+      user.stats.critDamage,
+      user.stats.attack,
+      target.stats.defense
     );
+    target.stats.hp -= damage;
+    const buffType = "increase_critRate";
+    const buffDetails = {
+      name: "Shadow Step",
+      buffType: buffType,
+      unique: true,
+      value_amount: { critRate: 10 }, // Example crit rate increase
+      targets: user,
+      turnLimit: 2, // Lasts for 2 turns
+    };
+    this.battleLogs.push(
+      `+ ${user.name} teleports behind ${target.name}, dealing ${damage} damage and increasing crit rate by 10% for 2 turns.`
+    );
+    this.buffDebuffManager.applyBuff(user, user, buffDetails);
+    await this.buffDebuffLogic.increaseWhat(user, buffDetails);
+
     this.cooldowns.push({
       name: "Shadow Step",
       cooldown: this.cooldownFinder("Shadow Step"),
@@ -349,10 +408,18 @@ class Ability {
   }
 
   async dualWield(user) {
-    user.stats.attackSpeed += 20; // Example: Dual Wield increases attack speed by 20
-    this.battleLogs.push(
-      `${user.name} wields two weapons simultaneously, increasing attack speed.`
-    );
+    const buffType = "apply_multipleHit";
+    const buffDetails = {
+      name: "Dual Wield",
+      buffType: buffType,
+      unique: true,
+      value_amount: 3, // Example attack speed increase
+      targets: user,
+    };
+
+    this.buffDebuffManager.applyBuff(user, user, buffDetails);
+    await this.buffDebuffLogic.applyWhat(user, buffDetails);
+
     this.cooldowns.push({
       name: "Dual Wield",
       cooldown: this.cooldownFinder("Dual Wield"),
@@ -360,10 +427,22 @@ class Ability {
   }
 
   async evasion(user) {
-    user.statusEffects.evasion = true; // Example: Apply an evasion status effect
-    this.battleLogs.push(
-      `${user.name} evades incoming attacks, reducing damage taken for a short period.`
+    const buffType = "apply_evasion";
+    const buffDetails = {
+      name: "Evasion",
+      buffType: buffType,
+      unique: true,
+      value_amount: { evasion: 50 }, // Example evasion value
+      targets: user,
+      turnLimit: 2, // Lasts for 2 turns
+    };
+
+    console.log(
+      `${user.name} evades his taxes, reducing damage taken for a short period.`
     );
+    this.buffDebuffManager.applyBuff(user, user, buffDetails);
+    await this.buffDebuffLogic.applyWhat(user, buffDetails);
+
     this.cooldowns.push({
       name: "Evasion",
       cooldown: this.cooldownFinder("Evasion"),
@@ -371,10 +450,20 @@ class Ability {
   }
 
   async smokeBomb(user) {
-    // Implement logic for creating a smoke cloud here
-    this.battleLogs.push(
-      `${user.name} throws a Smoke Bomb, creating a cloud of smoke.`
-    );
+    const buffType = "apply_invisibility";
+    const buffDetails = {
+      name: "Smoke Bomb",
+      buffType: buffType,
+      unique: true,
+      value_amount: { invisibility: true }, // Example invisibility value
+      targets: user,
+      turnLimit: 2, // Lasts for 2 turns
+    };
+
+    console.log(`${user.name} throws a Smoke Bomb, creating a cloud of smoke.`);
+    this.buffDebuffManager.applyBuff(user, user, buffDetails);
+    await this.buffDebuffLogic.applyWhat(user, buffDetails);
+
     this.cooldowns.push({
       name: "Smoke Bomb",
       cooldown: this.cooldownFinder("Smoke Bomb"),
@@ -382,27 +471,15 @@ class Ability {
   }
 
   async shurikenBarrage(user, target, specialContext) {
-    let damageArray = [];
-    let enemyNameArray = [];
-    // Use Promise.all with map instead of forEach
-    await Promise.all(
-      specialContext.map(async (targeta) => {
-        console.log("target:", targeta.stats.defense);
-        console.log("length", specialContext.length);
-        const damage = await calculateDamage(
-          user.stats.attack,
-          targeta.stats.defense
-        );
-        targeta.stats.hp -= damage * (1 / specialContext.length);
-        damageArray.push(damage * (1 / specialContext.length));
-        enemyNameArray.push(targeta.name);
-      })
-    );
+    const { damageArray, enemyNameArray } =
+      await this.buffDebuffLogic.aoeDamage(user, target, specialContext);
+
     this.battleLogs.push(
-      `+ ${user.name} performs Shuriken Barrage, hitting ${enemyNameArray.join(
-        " ,"
-      )} for ${damageArray.join(" ,")} damage respectively`
+      `${user.name} throws a flurry of shurikens, hitting ${enemyNameArray.join(
+        ", "
+      )} for ${damageArray.join(", ")} damage respectively.`
     );
+
     this.cooldowns.push({
       name: "Shuriken Barrage",
       cooldown: this.cooldownFinder("Shuriken Barrage"),
@@ -410,10 +487,21 @@ class Ability {
   }
 
   async charmingPresence(user, target) {
-    // Implement logic for charming the target here
-    this.battleLogs.push(
+    const debuffType = "apply_charm";
+    const debuffDetails = {
+      name: "Charming Presence",
+      debuffType: debuffType,
+      unique: true,
+      targets: target,
+      turnLimit: 2, // Lasts for 2 turns
+    };
+
+    console.log(
       `${user.name} uses Charming Presence. ${target.name} is charmed and becomes passive.`
     );
+    this.buffDebuffManager.applyDebuff(user, target, debuffDetails);
+    await this.buffDebuffLogic.applyWhat(user, debuffDetails);
+
     this.cooldowns.push({
       name: "Charming Presence",
       cooldown: this.cooldownFinder("Charming Presence"),
@@ -421,21 +509,36 @@ class Ability {
   }
 
   async acrobaticFlourish(user) {
-    user.statusEffects.evasion += 30; // Example: Acrobatic Flourish increases evasion by 30%
-    this.battleLogs.push(
+    const buffType = "apply_evasion";
+    const buffDetails = {
+      name: "Acrobatic Flourish",
+      buffType: buffType,
+      unique: true,
+      value_amount: { evasion: 40 }, // Example evasion value
+      targets: user,
+      turnLimit: 3, // Lasts for 3 turns
+    };
+
+    console.log(
       `${user.name} performs an Acrobatic Flourish, increasing evasion.`
     );
+    this.buffDebuffManager.applyBuff(user, user, buffDetails);
+    await this.buffDebuffLogic.applyWhat(user, buffDetails);
+
     this.cooldowns.push({
       name: "Acrobatic Flourish",
       cooldown: this.cooldownFinder("Acrobatic Flourish"),
     });
   }
-
   async healingLight(user, target) {
-    const healingAmount = calculateAbilityDamage(user.stats.magic, 30); // Example: Healing Light heals for 30 HP
-    target.stats.hp += healingAmount;
+    const healAmount = user.stats.magicPower * 1.5; // Example healing logic
+    target.stats.hp += healAmount;
+    console.log(
+      `${user.name} uses Healing Light on ${target.name}. ${target.name} is healed for ${healAmount} HP.`
+    );
+
     this.battleLogs.push(
-      `${user.name} uses Healing Light on ${target.name}. ${target.name} is healed.`
+      `${user.name} uses Healing Light on ${target.name}, healing for ${healAmount} HP.`
     );
     this.cooldowns.push({
       name: "Healing Light",
@@ -444,10 +547,22 @@ class Ability {
   }
 
   async divineProtection(user) {
-    // Implement logic for providing a shield of protection here
-    this.battleLogs.push(
+    const buffType = "apply_shield";
+    const buffDetails = {
+      name: "Divine Protection",
+      buffType: buffType,
+      unique: true,
+      value_amount: { shield: 100 }, // Example shield value
+      targets: user,
+      turnLimit: 3, // Lasts for 3 turns
+    };
+
+    console.log(
       `${user.name} provides a shield of Divine Protection, absorbing incoming damage.`
     );
+    this.buffDebuffManager.applyBuff(user, user, buffDetails);
+    await this.buffDebuffLogic.applyWhat(user, buffDetails);
+
     this.cooldowns.push({
       name: "Divine Protection",
       cooldown: this.cooldownFinder("Divine Protection"),

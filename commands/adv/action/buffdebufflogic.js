@@ -142,6 +142,29 @@ class BuffDebuffLogic {
       target.atkBar -= target.atkBar * (amount / 100);
     }
   }
+  async aoeDamage(user, target, specialContext) {
+    let damageArray = [];
+    let enemyNameArray = [];
+
+    await Promise.all(
+      specialContext.map(async (targeta) => {
+        console.log("target:", targeta.stats.defense);
+        console.log("length", specialContext.length);
+        const damage = await critOrNot(
+          user.stats.critRate,
+          user.stats.critDamage,
+          user.stats.attack,
+          targeta.stats.defense
+        );
+        targeta.stats.hp -= damage * (1.2 / specialContext.length);
+        damageArray.push(damage * (1.2 / specialContext.length));
+        enemyNameArray.push(targeta.name);
+      })
+    );
+
+    return { damageArray, enemyNameArray };
+  }
+
   async invincibility(target, duration) {
     target.status.invincible = true;
     target.status.invincibleTurns = duration;
@@ -177,7 +200,54 @@ class BuffDebuffLogic {
       target.stats.critDamage += target.stats.critDamage * (amount / 100);
     }
   }
+  async applyWhat(target, debuffDetails) {
+    const debuffs = debuffDetails.debuffType.split("_and_");
+    let derArray = [];
+    let statChanges = [];
+    for (const unit of Array.isArray(target) ? target : [target]) {
+      for (const debuffType of debuffs) {
+        const flat = debuffDetails.flat || false;
 
+        switch (debuffType) {
+          case "apply_immunity":
+            await this.immunity(unit, debuffDetails.turnLimit);
+            statChanges.push(
+              `attack by ${debuffDetails.value_amount.attack}${flat ? "" : "%"}`
+            );
+            break;
+          case "decrease_speed":
+            await this.decreaseSpeed(
+              unit,
+              debuffDetails.value_amount.speed,
+              flat
+            );
+            statChanges.push(
+              `speed by ${debuffDetails.value_amount.speed}${flat ? "" : "%"}`
+            );
+            break;
+          case "decrease_defense":
+            await this.decreaseDefense(
+              unit,
+              debuffDetails.value_amount.defense,
+              flat
+            );
+            statChanges.push(
+              `defense by ${debuffDetails.value_amount.defense}${
+                flat ? "" : "%"
+              }`
+            );
+            break;
+          default:
+            throw new Error(`Unknown debuff type: ${debuffType}`);
+        }
+      }
+      derArray.push(unit.name);
+    }
+    const logMessage = `${derArray.join(", ")} received ${
+      debuffDetails.name
+    } debuff, decreasing ${statChanges.join(" and ")}.`;
+    this.battleLogs.push(logMessage);
+  }
   async increaseWhat(target, buffDetails) {
     const buffs = buffDetails.buffType.split("_and_");
     let derArray = [];

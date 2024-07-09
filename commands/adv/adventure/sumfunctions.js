@@ -18,6 +18,10 @@ const collection = db.collection("akaillection");
 const { cards } = require("../information/cards.js"); // Import the cards data from 'cards.js'
 const abilities = require("../../../data/abilities.js");
 const DeactivatedElement = require("../../../data/mongo/elementSchema.js");
+const {
+  calculateDamage,
+  calculateCritDamage,
+} = require("../../../my_rust_library/my_rust_library.node");
 
 class GameImage {
   constructor(imgH, imgW, player, message) {
@@ -529,6 +533,24 @@ function getTier(rates) {
 //   const character = await pullGacha(playerId, gachaType);
 //   console.log(`Player received: ${character}`);
 // }
+async function critOrNot(
+  attackerCritRate,
+  critDamage,
+  authorAttack,
+  enemyDefense
+) {
+  const critChance = Math.random() * 100;
+  if (attackerCritRate === undefined) {
+    console.log("normal damage");
+    return calculateDamage(authorAttack, enemyDefense);
+  } else if (critChance <= attackerCritRate) {
+    console.log("crit damage");
+    return calculateCritDamage(authorAttack, critDamage, enemyDefense);
+  } else {
+    console.log("normal damage");
+    return calculateDamage(authorAttack, enemyDefense);
+  }
+}
 
 module.exports = {
   GameImage,
@@ -537,4 +559,5 @@ module.exports = {
   deactivatedElements,
   pullGacha,
   GACHA_TYPES,
+  critOrNot,
 };

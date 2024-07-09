@@ -6,6 +6,7 @@ const {
   cycleCooldowns,
   deactivateElement,
   deactivatedElements,
+  critOrNot,
 } = require("../adv/adventure/sumfunctions.js");
 const { bosses } = require("../adv/monsterInfo/bosses.js");
 const { mobs } = require("../adv/monsterInfo/mobs.js");
@@ -538,7 +539,9 @@ class Duel {
             `- ${target} barely dodges the attack!\n ============================================`
           );
         } else if (this.dodge.option === "reduce_damage") {
-          damage = calculateDamage(
+          damage = critOrNot(
+            this.player.stats.critRate,
+            this.player.stats.critDamage,
             this.player.stats.attack,
             this.enemyToHit.stats.defense
           );
@@ -557,7 +560,9 @@ class Duel {
             } damage!!\n ============================================`
           );
         } else if (this.dodge.option === "take_hit") {
-          damage = calculateDamage(
+          damage = critOrNot(
+            this.player.stats.critRate,
+            this.player.stats.critDamage,
             this.player.stats.attack,
             this.enemyToHit.stats.defense
           );
@@ -568,7 +573,9 @@ class Duel {
           );
           await this.handleTurnEffects(this.player);
         } else if (this.dodge.option === "take_1.5x_damage") {
-          damage = calculateDamage(
+          damage = critOrNot(
+            this.player.stats.critRate,
+            this.player.stats.critDamage,
             this.player.stats.attack,
             this.enemyToHit.stats.defense
           );
@@ -584,7 +591,9 @@ class Duel {
           this.dodge = { option: null, id: null };
         }
       } else {
-        damage = await calculateDamage(
+        damage = await critOrNot(
+          this.player.stats.critRate,
+          this.player.stats.critDamage,
           this.player.stats.attack,
           this.enemyToHit.stats.defense
         );
@@ -623,7 +632,9 @@ class Duel {
             `- ${target} barely dodges the attack!\n ============================================`
           );
         } else if (this.dodge.option === "reduce_damage") {
-          damage = calculateDamage(
+          damage = critOrNot(
+            this.opponent.stats.critRate,
+            this.opponent.stats.critDamage,
             this.opponent.stats.attack,
             this.enemyToHit.stats.defense
           );
@@ -642,7 +653,9 @@ class Duel {
             } damage!!\n ============================================`
           );
         } else if (this.dodge.option === "take_hit") {
-          damage = calculateDamage(
+          damage = critOrNot(
+            this.opponent.stats.critRate,
+            this.opponent.stats.critDamage,
             this.opponent.stats.attack,
             this.enemyToHit.stats.defense
           );
@@ -654,7 +667,9 @@ class Duel {
           await this.handleTurnEffects(this.opponent);
           this.dodge = { option: null, id: null };
         } else if (this.dodge.option === "take_1.5x_damage") {
-          damage = calculateDamage(
+          damage = critOrNot(
+            this.opponent.stats.critRate,
+            this.opponent.stats.critDamage,
             this.opponent.stats.attack,
             this.enemyToHit.stats.defense
           );
@@ -670,7 +685,9 @@ class Duel {
           this.dodge = { option: null, id: null };
         }
       } else {
-        damage = await calculateDamage(
+        damage = await critOrNot(
+          this.opponent.stats.critRate,
+          this.opponent.stats.critDamage,
           this.opponent.stats.attack,
           this.enemyToHit.stats.defense
         );
@@ -720,7 +737,10 @@ class Duel {
                 `- ${target} barely dodges the attack!\n ============================================`
               );
             } else if (this.dodge.option === "reduce_damage") {
-              damage = calculateDamage(
+              damage = critOrNot(
+                this.opponent.stats.critRate,
+                this.opponent.stats.critDamage,
+
                 this.opponent.stats.attack,
                 this.enemyToHit.stats.defense
               );
@@ -739,7 +759,9 @@ class Duel {
                 } damage!!\n ============================================`
               );
             } else if (this.dodge.option === "take_hit") {
-              damage = await calculateDamage(
+              damage = await critOrNot(
+                familiar.stats.critRate,
+                familiar.stats.critDamage,
                 familiar.stats.attack,
                 this.enemyToHit.stats.defense
               );
@@ -751,7 +773,10 @@ class Duel {
               await this.handleTurnEffects(familiar);
               this.dodge = { option: null, id: null };
             } else if (this.dodge.option === "take_1.5x_damage") {
-              damage = await calculateDamage(
+              damage = await critOrNot(
+                familiar.stats.critRate,
+                familiar.stats.critDamage,
+
                 familiar.stats.attack,
                 this.enemyToHit.stats.defense
               );
@@ -767,7 +792,9 @@ class Duel {
               this.dodge = { option: null, id: null };
             }
           } else {
-            damage = await calculateDamage(
+            damage = await critOrNot(
+              familiar.stats.critRate,
+              familiar.stats.critDamage,
               familiar.stats.attack,
               this.enemyToHit.stats.defense
             );
@@ -811,7 +838,9 @@ class Duel {
                 `- ${target} barely dodges the attack!\n ============================================`
               );
             } else if (this.dodge.option === "reduce_damage") {
-              damage = calculateDamage(
+              damage = critOrNot(
+                this.opponent.stats.critRate,
+                this.opponent.stats.critDamage,
                 this.opponent.stats.attack,
                 this.enemyToHit.stats.defense
               );
@@ -830,7 +859,9 @@ class Duel {
                 } damage!!\n ============================================`
               );
             } else if (this.dodge.option === "take_hit") {
-              damage = await calculateDamage(
+              damage = await critOrNot(
+                familiar.stats.critRate,
+                familiar.stats.critDamage,
                 familiar.stats.attack,
                 this.enemyToHit.stats.defense
               );
@@ -842,7 +873,9 @@ class Duel {
               await this.handleTurnEffects(familiar);
               this.dodge = { option: null, id: null };
             } else if (this.dodge.option === "take_1.5x_damage") {
-              damage = await calculateDamage(
+              damage = await critOrNot(
+                familiar.stats.critRate,
+                familiar.stats.critDamage,
                 familiar.stats.attack,
                 this.enemyToHit.stats.defense
               );
@@ -858,7 +891,9 @@ class Duel {
               this.dodge = { option: null, id: null };
             }
           } else {
-            damage = await calculateDamage(
+            damage = await critOrNot(
+              familiar.stats.critRate,
+              familiar.stats.critDamage,
               familiar.stats.attack,
               this.enemyToHit.stats.defense
             );
@@ -925,27 +960,7 @@ class Duel {
     } catch (error) {
       console.log("speedcalculator:", error);
     }
-  } //
-
-  // async fillAtkBars() {
-  //   try {
-  //     this.characters.sort((a, b) => b.stats.speed - a.stats.speed);
-  //     console.log("characters:", this.characters);
-  //     for (const character of this.characters) {
-  //       // console.log("characterName:", character);
-  //       const speed = await this.calculateOverallSpeed(character);
-
-  //       const speedMultiplier = character.speedBuff ? 1.3 : 1; // Apply Speed Buff if active
-  //       character.atkBar += speed * 0.05 * speedMultiplier;
-  //       character.attackBarEmoji = await this.generateAttackBarEmoji(
-  //         character.atkBar
-  //       );
-  //     }
-  //   } catch (error) {
-  //     console.log("fillBarError:", error);
-  //   }
-  // } //
-
+  }
   async fillAtkBars() {
     let charactersWith100AtkBar = [];
     let turnDecided = false;
@@ -1272,10 +1287,6 @@ class Duel {
           console.error("Error on hit:", error);
         }
       } else if (i.customId === "action_select") {
-        // if (
-        //   this.teamTurn === this.player.name &&
-        //   i.user.id === this.player._id
-        // ) {} else if ( this.teamTurn === this.opponent.name && i.user.id === this.opponent._id) {}
         const targetIndex = i.values[0];
         console.log("targetIndex:", targetIndex);
         const realTarget = targetIndex.replace("enemy_", "");
