@@ -26,36 +26,51 @@ class Ability {
   }
 
   //PLAYER ABILOITIES AKAI THIS WORKS BLUD
-
   async shieldBash(user, target) {
     const damage = await calculateDamage(
       user.stats.attack,
       target.stats.defense
     );
-    console.log("bossHp:", target.stats.hp);
     target.stats.hp -= damage;
-    target.stats.speed -= 10;
-    console.log("bossHpafter:", target.stats.hp);
-    this.battleLogs.push(
-      `+ ${user.name} uses Shield Bash on ${target.name} dealing ${damage}. ${target.name} now has ${target.stats.speed} speed for 3 turns!`
-    );
-    console.log(this.battleLogs.length);
+    const debuffType = "decrease_speed";
+    const debuffDetails = {
+      name: "Shield Bash",
+      debuffType: debuffType,
+      unique: true,
+      value_amount: { speed: 20 }, // Decrease speed by 20
+      targets: target,
+      turnLimit: 2, // Lasts for 2 turns
+      flat: true,
+    };
+
     console.log(
-      `${user.name} uses Shield Bash on ${target.name}. ${target.name} is slowed!`
+      `${user} uses Shield Bash on ${target}dealing ${damage} damage.`
     );
+    this.buffDebuffManager.applyDebuff(user, target, debuffDetails);
+    await this.buffDebuffLogic.decreaseWhat(target, debuffDetails);
+
     this.cooldowns.push({
       name: "Shield Bash",
       cooldown: this.cooldownFinder("Shield Bash"),
     });
-
-    // updateMovesOnCd(this.cooldowns, this.cooldownFinder('shieldBash'));
   }
 
   async defend(user) {
-    user.stats.defense += 10; // Example: Increase defense by 10
-    this.battleLogs.push(
-      `+ ${user.name} uses Defend. Their defense is increased.`
-    );
+    const buffType = "increase_defense";
+    const buffDetails = {
+      name: "Defend",
+      buffType: buffType,
+      unique: true,
+      value_amount: { defense: 30 }, // Increase defense by 30
+      targets: user,
+      turnLimit: 2, // Lasts for 2 turns
+      flat: true,
+    };
+
+    console.log(`${user} uses Defend. Their defense is increased.`);
+    this.buffDebuffManager.applyBuff(user, user, buffDetails);
+    await this.buffDebuffLogic.increaseWhat(user, buffDetails);
+
     this.cooldowns.push({
       name: "Defend",
       cooldown: this.cooldownFinder("Defend"),
@@ -63,27 +78,18 @@ class Ability {
   }
 
   async bloodlust(user, target) {
-    const buffType = "increase_attack_and_speed";
-    const buffName = "Bloodlust";
+    const buffType = "increase_attack_and_increase_speed";
     const buffDetails = {
       name: "Bloodlust",
+      buffType: buffType,
       unique: true,
       value_amount: { attack: 15, speed: 20 },
+      targets: target,
       turnLimit: 1,
       flat: true,
     };
-    this.buffDebuffManager.applyBuff(
-      user,
-      target,
-      buffType,
-      buffName,
-      buffDetails
-    );
-    await this.buffDebuffLogic.increaseAttackNSpeed(user, buffDetails);
-
-    this.battleLogs.push(
-      `${user.name} activates Bloodlust. Attack speed and damage increase.`
-    );
+    this.buffDebuffManager.applyBuff(user, target, buffDetails);
+    await this.buffDebuffLogic.increaseWhat(user, buffDetails);
     this.cooldowns.push({
       name: "Bloodlust",
       cooldown: this.cooldownFinder("Bloodlust"),
@@ -134,10 +140,20 @@ class Ability {
   }
 
   async crowdControl(user, target) {
-    target.focus = user;
-    this.battleLogs.push(
-      `${user.name} taunts ${target.name}. ${target.name} is now focused on ${user.name}.`
+    const debuffType = "taunt";
+    const debuffDetails = {
+      name: "Crowd Control",
+      debuffType: debuffType,
+      unique: true,
+      targets: target,
+      turnLimit: 3, // Lasts for 3 turns
+    };
+
+    console.log(
+      `${user} taunts ${target}. ${target} is now focused on ${user}.`
     );
+    this.buffDebuffManager.applyDebuff(user, target, debuffDetails);
+
     this.cooldowns.push({
       name: "Crowd Control",
       cooldown: this.cooldownFinder("Crowd Control"),
