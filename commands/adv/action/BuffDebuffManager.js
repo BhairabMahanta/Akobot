@@ -3,24 +3,24 @@ class BuffDebuffManager {
     this.battleLogs = that.battleLogs;
   }
 
-  async applyDebuff(user, target, debuffType, debuffName, buffDetails) {
+  async applyDebuff(user, target, buffDetails) {
     // Check if the target has immunity
     if (target.hasImmunity) {
       this.battleLogs.push(
-        `${target.name} is immune to ${debuffType} debuffs.`
+        `${target.name} is immune to ${buffDetails.debuffType} debuffs.`
       );
       return;
     }
 
     // Apply the debuff
     const debuff = {
-      type: debuffType,
-      name: debuffName,
+      type: buffDetails.debuffType,
+      name: buffDetails.debuffName,
       remainingTurns: buffDetails.turnLimit,
     };
     target.statuses.debuffs.push(debuff);
     this.battleLogs.push(
-      `${user} applied ${debuffName} to ${target.name} for ${buffDetails.turnLimit} turns.`
+      `${user} applied ${buffDetails.debuffName} to ${target.name} for ${buffDetails.turnLimit} turns.`
     );
   }
 
@@ -37,27 +37,27 @@ class BuffDebuffManager {
   }
 
   // Method to apply a buff
-  async applyBuff(user, target, buffType, buffName, buffDetails) {
+  async applyBuff(user, target, buffDetails) {
     // Apply the buff
     if (user.hasBuffBlocker) {
       this.battleLogs.push(
-        `${user.name} could not receive the ${buffName} buff.`
+        `${user.name} could not receive the ${buffDetails.buffName} buff.`
       );
       return;
     }
     let buff = {};
     if (buffDetails.unique === true) {
       buff = {
-        type: buffType,
-        name: buffName,
+        type: buffDetails.buffType,
+        name: buffDetails.buffName,
         remainingTurns: buffDetails.turnLimit,
         value_amount: buffDetails.value_amount,
         flat: buffDetails.flat || false,
       };
     } else {
       buff = {
-        type: buffType,
-        name: buffName,
+        type: buffDetails.buffType,
+        name: buffDetails.buffName,
         remainingTurns: buffDetails.turnLimit,
         value_amount: buffDetails.value_amount,
         flat: buffDetails.flat || false,

@@ -64,14 +64,255 @@ class BuffDebuffLogic {
       turnEnder.statuses.buffs.splice(i, 1); // Remove the expired buff from the array
     }
   }
+  async increaseAttack(target, amount, flat) {
+    if (flat) {
+      target.stats.attack += amount;
+    } else {
+      target.stats.attack += target.stats.attack * (amount / 100);
+    }
+  }
+
+  async decreaseAttack(target, amount, flat) {
+    if (flat) {
+      target.stats.attack -= amount;
+    } else {
+      target.stats.attack -= target.stats.attack * (amount / 100);
+    }
+  }
+
+  async increaseSpeed(target, amount, flat) {
+    if (flat) {
+      target.stats.speed += amount;
+    } else {
+      target.stats.speed += target.stats.speed * (amount / 100);
+    }
+  }
+
+  async decreaseSpeed(target, amount, flat) {
+    if (flat) {
+      target.stats.speed -= amount;
+    } else {
+      target.stats.speed -= target.stats.speed * (amount / 100);
+    }
+  }
+
+  async increaseDefense(target, amount, flat) {
+    if (flat) {
+      target.stats.defense += amount;
+    } else {
+      target.stats.defense += target.stats.defense * (amount / 100);
+    }
+  }
+
+  async decreaseDefense(target, amount, flat) {
+    if (flat) {
+      target.stats.defense -= amount;
+    } else {
+      target.stats.defense -= target.stats.defense * (amount / 100);
+    }
+  }
+  async increaseHp(target, amount, flat) {
+    if (flat) {
+      target.stats.hp += amount;
+    } else {
+      target.stats.hp += target.stats.hp * (amount / 100);
+    }
+  }
+
+  async decreaseHp(target, amount, flat) {
+    if (flat) {
+      target.stats.hp -= amount;
+    } else {
+      target.stats.hp -= target.stats.hp * (amount / 100);
+    }
+  }
+
+  async increaseAtkBar(target, amount, flat) {
+    if (flat) {
+      target.atkBar += amount;
+    } else {
+      target.atkBar += target.atkBar * (amount / 100);
+    }
+  }
+
+  async decreaseAtkBar(target, amount, flat) {
+    if (flat) {
+      target.atkBar -= amount;
+    } else {
+      target.atkBar -= target.atkBar * (amount / 100);
+    }
+  }
+  async invincibility(target, duration) {
+    target.status.invincible = true;
+    target.status.invincibleTurns = duration;
+  }
+
+  async stun(target, duration) {
+    target.status.stunned = true;
+    target.status.stunTurns = duration;
+  }
+
+  async freeze(target, duration) {
+    target.status.frozen = true;
+    target.status.freezeTurns = duration;
+  }
+
+  async immunity(target, duration) {
+    target.status.immune = true;
+    target.status.immunityTurns = duration;
+  }
+
+  async increaseCritRate(target, amount, flat) {
+    if (flat) {
+      target.stats.critRate += amount;
+    } else {
+      target.stats.critRate += target.stats.critRate * (amount / 100);
+    }
+  }
+
+  async increaseCritDamage(target, amount, flat) {
+    if (flat) {
+      target.stats.critDamage += amount;
+    } else {
+      target.stats.critDamage += target.stats.critDamage * (amount / 100);
+    }
+  }
+
+  async increaseWhat(target, buffDetails) {
+    const buffs = buffDetails.buffType.split("_and_");
+    let derArray = [];
+    let statChanges = [];
+    for (const unit of Array.isArray(target) ? target : [target]) {
+      for (const buffType of buffs) {
+        // const amount = buffDetails.value_amount[buffType.split("increase_")[1]];
+        const flat = buffDetails.flat || false;
+
+        switch (buffType) {
+          case "increase_attack":
+            await this.increaseAttack(
+              unit,
+              buffDetails.value_amount.attack,
+              flat
+            );
+            statChanges.push(
+              `attack by ${buffDetails.value_amount.attack}${flat ? "" : "%"}`
+            );
+            break;
+          case "increase_speed":
+            await this.increaseSpeed(
+              unit,
+              buffDetails.value_amount.speed,
+              flat
+            );
+            statChanges.push(
+              `speed by ${buffDetails.value_amount.speed}${flat ? "" : "%"}`
+            );
+            break;
+          case "increase_defense":
+            await this.increaseDefense(
+              unit,
+              buffDetails.value_amount.defense,
+              flat
+            );
+            statChanges.push(
+              `defense by ${buffDetails.value_amount.defense}${flat ? "" : "%"}`
+            );
+            break;
+          case "decrease_attack":
+            await this.increaseAttack(
+              unit,
+              buffDetails.value_amount.attack,
+              flat
+            );
+            break;
+          case "decrease_speed":
+            await this.increaseSpeed(
+              unit,
+              buffDetails.value_amount.speed,
+              flat
+            );
+            break;
+          case "decrease_defense":
+            await this.increaseDefense(
+              unit,
+              buffDetails.value_amount.defense,
+              flat
+            );
+            break;
+          default:
+            throw new Error(`Unknown buff type: ${buffType}`);
+        }
+      }
+      derArray.push(unit.name);
+    }
+    const logMessage = `${derArray.join(", ")} received ${
+      buffDetails.name
+    } buff, increasing ${statChanges.join(" and ")}.`;
+    this.battleLogs.push(logMessage);
+  }
+  async decreaseWhat(target, debuffDetails) {
+    const debuffs = debuffDetails.debuffType.split("_and_");
+    let derArray = [];
+    let statChanges = [];
+    for (const unit of Array.isArray(target) ? target : [target]) {
+      for (const debuffType of debuffs) {
+        const flat = debuffDetails.flat || false;
+
+        switch (debuffType) {
+          case "decrease_attack":
+            await this.decreaseAttack(
+              unit,
+              debuffDetails.value_amount.attack,
+              flat
+            );
+            statChanges.push(
+              `attack by ${debuffDetails.value_amount.attack}${flat ? "" : "%"}`
+            );
+            break;
+          case "decrease_speed":
+            await this.decreaseSpeed(
+              unit,
+              debuffDetails.value_amount.speed,
+              flat
+            );
+            statChanges.push(
+              `speed by ${debuffDetails.value_amount.speed}${flat ? "" : "%"}`
+            );
+            break;
+          case "decrease_defense":
+            await this.decreaseDefense(
+              unit,
+              debuffDetails.value_amount.defense,
+              flat
+            );
+            statChanges.push(
+              `defense by ${debuffDetails.value_amount.defense}${
+                flat ? "" : "%"
+              }`
+            );
+            break;
+          default:
+            throw new Error(`Unknown debuff type: ${debuffType}`);
+        }
+      }
+      derArray.push(unit.name);
+    }
+    const logMessage = `${derArray.join(", ")} received ${
+      debuffDetails.name
+    } debuff, decreasing ${statChanges.join(" and ")}.`;
+    this.battleLogs.push(logMessage);
+  }
+
   async increaseAttackNSpeed(target, buffDetails) {
     // if (target.statuses.buffs.some(buff => buff.name === buffDetails.name)) {
     //   this.battleLogs.push(`${target.name} already has the ${buffDetails.name} buff.`);
     //   return;
     // }
     if (buffDetails.unique === true && buffDetails.targets > 1) {
+      let derArray = [];
+      let buff;
       for (const unit of target) {
-        const buff = {
+        buff = {
           type: "increase_attack_and_speed",
           name: buffDetails.name,
           remainingTurns: buffDetails.turnLimit,
@@ -87,13 +328,15 @@ class BuffDebuffLogic {
           unit.stats.attack += unit.stats.attack * (buff.attack_amount / 100);
           unit.stats.speed += unit.stats.speed * (buff.speed_amount / 100);
         }
-
-        this.battleLogs.push(
-          `${unit.name} received ${
-            buffDetails.name
-          } buff, increasing attack by ${buff.value}${buff.flat ? "" : "%"}.`
-        );
+        derArray.push(unit.name);
       }
+      this.battleLogs.push(
+        ` ${derArray.join(", ")} received ${
+          buffDetails.name
+        } buff, increasing attack by ${buff.attack_amount}${
+          buff.flat ? "" : "%"
+        } and speed by ${buff.speed_amount}${buff.flat ? "" : "%"}.`
+      );
     } else {
       const buff = {
         type: "increase_attack_and_speed",
@@ -115,24 +358,11 @@ class BuffDebuffLogic {
       this.battleLogs.push(
         `${target.name} received ${
           buffDetails.name
-        } buff, increasing attack by ${buff.value}${buff.flat ? "" : "%"}.`
+        } buff, increasing attack by ${buff.attack_amount}${
+          buff.flat ? "" : "%"
+        } and speed by ${buff.speed_amount}${buff.flat ? "" : "%"}.`
       );
     }
-  }
-
-  // Method to remove a buff
-  async increaseDefense(target) {
-    // Remove the Attack Buff from the target
-  }
-
-  // Method to apply a debuff
-  async breakAttack(target) {
-    // Apply the Attack Break debuff to the target
-  }
-
-  // Method to remove a debuff
-  async increaseSpeed(target) {
-    // Remove the Attack Break debuff from the target
   }
 }
 module.exports = { BuffDebuffLogic };
