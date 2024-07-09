@@ -24,6 +24,8 @@ const playerSchema = new Schema(
       speed: Number,
       hp: Number,
       intelligence: Number,
+      critRate: Number,
+      critDamage: Number,
       wise: Number,
       luck: Number,
       devotion: Number,

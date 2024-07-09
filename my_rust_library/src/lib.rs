@@ -4,7 +4,11 @@ pub fn calculate_damage(author_atk: f64, opponent_defense: f64) -> f64 {
     let damage = (author_atk.sqrt()).powf((3.0_f64.sqrt()).powf(((850.0 + author_atk) / (450.0 + 1.26 * opponent_defense)).sqrt()));
     damage.floor()
 }
-
+#[napi]
+pub fn calculate_crit_damage(author_atk: f64, author_crit_damage:f64, opponent_defense: f64) -> f64 {
+    let damage = ((author_atk*(1.5_f64.powf(author_crit_damage))).sqrt()).powf((3.0_f64.sqrt()).powf(((850.0 + author_atk) / (450.0 + 1.26 * opponent_defense)).sqrt()));
+    damage.floor()
+}
 
 #[napi]
 pub fn add(left:i32, right: i32) -> i32 {
