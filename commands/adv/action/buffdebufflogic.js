@@ -211,31 +211,24 @@ class BuffDebuffLogic {
         switch (debuffType) {
           case "apply_immunity":
             await this.immunity(unit, debuffDetails.turnLimit);
-            statChanges.push(
-              `attack by ${debuffDetails.value_amount.attack}${flat ? "" : "%"}`
-            );
             break;
-          case "decrease_speed":
-            await this.decreaseSpeed(
-              unit,
-              debuffDetails.value_amount.speed,
-              flat
-            );
-            statChanges.push(
-              `speed by ${debuffDetails.value_amount.speed}${flat ? "" : "%"}`
-            );
+          case "apply_stun":
+            await this.stun(unit, debuffDetails.turnLimit);
             break;
-          case "decrease_defense":
-            await this.decreaseDefense(
-              unit,
-              debuffDetails.value_amount.defense,
-              flat
-            );
-            statChanges.push(
-              `defense by ${debuffDetails.value_amount.defense}${
-                flat ? "" : "%"
-              }`
-            );
+          case "apply_invincibility":
+            await this.invincibility(unit, debuffDetails.turnLimit);
+            break;
+          case "apply_freeze":
+            await this.freeze(unit, debuffDetails.turnLimit);
+            break;
+          case "apply_invisibility":
+            await this.invisibility(unit, debuffDetails.turnLimit);
+            break;
+          case "apply_block_buffs":
+            await this.blockBuffs(unit, debuffDetails.turnLimit);
+            break;
+          case "apply_cleanse":
+            await this.cleanse(unit);
             break;
           default:
             throw new Error(`Unknown debuff type: ${debuffType}`);

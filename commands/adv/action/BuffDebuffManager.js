@@ -3,24 +3,56 @@ class BuffDebuffManager {
     this.battleLogs = that.battleLogs;
   }
 
-  async applyDebuff(user, target, buffDetails) {
+  async applyDebuff(user, target, debuffDetails) {
     // Check if the target has immunity
-    if (target.hasImmunity) {
+    if (target.statuses.buffs.some((buff) => buff.type === "immunity")) {
       this.battleLogs.push(
-        `${target.name} is immune to ${buffDetails.debuffType} debuffs.`
+        `${target.name} is immune to ${debuffDetails.debuffType} debuffs.`
       );
       return;
     }
 
-    // Apply the debuff
-    const debuff = {
-      type: buffDetails.debuffType,
-      name: buffDetails.debuffName,
-      remainingTurns: buffDetails.turnLimit,
-    };
-    target.statuses.debuffs.push(debuff);
+    // Special case: apply_ or remove_
+    if (
+      debuffDetails.debuffType.startsWith("apply_") ||
+      debuffDetails.debuffType.startsWith("remove_")
+    ) {
+      const specialDebuff = {
+        type: debuffDetails.debuffType,
+        name: debuffDetails.name,
+        remainingTurns: debuffDetails.turnLimit,
+        value_amount: debuffDetails.value_amount,
+        targets: debuffDetails.targets,
+        flat: debuffDetails.flat || false,
+      };
+      target.statuses.debuffs.push(specialDebuff.value_amount);
+      console.log(`${target.name} received a special debuff:`, specialDebuff);
+    } else {
+      // Normal case: debuff application
+      const debuffTemplate = {
+        type: debuffDetails.debuffType,
+        name: debuffDetails.name,
+        remainingTurns: debuffDetails.turnLimit,
+        value_amount: debuffDetails.value_amount,
+        flat: debuffDetails.flat || false,
+      };
+
+      if (Array.isArray(debuffDetails.targets)) {
+        for (let target of debuffDetails.targets) {
+          const debuff = { ...debuffTemplate, targets: target };
+          target.statuses.debuffs.push(debuff);
+          console.log(`Debuff applied to ${target.name}:`, debuff);
+        }
+      } else {
+        const debuff = { ...debuffTemplate, targets: debuffDetails.targets };
+        debuffDetails.targets.statuses.debuffs.push(debuff);
+        console.log(`Debuff applied to ${debuffDetails.targets.name}:`, debuff);
+      }
+    }
+
+    // Log the debuff application
     this.battleLogs.push(
-      `${user} applied ${buffDetails.debuffName} to ${target.name} for ${buffDetails.turnLimit} turns.`
+      `${user.name} applied ${debuffDetails.name} to ${target.name} for ${debuffDetails.turnLimit} turns.`
     );
   }
 
@@ -38,36 +70,60 @@ class BuffDebuffManager {
 
   // Method to apply a buff
   async applyBuff(user, target, buffDetails) {
-    // Apply the buff
+    // Check if user has a buff blocker
     if (user.hasBuffBlocker) {
       this.battleLogs.push(
-        `${user.name} could not receive the ${buffDetails.buffName} buff.`
+        `${user.name} could not receive the ${buffDetails.name} buff.`
       );
       return;
     }
-    let buff = {};
-    if (buffDetails.unique === true) {
-      buff = {
+
+    // Special case: apply_ or remove_
+    if (
+      buffDetails.buffType.startsWith("apply_") ||
+      buffDetails.buffType.startsWith("remove_")
+    ) {
+      const specialBuff = {
         type: buffDetails.buffType,
-        name: buffDetails.buffName,
+        name: buffDetails.name,
         remainingTurns: buffDetails.turnLimit,
         value_amount: buffDetails.value_amount,
+        targets: buffDetails.targets,
         flat: buffDetails.flat || false,
       };
+      user.statuses.buffs.push(specialBuff.value_amount);
+      console.log(`${user.name} received a special buff:`, specialBuff);
     } else {
-      buff = {
+      // Normal case: buff application
+      const buffTemplate = {
         type: buffDetails.buffType,
-        name: buffDetails.buffName,
+        name: buffDetails.name,
         remainingTurns: buffDetails.turnLimit,
         value_amount: buffDetails.value_amount,
         flat: buffDetails.flat || false,
       };
+
+      if (Array.isArray(buffDetails.targets)) {
+        for (let target of buffDetails.targets) {
+          const buff = { ...buffTemplate, targets: target };
+          target.statuses.buffs.push(buff);
+          console.log(`Buff applied to ${user.name}:`, buff);
+        }
+      } else {
+        const buff = { ...buffTemplate, targets: buffDetails.targets };
+        buffDetails.targets.statuses.buffs.push(buff);
+        console.log(`Buff applied to ${user.name}:`, buff);
+      }
     }
-    user.statuses.buffs.push(buff);
-    console.log(`'user:`, user);
-    // this.battleLogs.push(
-    //   `${user.name} applied ${buffName} to ${target.name} for ${buffDetails.turnLimit} turns.`
-    // );
+
+    // Log the buff application
+    this.battleLogs.push(
+      `${user.name} applied ${buffDetails.name} to ${
+        target.name
+      } granting themselves ${buffDetails.buffType.split("_")[1]} for ${
+        buffDetails.turnLimit
+      } turns.`
+    );
   }
 
   // Method to remove a buff

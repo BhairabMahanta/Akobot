@@ -332,7 +332,6 @@ class Duel {
         console.log("moveOptionsError:", error);
       }
     } else if (this.currentTurn === this.player.name) {
-      console.log("playerclass:", this.player.class);
       const playerAbility = classes[this.player.class].abilities;
       // console.log('stuffimportant:', playerAbility)
       try {
@@ -411,7 +410,7 @@ class Duel {
     if (
       this.currentTurn === this.opponent.name ||
       this.enemyFamiliars.some((familiar) => {
-        console.log("familiar._id:", familiar._id);
+        // console.log("familiar._id:", familiar._id);
         const comparisonResult =
           familiar.name === this.currentTurn &&
           this.currentTurnId === this.opponent._id;
@@ -450,7 +449,7 @@ class Duel {
     } else if (
       this.currentTurn === this.player.name ||
       this.allyFamiliars.some((familiar) => {
-        console.log("familiar._id:", familiar._id);
+        // console.log("familiar._id:", familiar._id);
         const comparisonResult =
           familiar.name === this.currentTurn &&
           this.currentTurnId === this.player._id;
@@ -970,11 +969,6 @@ class Duel {
       for (const character of this.characters) {
         if (character.atkBar >= 100) {
           charactersWith100AtkBar.push(character);
-          if (charactersWith100AtkBar.length > 0) {
-            console.log(
-              `Characters with 100 attack bar: ${charactersWith100AtkBar.length}`
-            );
-          }
           return charactersWith100AtkBar; // Return immediately if any character already has atkBar >= 100
         }
       }
@@ -998,9 +992,7 @@ class Duel {
       }
 
       if (charactersWith100AtkBar.length > 0) {
-        console.log(
-          `Characters with 100 attack bar: ${charactersWith100AtkBar.length}`
-        );
+        console.log();
         // Process characters with 100 attack bar further (sorting, additional actions)
         // Do something with charactersWith100AtkBar
       }
@@ -1029,7 +1021,6 @@ class Duel {
       const emoji = "■";
       let emptyBars = 0;
       if (atkBar >= 100) {
-        console.log("atkBar:", atkBar);
         atkBar = 100;
       }
       const filledBars = Math.floor(atkBar / 10);
@@ -1084,22 +1075,12 @@ class Duel {
       // If multiple characters have reached 100 attack bar, determine the next turn based on speed
       charactersWith100AtkBar.sort((a, b) => b.atkBar - a.atkBar);
       let fastestCharacter = charactersWith100AtkBar[0];
-      // for (const character of charactersWith100AtkBar) {
-      //   if (character.atkBar > fastestCharacter.atkBar) {
-      //     fastestCharacter = character;
-      //   }
-      // }
-      console.log(
-        `${fastestCharacter.name} has the highest atkBar and will take the next turn.`
-      );
+
       this.currentTurn = fastestCharacter.name;
       fastestCharacter.attackBarEmoji = await this.generateAttackBarEmoji(
         fastestCharacter.atkBar
       );
 
-      console.log(
-        `${fastestCharacter.name} - ${fastestCharacter.atkBar} - ${fastestCharacter.attackBarEmoji}`
-      );
       fastestCharacter.atkBar -= 100;
     }
 
@@ -1125,8 +1106,6 @@ class Duel {
         this.battleLogs.shift();
         this.battleLogs.shift();
       }
-      console.log("battleLogsLengthAfterr:", this.battleLogs.length);
-
       if (this.battleLogs.length > 0) {
         this.battleEmbed.setDescription(
           `**Battle Logs:**\n\`\`\`diff\n+ ${this.battleLogs.join("\n")}\`\`\``
@@ -1208,7 +1187,6 @@ class Duel {
     console.log("startBattle");
 
     await this.getNextTurn();
-    console.log("currentTurn:", this.currentTurn);
     this.initialMessage = await this.sendInitialEmbed(message);
     // console.log("initialMessage:", this.initialMessage);
     this.initialMessage = await message.channel.send({
@@ -1236,7 +1214,6 @@ class Duel {
     // Handle button interactions
     collector.on("collect", async (i) => {
       await i.deferUpdate();
-      console.log("customid:", i.customId);
 
       if (i.customId === "action_normal") {
         try {
@@ -1244,7 +1221,6 @@ class Duel {
             this.teamTurn === this.player.name &&
             i.user.id === this.player._id
           ) {
-            console.log("true");
             if (this.aliveOpponentTeam.length === 1) {
               this.pickedChoice = true;
               this.sendFollowUp = true;
@@ -1288,7 +1264,7 @@ class Duel {
         }
       } else if (i.customId === "action_select") {
         const targetIndex = i.values[0];
-        console.log("targetIndex:", targetIndex);
+
         const realTarget = targetIndex.replace("enemy_", "");
         if (
           this.teamTurn === this.player.name &&
@@ -1306,7 +1282,7 @@ class Duel {
         // Continue with your code logic after selecting an enemy
       } else if (i.customId === "starter") {
         const selectedClassValue = i.values[0]; // Get the selected value // gae shit
-        console.log("selectedValues", selectedClassValue);
+
         if (
           this.teamTurn === this.player.name &&
           i.user.id === this.player._id
@@ -1333,16 +1309,14 @@ class Duel {
                 "player_ability_",
                 ""
               );
-              console.log("abilityName:a", abilityName);
               const abilityNameCamel = await this.toCamelCase(abilityName);
-              console.log("abilityName:a", abilityNameCamel);
+
               // Check if the abilityName exists as a method in the Ability class
               if (typeof this.ability[abilityNameCamel] === "function") {
                 const method = this.ability[abilityNameCamel];
 
                 if (method) {
                   const functionAsString = method.toString();
-                  console.log("functionAsString:", functionAsString);
                   const parameterNames = functionAsString
                     .replace(/[/][/].*$/gm, "") // remove inline comments
                     .replace(/\s+/g, "") // remove white spaces
@@ -1352,11 +1326,11 @@ class Duel {
                     .split(",")
                     .filter(Boolean); // split the parameters into an array
 
-                  console.log(
-                    `Method ${abilityNameCamel} has the following parameters: ${parameterNames.join(
-                      ", "
-                    )}`
-                  );
+                  // console.log(
+                  //   `Method ${abilityNameCamel} has the following parameters: ${parameterNames.join(
+                  //     ", "
+                  // )}`
+                  // );
                 } else {
                   console.log(`Method ${abilityNameCamel} does not exist.`);
                 }
@@ -1381,7 +1355,7 @@ class Duel {
                 }
                 await cycleCooldowns(this.cooldowns);
                 await this.getNextTurn();
-                console.log("currentTurn:", this.currentTurn);
+                console.log("oppshITTTT:", this.player.statuses.buffs.flat());
                 this.printBattleResult();
                 const updatedEmbed = await this.sendInitialEmbed(message);
               } else {

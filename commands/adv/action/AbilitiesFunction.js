@@ -462,7 +462,7 @@ class Ability {
 
     console.log(`${user.name} throws a Smoke Bomb, creating a cloud of smoke.`);
     this.buffDebuffManager.applyBuff(user, user, buffDetails);
-    await this.buffDebuffLogic.applyWhat(user, buffDetails);
+    // await this.buffDebuffLogic.applyWhat(user, buffDetails);
 
     this.cooldowns.push({
       name: "Smoke Bomb",
