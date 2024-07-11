@@ -137,6 +137,12 @@ class Ability {
       debuffType: debuffType,
       unique: true,
       targets: target,
+      value_name: "taunt",
+      value_amount: {
+        taunt: {
+          state: true,
+        },
+      },
       turnLimit: 3, // Lasts for 3 turns
     };
 
@@ -144,7 +150,6 @@ class Ability {
       `${user} taunts ${target}. ${target} is now focused on ${user}.`
     );
     this.buffDebuffManager.applyDebuff(user, target, debuffDetails);
-    await this.buffDebuffLogic.applyWhat(target, debuffDetails);
 
     this.cooldowns.push({
       name: "Crowd Control",
@@ -200,9 +205,14 @@ class Ability {
     // Apply DoT debuff
     const debuffDetails = {
       name: "Fireball",
-      debuffType: "apply_dot",
+      debuffType: "apply_burn",
       unique: true,
-      value_amount: 10, // Example DoT damage per turn
+      value_name: "burn",
+      value_amount: {
+        burn: {
+          state: true,
+        },
+      },
       targets: target,
       turnLimit: 3, // Lasts for 3 turns
     };
@@ -225,9 +235,15 @@ class Ability {
       name: "Arcane Shield",
       buffType: buffType,
       unique: true,
-      value_amount: { shield: 50 }, // Absorb 50 points of magic damage
+      value_name: "shield",
+      value_amount: {
+        shield: {
+          state: true,
+          amount: 50, // Example shield amount
+        },
+      },
       targets: user,
-      turnLimit: 3, // Lasts for 3 turns
+      turnLimit: 3,
     };
 
     console.log(
@@ -248,7 +264,12 @@ class Ability {
       name: "Frost Nova",
       debuffType: debuffType,
       unique: true,
-      value_amount: { freeze: true }, // Reduce speed by 30%
+      value_name: "freeze",
+      value_amount: {
+        freeze: {
+          state: true,
+        },
+      },
       targets: specialContext,
       turnLimit: 2, // Lasts for 2 turns
     };
@@ -321,7 +342,12 @@ class Ability {
       name: "Mirror Image",
       buffType: buffType,
       unique: true,
-      value_amount: { evasion: 30 }, // Example evasion value
+      value_name: "evasion",
+      value_amount: {
+        evasion: {
+          state: true,
+        },
+      },
       targets: user,
       turnLimit: 3, // Lasts for 3 turns
     };
@@ -339,12 +365,17 @@ class Ability {
   }
 
   async mindTrick(user, target) {
-    const debuffType = "apply_disorientation";
+    const debuffType = "apply_confusion";
     const debuffDetails = {
       name: "Mind Trick",
       debuffType: debuffType,
       unique: true,
-      value_amount: { accuracy: -20 }, // Example disorientation value
+      value_name: "confusion",
+      value_amount: {
+        confusion: {
+          state: true,
+        },
+      },
       targets: target,
       turnLimit: 3, // Lasts for 3 turns
     };
@@ -432,7 +463,12 @@ class Ability {
       name: "Evasion",
       buffType: buffType,
       unique: true,
-      value_amount: { evasion: 50 }, // Example evasion value
+      value_name: "evasion",
+      value_amount: {
+        evasion: {
+          state: true,
+        },
+      },
       targets: user,
       turnLimit: 2, // Lasts for 2 turns
     };
@@ -450,16 +486,15 @@ class Ability {
   }
 
   async smokeBomb(user) {
-    const buffType = "apply_invincibility";
+    const buffType = "apply_invisible";
     const buffDetails = {
       name: "Smoke Bomb",
       buffType: buffType,
       unique: true,
-      value_name: "invincible",
+      value_name: "invisible",
       value_amount: {
-        invincible: {
+        invisible: {
           state: true,
-          name: "invincible",
         },
       },
       targets: user,
@@ -498,6 +533,12 @@ class Ability {
       name: "Charming Presence",
       debuffType: debuffType,
       unique: true,
+      value_name: "charm",
+      value_amount: {
+        charm: {
+          state: true,
+        },
+      },
       targets: target,
       turnLimit: 2, // Lasts for 2 turns
     };
@@ -506,7 +547,6 @@ class Ability {
       `${user.name} uses Charming Presence. ${target.name} is charmed and becomes passive.`
     );
     this.buffDebuffManager.applyDebuff(user, target, debuffDetails);
-    await this.buffDebuffLogic.applyWhat(user, debuffDetails);
 
     this.cooldowns.push({
       name: "Charming Presence",
@@ -520,7 +560,12 @@ class Ability {
       name: "Acrobatic Flourish",
       buffType: buffType,
       unique: true,
-      value_amount: { evasion: 40 }, // Example evasion value
+      value_name: "evasion",
+      value_amount: {
+        evasion: {
+          state: true,
+        },
+      },
       targets: user,
       turnLimit: 3, // Lasts for 3 turns
     };
@@ -529,7 +574,6 @@ class Ability {
       `${user.name} performs an Acrobatic Flourish, increasing evasion.`
     );
     this.buffDebuffManager.applyBuff(user, user, buffDetails);
-    await this.buffDebuffLogic.applyWhat(user, buffDetails);
 
     this.cooldowns.push({
       name: "Acrobatic Flourish",
@@ -558,7 +602,12 @@ class Ability {
       name: "Divine Protection",
       buffType: buffType,
       unique: true,
-      value_amount: { shield: 100 }, // Example shield value
+      value_name: "shield",
+      value_amount: {
+        shield: {
+          state: true,
+        },
+      },
       targets: user,
       turnLimit: 3, // Lasts for 3 turns
     };
