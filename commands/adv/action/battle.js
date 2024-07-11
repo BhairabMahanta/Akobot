@@ -21,6 +21,7 @@ const {
   getCardStats,
   getCardMoves,
   getPlayerMoves,
+  handleTurnEffects,
 } = require("../../util/glogic.js");
 const classes = require("../../../data/classes/allclasses.js");
 const abilities = require("../../../data/abilities.js");
@@ -276,40 +277,6 @@ class Battle {
     // this.startBattle(this.message);
     //   }
   }
-
-  async handleTurnEffects(turnEnder) {
-    // Handle debuffs
-    for (let i = turnEnder.statuses.debuffs.length - 1; i >= 0; i--) {
-      turnEnder.statuses.debuffs[i].remainingTurns--;
-      if (turnEnder.statuses.debuffs[i].remainingTurns <= 0) {
-        this.buffDebuffLogic.overLogic(
-          turnEnder,
-          turnEnder.statuses.buffs[i],
-          i,
-          true
-        );
-
-        console.log(`Debuff removed from ${turnEnder.name}`);
-      }
-    }
-
-    // Handle buffs
-    for (let i = turnEnder.statuses.buffs.length - 1; i >= 0; i--) {
-      turnEnder.statuses.buffs[i].remainingTurns--;
-      console.log(`turn buff stuff ${turnEnder.statuses.buffs}`);
-      if (turnEnder.statuses.buffs[i].remainingTurns <= 0) {
-        this.buffDebuffLogic.overLogic(
-          turnEnder,
-          turnEnder.statuses.buffs[i],
-          i,
-          false
-        );
-
-        console.log(`Buff removed from ${turnEnder.name}`);
-      }
-    }
-  }
-
   async sendInitialEmbed() {
     try {
       const iconMap = {
@@ -1030,7 +997,7 @@ class Battle {
       console.log(
         `${this.currentTurn} attacks ${target} for ${damage} damage using gayness`
       );
-      await this.handleTurnEffects(this.player);
+      await handleTurnEffects(this.player);
       // this.getNextTurn()
       // console.log('currentTurn:', this.currentTurn);
     } else if (this.playerFamiliar.includes(this.currentTurn)) {
@@ -1054,7 +1021,7 @@ class Battle {
           console.log(
             `${this.currentTurn} attacks ${target} for ${damage} damage using an attack`
           );
-          await this.handleTurnEffects(familiar);
+          await handleTurnEffects(familiar);
           break; // Exit the loop once the attacking familiar is found
         }
       }
@@ -1150,7 +1117,7 @@ class Battle {
 
         // console.log('currentTurn:', this.currentTurn);
       }
-      await this.handleTurnEffects(enemies);
+      await handleTurnEffects(enemies);
     }
     if (this.currentTurn != this.boss.name) {
       console.log("notmy turn bitches");
@@ -1195,7 +1162,7 @@ class Battle {
       );
       await this.getNextTurn();
       console.log("currentTurnForDragonafter;", this.currentTurn);
-      await this.handleTurnEffects(this.boss);
+      await handleTurnEffects(this.boss);
       //  const updatedEmbed = await this.sendInitialEmbed(message);
       // this.initialMessage.edit({ embeds: [updatedEmbed], components: await this.getDuelActionRow() });
 

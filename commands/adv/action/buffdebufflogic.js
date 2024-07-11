@@ -165,25 +165,7 @@ class BuffDebuffLogic {
     return { damageArray, enemyNameArray };
   }
 
-  async invincibility(target, duration) {
-    target.status.invincible = true;
-    target.status.invincibleTurns = duration;
-  }
-
-  async stun(target, duration) {
-    target.status.stunned = true;
-    target.status.stunTurns = duration;
-  }
-
-  async freeze(target, duration) {
-    target.status.frozen = true;
-    target.status.freezeTurns = duration;
-  }
-
-  async immunity(target, duration) {
-    target.status.immune = true;
-    target.status.immunityTurns = duration;
-  }
+  //invincible invisible stun freeze, immunity, DOT, unskillable, taunt, provoke, sleep, oblivion, silence, block beneficial effects, block harmful effects, block healing, block revive, reflect damage, counter, endure,
 
   async increaseCritRate(target, amount, flat) {
     if (flat) {
