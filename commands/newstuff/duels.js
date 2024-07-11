@@ -464,8 +464,8 @@ class Duel {
     const attacker = this.getCurrentAttacker();
     const target = this.enemyToHit;
 
-    const dodgeEffect = this.handleDodge(attacker, target);
-
+    const dodgeEffect = await this.handleDodge(attacker, target);
+    console.log("dodgeEffect:", dodgeEffect);
     if (dodgeEffect) {
       await handleTurnEffects(attacker);
       this.dodge = { option: null, id: null };
@@ -473,25 +473,130 @@ class Duel {
     }
 
     const damage = await this.calculatePFDamage(attacker, target);
+    console.log("test");
+    await this.handleStatusEffects(target, damage, attacker);
+  }
+  async handlePreTurnEffects(target, type) {
+    const statusEffects = {
+      freeze: {
+        apply: (target) => {
+          this.battleLogs.push(
+            `- ${target.name} is frozen and cannot act this turn.`
+          );
+          console.log("frozen haha");
+          return true; // Turn is skipped
+        },
+      },
+      stun: {
+        apply: (target) => {
+          this.battleLogs.push(
+            `- ${target.name} is stunned and cannot act this turn.`
+          );
+          return true; // Turn is skipped
+        },
+      },
+      sleep: {
+        apply: (target) => {
+          this.battleLogs.push(
+            `- ${target.name} is asleep and cannot act this turn.`
+          );
+          return true; // Turn is skipped
+        },
+      },
+      taunt: {
+        apply: (target) => {
+          this.battleLogs.push(
+            `- ${target.name} is taunted and must target the taunter.`
+          );
+          return false; // Turn is not skipped, but actions are restricted
+        },
+      },
+      // Add other status effects here
+    };
 
-    target.stats.hp -= damage;
-    this.battleLogs.push(
-      `+ ${this.currentTurn} attacks ${target.name} for ${damage} damage using an attack`
-    );
+    let statuses;
+    if (type === "debuffs") {
+      statuses = target.statuses.debuffs || {};
+    } else if (type === "buffs") {
+      statuses = target.statuses.buffs || {};
+    }
+    if (!statuses || statuses.length === 0) {
+      return false; // No status effects to handle
+    }
+    for (const status of statuses) {
+      for (const [effect, { apply }] of Object.entries(statusEffects)) {
+        console.log("status:", status, "effect:", effect);
+        if (status[effect] && apply(target)) {
+          return true;
+        }
+      }
+    }
 
-    await handleTurnEffects(attacker);
+    return false;
   }
 
-  getCurrentAttacker() {
-    if (this.currentTurn === this.player.name) return this.player;
-    if (this.currentTurn === this.opponent.name) return this.opponent;
+  async handleStatusEffects(target, damage, attacker) {
+    const statusEffectsOnDamage = {
+      invincible: {
+        apply: () => {
+          this.battleLogs.push(
+            `- ${target.name}'s invincibility nullifies the attack.`
+          );
+          damage = 0;
+          return true; // Damage is null
+        },
+      },
+      reflect: {
+        apply: () => {
+          const reflectDamage = Math.floor(damage * 0.4);
+          this.getCurrentAttacker().stats.hp -= reflectDamage;
+          this.battleLogs.push(
+            `- ${target.name} reflects ${reflectDamage} damage back to the attacker.`
+          );
+          return true;
+        },
+      },
+      endure: {
+        apply: () => {
+          if (target.stats.hp - damage <= 0) {
+            target.stats.hp = 1;
+            this.battleLogs.push(
+              `- ${target.name} endures the hit and stays at 1 HP.`
+            );
+            return true; // Damage is nullified
+          }
+        },
+      },
+      // Add more status effects as needed
+    };
+    let statuses = target.statuses.buffs || {};
+    console.log("statuses:", statuses);
+    if (!statuses || statuses.length === 0) {
+      console.log("hehehehe ");
+      return false; // No status effects to handle
+    }
+    let isTrue = false;
+    for (const status of statuses) {
+      for (const [effect, { apply }] of Object.entries(statusEffectsOnDamage)) {
+        console.log("status:", status, "effect:", effect);
+        if (status[effect] && apply(target)) {
+          console.log("happu");
+          isTrue = true;
+        }
+      }
+    }
+    if (isTrue) {
+      await handleTurnEffects(attacker);
+      return true;
+    } else {
+      target.stats.hp -= damage;
+      this.battleLogs.push(
+        `+ ${this.currentTurn} attacks ${target.name} for ${damage} damage using an attack`
+      );
 
-    return (
-      this.allyFamiliars.find(
-        (familiar) => familiar.name === this.currentTurn
-      ) ||
-      this.enemyFamiliars.find((familiar) => familiar.name === this.currentTurn)
-    );
+      await handleTurnEffects(attacker);
+      return false;
+    }
   }
 
   async handleDodge(attacker, target) {
@@ -544,25 +649,6 @@ class Duel {
     }
 
     return false;
-  }
-
-  async calculatePFDamage(attacker, target) {
-    return critOrNot(
-      attacker.stats.critRate,
-      attacker.stats.critDamage,
-      attacker.stats.attack,
-      target.stats.defense
-    );
-  }
-
-  getReducedDamage(damage) {
-    const damageReductionPercentage = Math.random() * (40 - 15) + 15;
-    return Math.floor(damage * (1 - damageReductionPercentage / 100));
-  }
-
-  getIncreasedDamage(damage) {
-    const damageReductionPercentage = Math.random() * (40 - 15) + 15;
-    return Math.floor(damage * (1 - damageReductionPercentage / 100));
   }
 
   async calculateOverallSpeed(character) {
@@ -705,6 +791,15 @@ class Duel {
     return `[${hpBarString}]`;
   }
 
+  getTauntTarget() {
+    // Implement logic to return the target with taunt
+    // For now, let's assume the first taunting enemy is returned
+    return (
+      this.enemyFamiliars.find((familiar) => familiar.statuses.debuffs.taunt) ||
+      this.opponent
+    );
+  }
+
   async getNextTurn() {
     let nextTurn = null;
     // console.log("ho raha hai");
@@ -735,6 +830,13 @@ class Duel {
     }
 
     await this.fillHpBars();
+    const currentAttacker = this.getCurrentAttacker();
+    const debuffs = "debuffs";
+    if (await this.handlePreTurnEffects(currentAttacker, debuffs)) {
+      // If the current attacker is affected by a debuff that skips the turn, find the next turn
+      return this.getNextTurn(); // Recursively call to get the next valid turn
+    }
+
     return nextTurn;
   } //
   async sendInitialEmbed() {
@@ -1005,6 +1107,7 @@ class Duel {
                 }
                 await cycleCooldowns(this.cooldowns);
                 await this.getNextTurn();
+                console.log("oppshITTTT:", this.player.statuses.debuffs.flat());
                 console.log("oppshITTTT:", this.player.statuses.buffs.flat());
                 this.printBattleResult();
                 const updatedEmbed = await this.sendInitialEmbed(message);
@@ -1095,6 +1198,35 @@ class Duel {
       }
     });
   }
+  getCurrentAttacker() {
+    if (this.currentTurn === this.player.name) return this.player;
+    if (this.currentTurn === this.opponent.name) return this.opponent;
+
+    return (
+      this.allyFamiliars.find(
+        (familiar) => familiar.name === this.currentTurn
+      ) ||
+      this.enemyFamiliars.find((familiar) => familiar.name === this.currentTurn)
+    );
+  }
+  async calculatePFDamage(attacker, target) {
+    return critOrNot(
+      attacker.stats.critRate,
+      attacker.stats.critDamage,
+      attacker.stats.attack,
+      target.stats.defense
+    );
+  }
+
+  getReducedDamage(damage) {
+    const damageReductionPercentage = Math.random() * (40 - 15) + 15;
+    return Math.floor(damage * (1 - damageReductionPercentage / 100));
+  }
+
+  getIncreasedDamage(damage) {
+    const damageReductionPercentage = Math.random() * (40 - 15) + 15;
+    return Math.floor(damage * (1 - damageReductionPercentage / 100));
+  }
   async printBattleResult() {
     // Implement code to display the battle result (victory, defeat, or draw)
     // this.printBattleResult();
@@ -1130,7 +1262,6 @@ class Duel {
         this.aliveOpponentTeam = this.aliveOpponentTeam.filter(
           (enemy) => enemy !== character
         );
-        console.log("ALIVEFAM:", this.characters);
 
         break;
       }

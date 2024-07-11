@@ -10,7 +10,7 @@ const {
 const { cards } = require("../adv/information/cards.js"); // Import the cards data from 'cards.js'
 const abilities = require("../../data/abilities.js");
 const { run } = require("node:test");
-const BuffDebuffLogic = require("../adv/action/buffdebufflogic.js");
+const { BuffDebuffLogic } = require("../adv/action/buffdebufflogic.js");
 const buffDebuffLogic = new BuffDebuffLogic(this);
 // Function to get the index of the maximum value among three
 function getMax(a, b, c) {

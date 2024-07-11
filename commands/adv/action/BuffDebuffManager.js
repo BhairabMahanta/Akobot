@@ -5,12 +5,12 @@ class BuffDebuffManager {
 
   async applyDebuff(user, target, debuffDetails) {
     // Check if the target has immunity
-    if (target.statuses.buffs.some((buff) => buff.type === "immunity")) {
-      this.battleLogs.push(
-        `${target.name} is immune to ${debuffDetails.debuffType} debuffs.`
-      );
-      return;
-    }
+    // if (target.statuses.buffs.some((buff) => buff.type === "immunity")) {
+    //   this.battleLogs.push(
+    //     `${target.name} is immune to ${debuffDetails.debuffType} debuffs.`
+    //   );
+    //   return;
+    // }
 
     // Special case: apply_ or remove_
     if (
@@ -25,8 +25,28 @@ class BuffDebuffManager {
         targets: debuffDetails.targets,
         flat: debuffDetails.flat || false,
       };
-      target.statuses.debuffs.push(specialDebuff.value_amount);
-      console.log(`${target.name} received a special debuff:`, specialDebuff);
+
+      if (Array.isArray(target)) {
+        for (let trgt of target) {
+          if (!trgt.statuses.debuffs) {
+            trgt.statuses.debuffs = [];
+          }
+          debuffDetails.value_amount[debuffDetails.value_name] = {
+            ...debuffDetails.value_amount[debuffDetails.value_name], // Existing properties of invincible
+            ...specialDebuff, // New properties from specialBuff
+          };
+          trgt.statuses.debuffs.push(specialDebuff.value_amount);
+          this.battleLogs.push(
+            `${user.name} applied ${debuffDetails.name} to ${trgt.name} for ${debuffDetails.turnLimit} turns.`
+          );
+        }
+      } else {
+        debuffDetails.value_amount[debuffDetails.value_name] = {
+          ...debuffDetails.value_amount[debuffDetails.value_name], // Existing properties of invincible
+          ...specialDebuff, // New properties from specialBuff
+        };
+        debuffDetails.targets.statuses.debuffs.push(specialDebuff.value_amount);
+      }
     } else {
       // Normal case: debuff application
       const debuffTemplate = {
@@ -40,6 +60,9 @@ class BuffDebuffManager {
       if (Array.isArray(debuffDetails.targets)) {
         for (let target of debuffDetails.targets) {
           const debuff = { ...debuffTemplate, targets: target };
+          this.battleLogs.push(
+            `${user.name} applied ${debuffDetails.name} to ${target.name} for ${debuffDetails.turnLimit} turns.`
+          );
           target.statuses.debuffs.push(debuff);
           console.log(`Debuff applied to ${target.name}:`, debuff);
         }
@@ -47,13 +70,13 @@ class BuffDebuffManager {
         const debuff = { ...debuffTemplate, targets: debuffDetails.targets };
         debuffDetails.targets.statuses.debuffs.push(debuff);
         console.log(`Debuff applied to ${debuffDetails.targets.name}:`, debuff);
+        this.battleLogs.push(
+          `${user.name} applied ${debuffDetails.name} to ${target.name} for ${debuffDetails.turnLimit} turns.`
+        );
       }
     }
 
     // Log the debuff application
-    this.battleLogs.push(
-      `${user.name} applied ${debuffDetails.name} to ${target.name} for ${debuffDetails.turnLimit} turns.`
-    );
   }
 
   // Method to remove a debuff
@@ -87,12 +110,33 @@ class BuffDebuffManager {
         type: buffDetails.buffType,
         name: buffDetails.name,
         remainingTurns: buffDetails.turnLimit,
-        value_amount: buffDetails.value_amount,
         targets: buffDetails.targets,
         flat: buffDetails.flat || false,
       };
-      user.statuses.buffs.push(specialBuff.value_amount);
-      console.log(`${user.name} received a special buff:`, specialBuff);
+      if (Array.isArray(target)) {
+        for (let trgt of target) {
+          if (!trgt.statuses.buffs) {
+            trgt.statuses.buffs = [];
+          }
+          buffDetails.value_amount[buffDetails.value_name] = {
+            ...buffDetails.value_amount[buffDetails.value_name], // Existing properties of invincible
+            ...specialBuff, // New properties from specialBuff
+          };
+          trgt.statuses.buffs.push(buffDetails.value_amount);
+          trgt.statuses.buffs[buffDetails.value_amount].push(specialBuff);
+          this.battleLogs.push(
+            `${user.name} applied ${buffDetails.name} to ${trgt.name} for ${buffDetails.turnLimit} turns.`
+          );
+          console.log(trgt.statuses.debuffs.flat());
+        }
+      } else {
+        buffDetails.value_amount[buffDetails.value_name] = {
+          ...buffDetails.value_amount[buffDetails.value_name], // Existing properties of invincible
+          ...specialBuff, // New properties from specialBuff
+        };
+
+        user.statuses.buffs.push(buffDetails.value_amount);
+      }
     } else {
       // Normal case: buff application
       const buffTemplate = {

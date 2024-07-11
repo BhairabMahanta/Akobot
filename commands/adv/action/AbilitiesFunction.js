@@ -248,7 +248,7 @@ class Ability {
       name: "Frost Nova",
       debuffType: debuffType,
       unique: true,
-      value_amount: { speed: -30 }, // Reduce speed by 30%
+      value_amount: { freeze: true }, // Reduce speed by 30%
       targets: specialContext,
       turnLimit: 2, // Lasts for 2 turns
     };
@@ -257,7 +257,7 @@ class Ability {
       await this.buffDebuffLogic.aoeDamage(user, target, specialContext);
 
     this.buffDebuffManager.applyDebuff(user, specialContext, debuffDetails);
-    await this.buffDebuffLogic.decreaseWhat(target, debuffDetails);
+    // await this.buffDebuffLogic.decreaseWhat(target, debuffDetails);
     this.battleLogs.push(
       `+ ${user.name} performs frostNova, hitting ${enemyNameArray.join(
         " ,"
@@ -450,12 +450,18 @@ class Ability {
   }
 
   async smokeBomb(user) {
-    const buffType = "apply_invisibility";
+    const buffType = "apply_invincibility";
     const buffDetails = {
       name: "Smoke Bomb",
       buffType: buffType,
       unique: true,
-      value_amount: { invisibility: true }, // Example invisibility value
+      value_name: "invincible",
+      value_amount: {
+        invincible: {
+          state: true,
+          name: "invincible",
+        },
+      },
       targets: user,
       turnLimit: 2, // Lasts for 2 turns
     };

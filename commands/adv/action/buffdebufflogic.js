@@ -1,3 +1,4 @@
+const { critOrNot } = require("../adventure/sumfunctions.js");
 const buffs = {
   "Attack Boost": {
     name: "Attack Boost",
@@ -148,8 +149,6 @@ class BuffDebuffLogic {
 
     await Promise.all(
       specialContext.map(async (targeta) => {
-        console.log("target:", targeta.stats.defense);
-        console.log("length", specialContext.length);
         const damage = await critOrNot(
           user.stats.critRate,
           user.stats.critDamage,
