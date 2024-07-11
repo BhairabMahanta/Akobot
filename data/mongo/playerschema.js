@@ -21,6 +21,7 @@ const playerSchema = new Schema(
       magic: Number,
       training: Number,
       defense: Number,
+      magicDefense: Number,
       speed: Number,
       hp: Number,
       intelligence: Number,
@@ -52,6 +53,29 @@ const playerSchema = new Schema(
       x: Number,
       y: Number,
     },
+    collectionInv: [
+      {
+        serialId: String,
+        globalId: String,
+        name: String,
+        stats: {
+          level: Number,
+          xp: Number,
+          attack: Number,
+          defense: Number,
+          speed: Number,
+          hp: Number,
+          tier: Number,
+          evolution: Number,
+          critRate: Number,
+          critDamage: Number,
+          magic: Number,
+          magicDefense: Number,
+          // Add other relevant stats here
+        },
+      },
+    ],
+    deck: [{ slot: Number, serialId: String, globalId: String, name: String }],
   },
   { strict: false }
 );

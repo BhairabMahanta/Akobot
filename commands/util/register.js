@@ -12,6 +12,8 @@ const locations = require("../../data/locations");
 const { cards } = require("../adv/information/cards.js");
 let startedTutorial = [537619455409127442];
 let deniedTutorial = [];
+const { allFamiliars } = require("../adv/information/allfamilliars.js");
+
 let collectionCounter = 0; // Initialize the collection counter
 module.exports = {
   name: "register",
@@ -24,19 +26,6 @@ module.exports = {
 
     let Player = await playerModel(db, akaillection);
 
-    /* const count = await Player.countDocuments();
-  if (count >= 20) {
-      // Increment the collection counter
-      collectionCounter++;
-    }
-  
-
-    // Update the collection name
-    if (collectionCounter > 0) {
-      akaillection = `akaillection${collectionCounter}`;
-    } else {
-      akaillection = "akaillection";
-    }*/
     Player = await playerModel(db, akaillection);
 
     if (!startedTutorial.includes(message.author.id)) {
@@ -85,20 +74,18 @@ module.exports = {
     // }
 
     function getRandomCard() {
-      const cardNames = Object.keys(cards);
-      console.log("cardnames:", cardNames);
-      const randomCardName =
-        cardNames[Math.floor(Math.random() * cardNames.length)];
-      const randomCard = cards[randomCardName];
-      console.log("name:", randomCardName, "card:", randomCard);
-      return { name: randomCardName, card: randomCard };
+      const tier1Familiars = Object.keys(allFamiliars.Tier1);
+      const randomFamiliarName =
+        tier1Familiars[Math.floor(Math.random() * tier1Familiars.length)];
+      const randomFamiliar = allFamiliars.Tier1[randomFamiliarName];
+      return { name: randomFamiliarName, card: randomFamiliar };
     }
 
     const randomCardData = getRandomCard();
-    // Initialize the player's data with the character name
+    const randomCard = randomCardData.name;
+    const randomCardStats = randomCardData.card.stats;
+    const randomCardExperience = randomCardData.card.experience;
     const playerId = message.author.id;
-    // Send the initial question to the user
-    const firstQuestion = story.questions.find((q) => q.id === 1);
 
     const playerData2 = new Player({
       _id: playerId,
@@ -108,20 +95,21 @@ module.exports = {
       stats: {
         attack: 100,
         tactics: 0,
-        magic: 15,
+        magic: 1,
         training: 0,
-        defense: 90,
-        speed: 100,
-        hp: 1000,
+        defense: 100,
+        magicDefense: 0,
+        speed: 110,
+        hp: 2000,
         intelligence: 1,
         wise: 1,
         luck: 1,
         devotion: 0,
-        potential: 10,
+        potential: 1,
       },
       balance: { coins: 0, gems: 0 },
       exp: { xp: 0, level: 0 },
-      cards: { name: [randomCardData.name] },
+      cards: { name: [randomCard] },
       class: "Knight",
       race: "Human",
       stuff: {
@@ -129,6 +117,43 @@ module.exports = {
         generatedRandomElements2: false,
       },
       playerpos: { x: 100, y: 50 },
+      selectedFamiliars: {
+        name: [randomCard],
+      },
+      collectionInv: [
+        {
+          serialId: `serial-${collectionCounter++}`,
+          globalId: `global-${Math.floor(Math.random() * 1000000)}`,
+          name: randomCard,
+          stats: {
+            level: randomCardExperience.level,
+            xp: randomCardExperience.current,
+            attack: randomCardStats.attack,
+            defense: randomCardStats.defense,
+            speed: randomCardStats.speed,
+            hp: randomCardStats.hp,
+            tier: randomCardData.card.tier,
+            evolution: 0,
+            critRate: randomCardStats.critRate || 0,
+            critDamage: randomCardStats.critDamage || 0,
+            magic: randomCardStats.magic || 0,
+            magicDefense: randomCardStats.magicDefense || 0,
+          },
+        },
+      ],
+      deck: [
+        {
+          slot: 1,
+          serialId: `serial-${collectionCounter}`,
+          globalId: `global-${Math.floor(Math.random() * 1000000)}`,
+          name: randomCard,
+        },
+        { slot: 2, serialId: "empty", globalId: "empty", name: "empty" },
+        { slot: 3, serialId: "empty", globalId: "empty", name: "empty" },
+        { slot: 4, serialId: "empty", globalId: "empty", name: "empty" },
+        { slot: 5, serialId: "empty", globalId: "empty", name: "empty" },
+        { slot: 6, serialId: "empty", globalId: "empty", name: "empty" },
+      ],
     });
 
     // Save the player data to the database
