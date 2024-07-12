@@ -138,7 +138,7 @@ async function handleNavigation(
   // const element = new Element('Monster', 200, 300); // Replace with actual element details
 
   // Call methods on the instances
-  await gameImage.generateAreaElements("Forest Clearing");
+  // await gameImage.generateAreaElements("Forest Clearing");
   // await gameImage.generateRandomElements(0.55, 0.5, 10);
   await gameImage.generateTutorialEntities();
 
