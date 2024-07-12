@@ -503,12 +503,10 @@ const DROP_RATES = {
 };
 
 async function pullGacha(playerId, gachaType) {
-  console.log("allfamiliars:", allFamiliars);
   const rates = DROP_RATES[gachaType];
   const tier = getTier(rates);
   const tieraaa = `Tier${tier}`;
   const characters = Object.keys(allFamiliars[tieraaa]);
-  console.log("characters:", allFamiliars[tieraaa]);
   const selectedCharacter =
     characters[Math.floor(Math.random() * characters.length)];
 
@@ -516,7 +514,6 @@ async function pullGacha(playerId, gachaType) {
   const update = { $addToSet: { "cards.name": selectedCharacter } };
 
   await collection.updateOne(filter, update);
-  console.log(`Player received: ${allFamiliars[tieraaa][selectedCharacter]}`);
   return allFamiliars[tieraaa][selectedCharacter];
 }
 

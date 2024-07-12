@@ -219,7 +219,33 @@ module.exports = {
             await new Promise((resolve) => setTimeout(resolve, 500)); // Delay for anticipation
 
             const character = await pullGacha(playerId, gachaType);
+            const gaeData = await collection.findOne({ _id: playerId });
+            const pushCharacter = {
+              serialId: `${gaeData.collectionInv.length + 1}`,
+              globalId: `${Math.floor(Math.random() * 1000000)}`,
+              name: character.name,
+              stats: {
+                level: character.experience.level,
+                xp: character.experience.current,
+                attack: character.stats.attack,
+                defense: character.stats.defense,
+                speed: character.stats.speed,
+                hp: character.stats.hp,
+                tier: character.tier,
+                evolution: 0,
+                critRate: character.stats.critRate || 0,
+                critDamage: character.stats.critDamage || 0,
+                magic: character.stats.magic || 0,
+                magicDefense: character.stats.magicDefense || 0,
+              },
+            };
             pulledFamiliars.push(character);
+
+            // Add familiar to player's collection
+            await collection.updateOne(
+              { _id: playerDataNonUpdating._id },
+              { $push: { collectionInv: pushCharacter } }
+            );
 
             if (
               gachaType === GACHA_TYPES.COMMON_TOKEN &&
