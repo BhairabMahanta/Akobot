@@ -473,11 +473,7 @@ class Ability {
       turnLimit: 2, // Lasts for 2 turns
     };
 
-    console.log(
-      `${user.name} evades his taxes, reducing damage taken for a short period.`
-    );
     this.buffDebuffManager.applyBuff(user, user, buffDetails);
-    await this.buffDebuffLogic.applyWhat(user, buffDetails);
 
     this.cooldowns.push({
       name: "Evasion",
@@ -501,7 +497,6 @@ class Ability {
       turnLimit: 2, // Lasts for 2 turns
     };
 
-    console.log(`${user.name} throws a Smoke Bomb, creating a cloud of smoke.`);
     this.buffDebuffManager.applyBuff(user, user, buffDetails);
     // await this.buffDebuffLogic.applyWhat(user, buffDetails);
 
@@ -543,9 +538,6 @@ class Ability {
       turnLimit: 2, // Lasts for 2 turns
     };
 
-    console.log(
-      `${user.name} uses Charming Presence. ${target.name} is charmed and becomes passive.`
-    );
     this.buffDebuffManager.applyDebuff(user, target, debuffDetails);
 
     this.cooldowns.push({
