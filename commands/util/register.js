@@ -122,8 +122,8 @@ module.exports = {
       },
       collectionInv: [
         {
-          serialId: `serial-${collectionCounter++}`,
-          globalId: `global-${Math.floor(Math.random() * 1000000)}`,
+          serialId: `${collectionCounter + 1}`,
+          globalId: `${Math.floor(Math.random() * 1000000)}`,
           name: randomCard,
           stats: {
             level: randomCardExperience.level,
@@ -144,8 +144,8 @@ module.exports = {
       deck: [
         {
           slot: 1,
-          serialId: `serial-${collectionCounter}`,
-          globalId: `global-${Math.floor(Math.random() * 1000000)}`,
+          serialId: `${collectionCounter + 1}`,
+          globalId: `${Math.floor(Math.random() * 1000000)}`,
           name: randomCard,
         },
         { slot: 2, serialId: "empty", globalId: "empty", name: "empty" },

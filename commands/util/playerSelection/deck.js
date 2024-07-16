@@ -24,13 +24,31 @@ module.exports = {
       playerData = { _id: message.author.id, deck: [] };
       await collection.insertOne(playerData);
     }
-
+    const empty = "empty";
+    const updatedDescription = playerData.deck
+      .map(
+        (item, index) =>
+          `${
+            item
+              ? `\`\`${item.name.toString().padStart(14, " ")}\`\``
+              : `\`\`${empty.toString().padStart(7, " ")}\`\``
+          }`
+      )
+      .join("\n");
+    const formattedDescription = updatedDescription.split("\n");
+    const topRow = formattedDescription.slice(0, 3).join("   ");
+    const bottomRow = formattedDescription.slice(3, 6).join("   ");
     const embed = new EmbedBuilder()
       .setTitle("Deck Configuration")
-      .setDescription(
-        "1) empty\n2) empty\n3) empty\n4) empty\n5) empty\n6) empty"
+      .setDescription(`**__FL__**: ${topRow}\n\n__**BL**__: ${bottomRow}\n\n`)
+      .setColor(0x00ae86)
+      .setImage(
+        `https://cdn.discordapp.com/attachments/984382901716148234/1261411218426564649/Untitled27_20240713012735.png?ex=6692dc3e&is=66918abe&hm=75f7c1beda3a0f071ea9aeed45d9c65d7f37d60720bf483371d76c5ee1fd6101&`,
+        { format: "png", dynamic: true, size: 1024 }
       )
-      .setColor(0x00ae86);
+      .setFooter({
+        text: `FrontLine elements are hit more often and backline are hit less often/reduced dmg`,
+      });
 
     const buttons1 = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
@@ -92,25 +110,33 @@ module.exports = {
       const slotNumber = interaction.customId.replace("modal-", "");
       const input = interaction.fields.getTextInputValue(`input-${slotNumber}`);
       let updateText = input;
+      const filtera = { _id: message.author.id };
+      const extraPlayerDataNonUpdating = await collection.findOne(filtera);
+      console.log("extraPlayerDataNonUpdating:", extraPlayerDataNonUpdating);
 
       if (input.toLowerCase() === "player") {
         updateText = {
           serialId: "player",
           globalId: message.author.id,
           name: message.author.username,
+
           stats: {},
         };
       } else {
+        const foundItem = extraPlayerDataNonUpdating.collectionInv.find(
+          (item) => item.serialId === input
+        );
+        console.log("foundItem:", foundItem);
+        let theElement;
+        if (foundItem) {
+          theElement = foundItem;
+        }
+
         updateText = {
           serialId: input,
-          globalId: `global_id_${input}`, // Example of global ID generation
-          name: `Familiar ${input}`, // You can fetch the actual name from another collection if needed
-          stats: {
-            level: 1,
-            xp: 0,
-            strength: 10,
-            defense: 10,
-          },
+          globalId: `${theElement.globalId}`, // Example of global ID generation
+          name: theElement.name, // You can fetch the actual name from another collection if needed
+          stats: theElement.stats,
         };
       }
 

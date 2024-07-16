@@ -474,6 +474,7 @@ class Duel {
 
     const damage = await this.calculatePFDamage(attacker, target);
     console.log("test");
+    console.log(damage);
     await this.handleStatusEffects(target, damage, attacker);
   }
   async handlePreTurnEffects(target, type) {
@@ -573,6 +574,11 @@ class Duel {
     console.log("statuses:", statuses);
     if (!statuses || statuses.length === 0) {
       console.log("hehehehe ");
+      await handleTurnEffects(attacker);
+      target.stats.hp -= damage;
+      this.battleLogs.push(
+        `+ ${this.currentTurn} attacks ${target.name} for ${damage} damage using an attack`
+      );
       return false; // No status effects to handle
     }
     let isTrue = false;
@@ -1003,6 +1009,7 @@ class Duel {
             // await this.performEnemyTurn(message);
             console.log("currentTurn:", this.currentTurn);
             this.printBattleResult();
+            const updatedEmbed = await this.sendInitialEmbed(message);
           } else {
             if (this.sendFollowUp) {
               i.followUp({
