@@ -31,11 +31,17 @@ module.exports = {
       const player = await collection.findOne(dbFilter);
       const dbFilter2 = { _id: opponentId };
       const opponent = await collection.findOne(dbFilter2);
+      if (!player || !opponent) {
+        message.reply({
+          content: "The opponent does not exist in the database.",
+          ephemeral: true,
+        });
+        return;
+      }
       // Extract opponent ID from command arguments
 
       // Create a new instance of DuelLogic
       const duel = new Duel(player, opponent, message);
-      console.log("worked Here beta");
       await duel.startEmbed();
     } catch (error) {
       console.error("Error executing duel command:", error);
