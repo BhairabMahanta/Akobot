@@ -91,7 +91,15 @@ module.exports = {
       _id: playerId,
       name: characterName,
       location: locations[0],
-      inventory: { active: [], backpack: [] },
+      inventory: {
+        active: [],
+        backpack: [],
+        tokens: {
+          commonScroll: 2,
+          rareScroll: 0,
+          legendaryScroll: 0,
+        },
+      },
       stats: {
         attack: 100,
         tactics: 0,
