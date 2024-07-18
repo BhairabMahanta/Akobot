@@ -279,14 +279,21 @@ class Duel {
             }
           })
           .filter(Boolean); // Remove undefined items
+
         // If there are no abilities available, add a failsafe option
         if (this.abilityOptions.length === 0) {
           this.abilityOptions.push({
-            label: "Cooldown",
+            label: "Cool down",
             description: "Your abilities are on cooldown",
             value: "cooldown",
           });
         }
+        this.abilityOptions.push({
+          label: "Refresh",
+          description: "Click here if your move is stuck",
+          value: "refresh",
+        });
+
         familiarArray = [];
         // console.log('abilityOptions:', this.abilityOptions)
       } catch (error) {
@@ -329,6 +336,11 @@ class Duel {
             value: "cooldown",
           });
         }
+        this.abilityOptions.push({
+          label: "Refresh",
+          description: "Click here if your move is stuck",
+          value: "refresh",
+        });
         // console.log("abilityOptions:", this.abilityOptions);
       } catch (error) {
         console.error("moveOptionsError:", error);
