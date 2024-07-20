@@ -26,11 +26,14 @@ module.exports = {
       const opponentId = extractOpponentId(args);
       const db = mongoClient.db("Akaimnky");
       const collection = db.collection("akaillection");
+
       // Define the filter based on the _id
       const dbFilter = { _id: message.author.id };
       const player = await collection.findOne(dbFilter);
+
       const dbFilter2 = { _id: opponentId };
       const opponent = await collection.findOne(dbFilter2);
+
       if (!player || !opponent) {
         message.reply({
           content: "The opponent does not exist in the database.",
@@ -38,10 +41,12 @@ module.exports = {
         });
         return;
       }
+
       // Extract opponent ID from command arguments
 
       // Create a new instance of DuelLogic
       const duel = new Duel(player, opponent, message);
+
       await duel.startEmbed();
     } catch (error) {
       console.error("Error executing duel command:", error);

@@ -11,6 +11,7 @@ const {
 const { bosses } = require("../adv/monsterInfo/bosses.js");
 const { mobs } = require("../adv/monsterInfo/mobs.js");
 const { cards } = require("../adv/information/cards.js"); // Import the cards data from 'cards.js'
+const { allFamiliars } = require("../adv/information/allfamilliars.js");
 const { BuffDebuffLogic } = require("../adv/action/buffdebufflogic.js");
 const { BuffDebuffManager } = require("../adv/action/BuffDebuffManager.js");
 const {
@@ -23,6 +24,8 @@ const {
   getPlayerMoves,
   handleTurnEffects,
   toCamelCase,
+  generateAttackBarEmoji,
+  generateHPBarEmoji,
 } = require("../util/glogic.js");
 const classes = require("../../data/classes/allclasses.js");
 const abilities = require("../../data/abilities.js");
@@ -51,6 +54,7 @@ const buttonRow = new ActionRowBuilder().addComponents(
 class Duel {
   constructor(player, opponent, message) {
     this.famSource = JSON.parse(JSON.stringify(cards));
+    this.famsSource = JSON.parse(JSON.stringify(allFamiliars));
     this.message = message;
     this.player = player;
     this.opponent = opponent;
@@ -82,41 +86,80 @@ class Duel {
       try {
         if (this.player.selectedFamiliars) {
           this.playerFamiliar = this.player.selectedFamiliars.name;
-        } else if (!this.player.selectedFamiliars) {
-          console.log("gay");
-          this.playerFamiliar = { name: ["Fire Dragon"] };
-          this.message.channel.send(
-            "You have to select your familiar first using a!selectfamiliar"
-          );
-          this.continue = false;
-        }
-      } catch (error) {
-        console.log("No selected Familiars!", error);
-      }
-      try {
-        if (this.opponent.selectedFamiliars) {
-          this.opponentFamiliar = this.opponent.selectedFamiliars.name;
-        } else if (!this.opponent.selectedFamiliars) {
-          this.opponentFamiliar = { name: ["Fire Dragon"] };
+        } else {
+          console.log("No selected Familiars for player!");
+          this.playerFamiliar = [{ name: "Fire Dragon" }]; // Adjusted to match the object structure
           this.message.channel.send(
             "You have to select your familiar first using a!selectFamiliar"
           );
           this.continue = false;
         }
       } catch (error) {
-        console.log("No selected Familiars!", error);
+        console.log("Error accessing player selectedFamiliars:", error);
       }
-      this.allies.push(this.player);
-      this.opponentsTeam.push(this.opponent);
-      for (const familiarName of this.playerFamiliar) {
-        const familiarData = this.famSource[familiarName];
-        if (familiarData) {
-          // Create a deep copy of the familiar object before pushing it into allies
-          const clonedFamiliar = JSON.parse(JSON.stringify(familiarData));
-          this.allies.push(clonedFamiliar);
-          this.alivePlayerTeam = [...this.allies];
-          this.allyFamiliars.push(clonedFamiliar);
+
+      try {
+        if (this.opponent.selectedFamiliars) {
+          this.opponentFamiliar = this.opponent.selectedFamiliars.name;
+          console.log("Opponent familiars:", this.opponentFamiliar);
+        } else {
+          console.log("No selected Familiars for opponent!");
+          this.opponentFamiliar = [{ name: "Fire Dragon" }]; // Adjusted to match the object structure
+          this.message.channel.send(
+            "You have to select your familiar first using a!selectFamiliar"
+          );
+          this.continue = false;
         }
+      } catch (error) {
+        console.log("Error accessing opponent selectedFamiliars:", error);
+      }
+
+      // Ensure famsSource and allFamiliars are defined and accessible
+      if (this.famsSource) {
+        // Process player's familiars
+        for (const familiar of this.playerFamiliar) {
+          const familiarName = familiar.name;
+
+          const familiarDataFromAllFamiliars =
+            this.famsSource[`Tier${familiar.tier}`]?.[familiarName];
+          console.log(
+            "familiarDataFromAllFamiliars:",
+            familiarDataFromAllFamiliars
+          );
+
+          if (familiarDataFromAllFamiliars) {
+            // Create a deep copy of the familiar object before pushing it into allies
+            const clonedFamiliar = JSON.parse(
+              JSON.stringify(familiarDataFromAllFamiliars)
+            );
+            this.allies.push(clonedFamiliar);
+            this.allyFamiliars.push(clonedFamiliar);
+          }
+        }
+        this.allies.push(this.player);
+
+        this.alivePlayerTeam = [...this.allies];
+
+        // Process opponent's familiars
+        for (const familiar of this.opponentFamiliar) {
+          const familiarName = familiar.name;
+          const familiarDataFromAllFamiliars =
+            this.famsSource[`Tier${familiar.tier}`]?.[familiarName];
+
+          if (familiarDataFromAllFamiliars) {
+            // Create a deep copy of the familiar object before pushing it into opponentsTeam
+            const clonedFamiliar = JSON.parse(
+              JSON.stringify(familiarDataFromAllFamiliars)
+            );
+            console.log("clonedFamiliar:", clonedFamiliar);
+            this.opponentsTeam.push(clonedFamiliar);
+            this.enemyFamiliars.push(clonedFamiliar);
+          }
+        }
+        this.opponentsTeam.push(this.opponent);
+        this.aliveOpponentTeam = [...this.opponentsTeam];
+      } else {
+        console.log("famsSource or allFamiliars is not defined");
       }
 
       for (const familiarName of this.opponentFamiliar) {
@@ -594,64 +637,16 @@ class Duel {
 
   async calculateOverallSpeed(character) {
     try {
-      if (character === this.player) {
-        return this.player.stats.speed;
-      } else if (this.opponentFamiliar.includes(character.name)) {
-        // Find the familiar's speed by matching it with this.familiarInfo
-        const familiarInfo = this.characters.find(
-          (fam) => fam.name === character.name
-        );
-        // console.log("familiarInfoOOOOO:", familiarInfo);
-        const familiarSpeed = familiarInfo ? familiarInfo.stats.speed : 1; // Default to 0 if not found
-
-        return familiarSpeed;
-      } else if (this.playerFamiliar.includes(character.name)) {
-        // Find the familiar's speed by matching it with this.familiarInfo
-        const familiarInfo = this.characters.find(
-          (fam) => fam.name === character.name
-        );
-        // console.log("familiarInfoOOOOO:", familiarInfo);
-        const familiarSpeed = familiarInfo ? familiarInfo.stats.speed : 1; // Default to 0 if not found
-
-        return familiarSpeed;
-      } else if (character === this.opponent) {
-        return this.opponent.stats.speed;
-      } else {
-        console.log("Calculating speed for unknown character type: 0");
-        return 0; // Default to 0 for unknown character types
-      }
+      return character.stats.speed || 0;
     } catch (error) {
       console.log("speedcalculator:", error);
     }
-  } //
+  }
 
   async calculateOverallHp(character) {
     // console.log('character:', character)
     try {
-      if (character === this.player) {
-        return this.player.stats.hp;
-      } else if (character === this.opponent) {
-        return this.opponent.stats.hp;
-      } else if (this.opponentFamiliar.includes(character.name)) {
-        // Find the familiar's speed by matching it with this.familiarInfo
-        const familiarInfo = this.characters.find(
-          (fam) => fam.name === character.name
-        );
-        const familiarHp = familiarInfo ? familiarInfo.stats.hp : 0; // Default to 0 if not found
-
-        return familiarHp;
-      } else if (this.playerFamiliar.includes(character.name)) {
-        // Find the familiar's speed by matching it with this.familiarInfo
-        const familiarInfo = this.characters.find(
-          (fam) => fam.name === character.name
-        );
-        const familiarHp = familiarInfo ? familiarInfo.stats.hp : 0; // Default to 0 if not found
-
-        return familiarHp;
-      } else {
-        // console.log(`Calculating speed for unknown character type: 0`);
-        return 0; // Default to 0 for unknown character types
-      }
+      return character.stats.speed || 0;
     } catch (error) {
       console.log("speedcalculator:", error);
     }
@@ -682,7 +677,7 @@ class Duel {
         }
       }
       for (const character of this.characters) {
-        character.attackBarEmoji = await this.generateAttackBarEmoji(
+        character.attackBarEmoji = await generateAttackBarEmoji(
           character.atkBar
         );
       }
@@ -702,7 +697,7 @@ class Duel {
     try {
       for (const character of this.characters) {
         const hp = await this.calculateOverallHp(character);
-        character.hpBarEmoji = await this.generateHPBarEmoji(
+        character.hpBarEmoji = await generateHPBarEmoji(
           character.stats.hp,
           character.maxHp
         );
@@ -711,45 +706,6 @@ class Duel {
       console.log("fillBarError:", error);
     }
   } //
-
-  async generateAttackBarEmoji(atkBar) {
-    try {
-      const emoji = "■";
-      let emptyBars = 0;
-      if (atkBar >= 100) {
-        atkBar = 100;
-      }
-      const filledBars = Math.floor(atkBar / 10);
-      emptyBars = Math.floor(10 - filledBars);
-
-      // if (atkBar > 100) {
-      //   emptyBars = Math.floor(12 - filledBars);
-      // }
-      const attackBarString = `${emoji.repeat(filledBars)}${" ".repeat(
-        emptyBars
-      )}`;
-      return `[${attackBarString}]`;
-    } catch (error) {
-      console.log("errorHere:", error);
-    }
-  }
-
-  async generateHPBarEmoji(currentHP, maxHP) {
-    const emoji = "■";
-    let filledBars;
-    filledBars = Math.floor((currentHP / maxHP) * 17);
-    if (currentHP < 0) {
-      filledBars = 0;
-    }
-    const emptyBars = Math.floor(17 - filledBars);
-
-    let hpBarString = emoji.repeat(filledBars);
-    if (emptyBars > 0) {
-      hpBarString += " ".repeat(emptyBars);
-    }
-
-    return `[${hpBarString}]`;
-  }
 
   getTauntTarget() {
     // Implement logic to return the target with taunt
@@ -779,7 +735,7 @@ class Duel {
         this.teamTurn = this.opponent.name;
       }
       characterWith100AtkBar.atkBar -= 100;
-      characterWith100AtkBar.attackBarEmoji = await this.generateAttackBarEmoji(
+      characterWith100AtkBar.attackBarEmoji = await generateAttackBarEmoji(
         characterWith100AtkBar.atkBar
       );
     } else if (charactersWith100AtkBar.length > 1) {
@@ -799,7 +755,7 @@ class Duel {
       this.currentTurnId = fastestCharacter._id;
 
       fastestCharacter.atkBar -= 100;
-      fastestCharacter.attackBarEmoji = await this.generateAttackBarEmoji(
+      fastestCharacter.attackBarEmoji = await generateAttackBarEmoji(
         fastestCharacter.atkBar
       );
     }
@@ -1069,12 +1025,6 @@ class Duel {
                     .replace(/^[^(]*[(]/, "") // extract the parameters
                     .split(",")
                     .filter(Boolean); // split the parameters into an array
-
-                  // console.log(
-                  //   `Method ${abilityNameCamel} has the following parameters: ${parameterNames.join(
-                  //     ", "
-                  // )}`
-                  // );
                 } else {
                   console.log(`Method ${abilityNameCamel} does not exist.`);
                 }
@@ -1231,15 +1181,14 @@ class Duel {
     let updatedEmbed;
     for (const character of this.alivePlayerTeam) {
       if (
-        character.stats.hp < 0 &&
+        character.stats.hp <= 0 &&
         !this.deadCharacters.includes(character.name)
       ) {
-        this.battleLogs.push(`${character.name} died poggers`);
+        this.battleLogs.push(`${character.name} died 💀`);
         character.stats.speed = 0;
         character.atkBar = 0;
         character.stats.hp = 0;
         this.deadCharacters.push(character.name);
-        console.log("adeadenem:", this.deadEnemies);
         this.alivePlayerTeam = this.alivePlayerTeam.filter(
           (enemy) => enemy !== character
         );
@@ -1264,39 +1213,37 @@ class Duel {
         break;
       }
     }
+    // Determine the winner and loser
+    let winnerName, loserName;
     if (this.alivePlayerTeam.length === 0) {
-      const battleEmbed = new EmbedBuilder().setTitle(
-        "The battle has been concluded!!"
-      );
-      battleEmbed.setFields({
-        name: `GGs ${this.opponent.name}You've won!!`,
-        value: `The player ${this.opponent.name} has won the battle against ${this.player.name} \n Skill issues honestly lol`,
-        inline: true,
-      });
-      // this.initialMessage.edit({
-      //   embeds: [this.battleEmbed],
-      //   components: [],
-      // });
-      updatedEmbed = await this.sendInitialEmbed(this.message);
-      this.initialMessage.edit({
-        embeds: [updatedEmbed],
-        components: [],
-      });
-      this.message.channel.send({ embeds: [battleEmbed] });
+      // Player team is defeated
+      winnerName = this.opponent.name;
+      loserName = this.player.name;
     } else if (this.aliveOpponentTeam.length === 0) {
-      const battleEmbed = new EmbedBuilder().setTitle(
-        "The battle has been concluded!!"
-      );
-      battleEmbed.setFields({
-        name: `GGs ${this.player.name}You've won!!`,
-        value: `The player ${this.player.name} has won the battle against ${this.opponent.name} \n Skill issues honestly lol`,
-        inline: true,
-      });
-      updatedEmbed = await this.sendInitialEmbed(this.message);
-      this.initialMessage.edit({
+      // Opponent team is defeated
+      winnerName = this.player.name;
+      loserName = this.opponent.name;
+    }
+
+    // Proceed only if there's a winner
+    if (winnerName && loserName) {
+      // Create the battle conclusion embed
+      const battleEmbed = new EmbedBuilder()
+        .setTitle("The battle has been concluded!!")
+        .setFields({
+          name: `GGs ${winnerName}, You've won!!`,
+          value: `The player ${winnerName} has won the battle against ${loserName} \n Skill issues honestly lol`,
+          inline: true,
+        });
+
+      // Send the initial embed and update the initial message
+      const updatedEmbed = await this.sendInitialEmbed(this.message);
+      await this.initialMessage.edit({
         embeds: [updatedEmbed],
         components: [],
       });
+
+      // Send the battle conclusion message
       this.message.channel.send({ embeds: [battleEmbed] });
     } else {
       updatedEmbed = await this.sendInitialEmbed(this.message);
