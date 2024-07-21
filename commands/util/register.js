@@ -83,6 +83,13 @@ module.exports = {
 
     const randomCardData = getRandomCard();
     const randomCard = randomCardData.name;
+    const randomCardName = {
+      name: randomCard,
+      serialId: 1,
+      tier: randomCardData.card.tier,
+    };
+    console.log("randomCard:", randomCardName);
+
     const randomCardStats = randomCardData.card.stats;
     const randomCardExperience = randomCardData.card.experience;
     const playerId = message.author.id;
@@ -125,9 +132,6 @@ module.exports = {
         generatedRandomElements2: false,
       },
       playerpos: { x: 100, y: 50 },
-      selectedFamiliars: {
-        name: [randomCard],
-      },
       collectionInv: [
         {
           serialId: `${collectionCounter + 1}`,
@@ -162,6 +166,9 @@ module.exports = {
         { slot: 5, serialId: "empty", globalId: "empty", name: "empty" },
         { slot: 6, serialId: "empty", globalId: "empty", name: "empty" },
       ],
+      selectedFamiliars: {
+        name: [randomCardName],
+      },
     });
 
     // Save the player data to the database

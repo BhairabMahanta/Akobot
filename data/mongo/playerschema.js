@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const { Schema } = mongoose;
+
 const playerSchema = new Schema(
   {
     _id: String,
@@ -76,7 +77,11 @@ const playerSchema = new Schema(
       },
     ],
     deck: [{ slot: Number, serialId: String, globalId: String, name: String }],
+    selectedFamiliars: {
+      name: [{ name: String, serialId: Number, tier: Number }],
+    },
   },
+
   { strict: false }
 );
 
