@@ -41,7 +41,13 @@ module.exports = {
         });
         return;
       }
-
+      if (message.author.id === opponentId) {
+        message.reply({
+          content: "You cannot duel yourself!",
+          ephemeral: true,
+        });
+        return;
+      }
       // Extract opponent ID from command arguments
 
       // Create a new instance of DuelLogic
