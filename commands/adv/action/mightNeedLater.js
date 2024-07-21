@@ -127,4 +127,65 @@
     }
   }
 
+  //calculatespeed
+    async calculateOverallSpeed(character) {
+    try {
+      if (character === this.player) {
+        return this.player.stats.speed;
+      } else if (
+        this.opponentFamiliar.some(
+          (fam) => fam.name === character.name && fam._id === this.opponent._id
+        )
+      ) {
+        // Find the familiar's speed by matching it with this.characters
+        const familiarInfo = this.characters.find(
+          (fam) => fam.name === character.name
+        );
+        const familiarSpeed = familiarInfo ? familiarInfo.stats.speed : 1; // Default to 1 if not found
+        return familiarSpeed;
+      } else if (
+        this.playerFamiliar.some(
+          (fam) => fam.name === character.name && fam._id === this.player._id
+        )
+      ) {
+        // Find the familiar's speed by matching it with this.characters
+        const familiarInfo = this.characters.find(
+          (fam) => fam.name === character.name
+        );
+        const familiarSpeed = familiarInfo ? familiarInfo.stats.speed : 1; // Default to 1 if not found
+        return familiarSpeed;
+      } else if (character === this.opponent) {
+        return this.opponent.stats.speed;
+      } else {
+        console.log("Calculating speed for unknown character type: 0");
+        return 0; // Default to 0 for unknown character types
+      }
+    } catch (error) {
+      console.log("speedcalculator:", error);
+    }
+  }
+
+
+
+
+  //team turn
+   const isCurrentTurnFamiliar = (familiars, currentTurn) => {
+      return familiars.some((familiar) => {
+        return (
+          familiar.name === currentTurn && familiar._id === this.currentTurnId
+        );
+      });
+    };
+
+    // Determine if it's the opponent's or player's turn
+    const isOpponentTurn =
+      this.currentTurn === this.opponent.name ||
+      isCurrentTurnFamiliar(this.enemyFamiliars, this.currentTurn);
+    const isPlayerTurn =
+      this.currentTurn === this.player.name ||
+      isCurrentTurnFamiliar(this.allyFamiliars, this.currentTurn);
+
+    if (isOpponentTurn || isPlayerTurn) {
+      this.teamTurn = isOpponentTurn ? this.opponent.name : this.player.name;
+
   */

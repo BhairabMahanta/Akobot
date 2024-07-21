@@ -178,6 +178,42 @@ async function toCamelCase(str) {
     .replace(/\s/g, ""); // Remove any remaining spaces
 } // move
 
+async function generateAttackBarEmoji(atkBar) {
+  try {
+    const emoji = "■";
+    let emptyBars = 0;
+    if (atkBar >= 100) {
+      atkBar = 100;
+    }
+    const filledBars = Math.floor(atkBar / 10);
+    emptyBars = Math.floor(10 - filledBars);
+
+    const attackBarString = `${emoji.repeat(filledBars)}${" ".repeat(
+      emptyBars
+    )}`;
+    return `[${attackBarString}]`;
+  } catch (error) {
+    console.log("errorHere:", error);
+  }
+}
+
+async function generateHPBarEmoji(currentHP, maxHP) {
+  const emoji = "■";
+  let filledBars;
+  filledBars = Math.floor((currentHP / maxHP) * 17);
+  if (currentHP < 0) {
+    filledBars = 0;
+  }
+  const emptyBars = Math.floor(17 - filledBars);
+
+  let hpBarString = emoji.repeat(filledBars);
+  if (emptyBars > 0) {
+    hpBarString += " ".repeat(emptyBars);
+  }
+
+  return `[${hpBarString}]`;
+}
+
 module.exports = {
   getMax,
   checkResults,
@@ -189,4 +225,6 @@ module.exports = {
   getPlayerMoves,
   handleTurnEffects,
   toCamelCase,
+  generateHPBarEmoji,
+  generateAttackBarEmoji,
 };

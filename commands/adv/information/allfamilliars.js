@@ -70,6 +70,7 @@ const allFamiliars = {
         // Add more moves as needed
       ],
     },
+
     "Earth Golem": {
       id: 3,
       sl: 3,
@@ -483,6 +484,43 @@ const allFamiliars = {
         {
           id: 28,
           name: "Inferno",
+          power: 25,
+          cooldown: 3,
+          level: 1,
+        },
+        // Add more moves as needed
+      ],
+    },
+    "Fire Dragon": {
+      id: 14.1,
+      sl: 14.1,
+      name: "Fire Dragon",
+      element: "Fire",
+      tier: 1,
+      stats: {
+        attack: 65,
+        defense: 70,
+        speed: 90,
+        hp: 90,
+      },
+      experience: {
+        current: 0,
+        required: 100,
+        level: 1,
+      },
+      moves: [
+        {
+          id: 27.1,
+          name: "Flame Strike",
+          description: "shit",
+          power: 25,
+          cooldown: 3,
+          level: 1,
+        },
+        {
+          id: 28.1,
+          name: "Dragon Claw",
+          description: "shit2",
           power: 25,
           cooldown: 3,
           level: 1,
