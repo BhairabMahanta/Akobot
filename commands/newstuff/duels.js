@@ -59,6 +59,8 @@ class Duel {
     this.player = player;
     this.opponent = opponent;
     this.allies = [];
+    this.playerChoice = { status: false, enemy: null };
+    this.opponentChoice = { status: false, enemy: null };
     this.allyFamiliars = [];
     this.opponentsTeam = [];
     this.enemyFamiliars = [];
@@ -298,10 +300,10 @@ class Duel {
     let familiarArray = [];
     let rows;
     if (
-      this.playerFamiliar.includes(this.currentTurn) ||
-      this.opponentFamiliar.includes(this.currentTurn)
+      this.playerFamiliar.includes(this.currentTurn.name) ||
+      this.opponentFamiliar.includes(this.currentTurn.name)
     ) {
-      familiarArray.push(this.currentTurn);
+      familiarArray.push(this.currentTurn.name);
       const moveFinder = familiarArray.map((cardName) =>
         getCardMoves(cardName)
       );
@@ -343,10 +345,12 @@ class Duel {
         console.log("moveOptionsError:", error);
       }
     } else if (
-      [this.player.name, this.opponent.name].includes(this.currentTurn)
+      [this.player.name, this.opponent.name].includes(this.currentTurn.name)
     ) {
       const currentCharacter =
-        this.currentTurn === this.player.name ? this.player : this.opponent;
+        this.currentTurn.name === this.player.name
+          ? this.player
+          : this.opponent;
       const playerAbility = classes[currentCharacter.class].abilities;
       // console.log('stuffimportant:', playerAbility)
       try {
@@ -391,24 +395,13 @@ class Duel {
     }
 
     // Helper function to check if the current turn matches any familiar
-    const isCurrentTurnFamiliar = (familiars, currentTurn) => {
-      return familiars.some((familiar) => {
-        return (
-          familiar.name === currentTurn && familiar._id === this.currentTurnId
-        );
-      });
-    };
-
-    // Determine if it's the opponent's or player's turn
-    const isOpponentTurn =
-      this.currentTurn === this.opponent.name ||
-      isCurrentTurnFamiliar(this.enemyFamiliars, this.currentTurn);
-    const isPlayerTurn =
-      this.currentTurn === this.player.name ||
-      isCurrentTurnFamiliar(this.allyFamiliars, this.currentTurn);
-
+    this.teamTurn =
+      this.currentTurn._id === this.player._id
+        ? this.player.name
+        : this.opponent.name;
+    const isOpponentTurn = this.teamTurn === this.opponent.name;
+    const isPlayerTurn = this.teamTurn === this.player.name;
     if (isOpponentTurn || isPlayerTurn) {
-      this.teamTurn = isOpponentTurn ? this.opponent.name : this.player.name;
       const aliveTeam = isOpponentTurn
         ? this.alivePlayerTeam
         : this.aliveOpponentTeam;
@@ -443,7 +436,10 @@ class Duel {
 
   async performTurn() {
     const attacker = this.getCurrentAttacker();
-    const target = this.enemyToHit;
+    const target =
+      this.currentTurnId === this.player._id
+        ? this.playerChoice.enemy
+        : this.opponeneChoice.enemy;
 
     const dodgeEffect = await this.handleDodge(attacker, target);
 
@@ -555,7 +551,7 @@ class Duel {
       await handleTurnEffects(attacker);
       target.stats.hp -= damage;
       this.battleLogs.push(
-        `+ ${this.currentTurn} attacks ${target.name} for ${damage} damage using an attack`
+        `+ ${this.currentTurn.name} attacks ${target.name} for ${damage} damage using an attack`
       );
       return false; // No status effects to handle
     }
@@ -575,7 +571,7 @@ class Duel {
     } else {
       target.stats.hp -= damage;
       this.battleLogs.push(
-        `+ ${this.currentTurn} attacks ${target.name} for ${damage} damage using an attack`
+        `+ ${this.currentTurn.name} attacks ${target.name} for ${damage} damage using an attack`
       );
 
       await handleTurnEffects(attacker);
@@ -723,11 +719,11 @@ class Duel {
     if (charactersWith100AtkBar.length === 1) {
       const characterWith100AtkBar = charactersWith100AtkBar[0];
 
-      this.currentTurn = characterWith100AtkBar.name;
+      this.currentTurn = characterWith100AtkBar;
       this.currentTurnId = characterWith100AtkBar._id;
       if (
         this.currentTurn === this.player.name ||
-        (this.playerFamiliar.includes(this.currentTurn) &&
+        (this.playerFamiliar.includes(this.currentTurn.name) &&
           characterWith100AtkBar._id === this.player._id)
       ) {
         this.teamTurn = this.player.name;
@@ -742,10 +738,10 @@ class Duel {
       // If multiple characters have reached 100 attack bar, determine the next turn based on speed
       charactersWith100AtkBar.sort((a, b) => b.atkBar - a.atkBar);
       let fastestCharacter = charactersWith100AtkBar[0];
-      this.currentTurn = fastestCharacter.name;
+      this.currentTurn = fastestCharacter;
       if (
-        this.currentTurn === this.player.name ||
-        (this.playerFamiliar.includes(this.currentTurn) &&
+        this.currentTurn.name === this.player.name ||
+        (this.playerFamiliar.includes(this.currentTurn.name) &&
           fastestCharacter._id === this.player._id)
       ) {
         this.teamTurn = this.player.name;
@@ -803,7 +799,7 @@ class Duel {
       }
       this.battleEmbed.addFields({
         name: "Current Turn",
-        value: `\`\`\`${this.currentTurn}\`\`\``,
+        value: `\`\`\`${this.currentTurn.name}\`\`\``,
         inline: false,
       });
       let playerAndFamiliarsInfo = ""; // Initialize an empty string to store the info
@@ -817,7 +813,7 @@ class Duel {
         } ${familiar.stats.hp} ♥️\n[2;36m [2;34m${familiar.attackBarEmoji} ${Math.floor(
           familiar.atkBar
         )} ${
-          this.currentTurn === familiar.name &&
+          this.currentTurn.name === familiar.name &&
           familiar._id === this.currentTurnId
             ? "☝️"
             : "🙋"
@@ -832,7 +828,7 @@ class Duel {
       }\n[2;32m ${this.player.hpBarEmoji} ${this.player.stats.hp} ♥️\n[2;36m [2;34m${
         this.player.attackBarEmoji
       } ${Math.floor(this.player.atkBar)} ${
-        this.currentTurn === this.player.name ? "☝️" : "🙋"
+        this.currentTurn.name === this.player.name ? "☝️" : "🙋"
       }`;
 
       this.battleEmbed.addFields({
@@ -851,7 +847,7 @@ class Duel {
         } ${familiar.stats.hp} ♥️\n[2;36m [2;34m${familiar.attackBarEmoji} ${Math.floor(
           familiar.atkBar
         )} ${
-          this.currentTurn === familiar.name &&
+          this.currentTurn.name === familiar.name &&
           familiar._id === this.currentTurnId
             ? "☝️"
             : "🙋"
@@ -866,7 +862,7 @@ class Duel {
       }\n[2;32m ${this.opponent.hpBarEmoji} ${this.opponent.stats.hp} ♥️\n[2;36m [2;34m${
         this.opponent.attackBarEmoji
       } ${Math.floor(this.opponent.atkBar)} ${
-        this.currentTurn === this.opponent.name ? "☝️" : "🙋"
+        this.currentTurn.name === this.opponent.name ? "☝️" : "🙋"
       }`;
 
       this.battleEmbed.addFields({
@@ -922,34 +918,36 @@ class Duel {
             i.user.id === this.player._id
           ) {
             if (this.aliveOpponentTeam.length === 1) {
-              this.pickedChoice = true;
+              this.playerChoice.status = true;
               this.sendFollowUp = true;
-              this.enemyToHit = this.aliveOpponentTeam[0];
+              this.playerChoice.enemy = this.aliveOpponentTeam[0];
             }
           } else if (
             this.teamTurn === this.opponent.name &&
             i.user.id === this.opponent._id
           ) {
             if (this.alivePlayerTeam.length === 1) {
-              this.pickedChoice = true;
+              this.opponentChoice.status = true;
               this.sendFollowUp = true;
-              this.enemyToHit = this.alivePlayerTeam[0];
+              this.opponentChoice.enemy = this.alivePlayerTeam[0];
             }
           } else {
-            this.pickedChoice = false;
             this.sendFollowUp = false;
             await i.followUp({
               content: "I dont think it is your turn dawg.",
               ephemeral: true,
             });
           }
-          if (this.pickedChoice) {
-            this.pickedChoice = true; // i can use mongodb to allow people to turn this off and on
+          if (this.playerChoice.status || this.opponentChoice.status) {
+            this.playerChoice.status
+              ? (this.playerChoice.status = true)
+              : (this.opponentChoice.status = true);
+            // i can use mongodb to allow people to turn this off and on
             this.performTurn(message);
             await this.getNextTurn();
             await cycleCooldowns(this.cooldowns);
             this.printBattleResult();
-            console.log("currentTurn:", this.currentTurn);
+            console.log("currentTurn:", this.currentTurn.name);
             await this.sendInitialEmbed(message);
           } else {
             if (this.sendFollowUp) {
@@ -970,14 +968,16 @@ class Duel {
           this.teamTurn === this.player.name &&
           i.user.id === this.player._id
         ) {
-          this.enemyToHit = this.aliveOpponentTeam[realTarget];
-          this.pickedChoice = true;
+          this.playerChoice.enemy = this.aliveOpponentTeam[realTarget];
+
+          this.playerChoice.status = true;
         } else if (
           this.teamTurn === this.opponent.name &&
           i.user.id === this.opponent._id
         ) {
-          this.enemyToHit = this.alivePlayerTeam[realTarget];
-          this.pickedChoice = true;
+          this.opponentChoice.enemy = this.alivePlayerTeam[realTarget];
+
+          this.opponentChoice.status = true;
         }
         // Continue with your code logic after selecting an enemy
       } else if (i.customId === "starter") {
@@ -988,20 +988,22 @@ class Duel {
           i.user.id === this.player._id
         ) {
           if (this.aliveOpponentTeam.length === 1) {
-            this.pickedChoice = true;
-            this.enemyToHit = this.aliveOpponentTeam[0];
+            this.playerChoice.status = true;
+            this.playerChoice.enemy = this.aliveOpponentTeam[0];
           }
         } else if (
           this.teamTurn === this.opponent.name &&
           i.user.id === this.opponent._id
         ) {
           if (this.alivePlayerTeam.length === 1) {
-            this.pickedChoice = true;
-            this.enemyToHit = this.alivePlayerTeam[0];
+            this.opponentChoice.status = true;
+            this.opponentChoice.enemy = this.aliveOpponentTeam[0];
           }
         }
-        if (this.pickedChoice) {
-          this.pickedChoice = true;
+        if (this.playerChoice.status || this.opponentChoice.status) {
+          this.playerChoice.status
+            ? (this.playerChoice.status = true)
+            : (this.opponentChoice.status = true);
 
           if (selectedClassValue.startsWith("player_ability_")) {
             try {
@@ -1034,7 +1036,7 @@ class Duel {
                 ) {
                   this.ability[abilityNameCamel](
                     this.player,
-                    this.enemyToHit,
+                    this.playerChoice.enemy,
                     this.aliveOpponentTeam
                   );
                 } else if (
@@ -1043,7 +1045,7 @@ class Duel {
                 ) {
                   this.ability[abilityNameCamel](
                     this.opponent,
-                    this.enemyToHit,
+                    this.opponentChoice.enemy,
                     this.alivePlayerTeam
                   );
                 }
@@ -1076,13 +1078,16 @@ class Duel {
                 ) {
                   for (const familiar of this.characters) {
                     if (
-                      familiar.name === this.currentTurn &&
+                      familiar.name === this.currentTurn.name &&
                       this.currentTurnId === this.player._id
                     ) {
-                      this.ability[abilityNameCamel](familiar, this.enemyToHit);
+                      this.ability[abilityNameCamel](
+                        familiar,
+                        this.playerChoice.enemy
+                      );
                       await cycleCooldowns(this.cooldowns);
                       await this.getNextTurn();
-                      console.log("currentTurn:", this.currentTurn);
+                      console.log("currentTurn:", this.currentTurn.name);
                       this.printBattleResult();
                       break;
                     }
@@ -1093,13 +1098,16 @@ class Duel {
                 ) {
                   for (const familiar of this.characters) {
                     if (
-                      familiar.name === this.currentTurn &&
+                      familiar.name === this.currentTurn.name &&
                       this.currentTurnId === this.opponent._id
                     ) {
-                      this.ability[abilityNameCamel](familiar, this.enemyToHit);
+                      this.ability[abilityNameCamel](
+                        familiar,
+                        this.opponentChoice.enemy
+                      );
                       await cycleCooldowns(this.cooldowns);
                       await this.getNextTurn();
-                      console.log("currentTurn:", this.currentTurn);
+                      console.log("currentTurn:", this.currentTurn.name);
                       this.printBattleResult();
                       break;
                     }
@@ -1131,31 +1139,19 @@ class Duel {
           dodgeOptions[Math.floor(Math.random() * dodgeOptions.length)];
         this.dodge.option = randomDodge;
         this.dodge.id = i.user.id;
-        this.battleLogs.push(`- ${this.currentTurn} is attempting to dodge`);
+        this.battleLogs.push(
+          `- ${this.currentTurn.name} is attempting to dodge`
+        );
         await cycleCooldowns(this.cooldowns);
         await this.getNextTurn();
         // await this.performEnemyTurn(message);
-        console.log("currentTurn:", this.currentTurn);
+        console.log("currentTurn:", this.currentTurn.name);
         this.printBattleResult();
       }
     });
   }
   getCurrentAttacker() {
-    if (this.currentTurn === this.player.name) return this.player;
-    if (this.currentTurn === this.opponent.name) return this.opponent;
-
-    return (
-      this.allyFamiliars.find(
-        (familiar) =>
-          familiar.name === this.currentTurn &&
-          familiar._id === this.currentTurnId
-      ) ||
-      this.enemyFamiliars.find(
-        (familiar) =>
-          familiar.name === this.currentTurn &&
-          familiar._id === this.currentTurnId
-      )
-    );
+    return this.currentTurn;
   }
   async calculatePFDamage(attacker, target) {
     return critOrNot(
@@ -1184,15 +1180,26 @@ class Duel {
         character.stats.hp <= 0 &&
         !this.deadCharacters.includes(character.name)
       ) {
-        this.battleLogs.push(`${character.name} died 💀`);
+        let thang = false;
+
         character.stats.speed = 0;
         character.atkBar = 0;
         character.stats.hp = 0;
         this.deadCharacters.push(character.name);
+        if (this.opponentChoice.enemy === character) {
+          this.opponentChoice.status = false;
+          this.opponentChoice.enemy = null;
+          thang = true;
+        }
+        thang
+          ? this.battleLogs.push(
+              `${character.name} died, please pick a different enemy!`
+            )
+          : this.battleLogs.push(`${character.name} died lol`);
         this.alivePlayerTeam = this.alivePlayerTeam.filter(
           (enemy) => enemy !== character
         );
-        console.log("ALIVEFAM:", this.characters);
+
         break;
       }
     }
@@ -1201,11 +1208,21 @@ class Duel {
         character.stats.hp < 0 &&
         !this.deadCharacters.includes(character.name)
       ) {
-        this.battleLogs.push(`${character.name} died lol`);
+        let thang = false;
         character.stats.speed = 0;
         character.atkBar = 0;
         character.stats.hp = 0;
         this.deadCharacters.push(character.name);
+        if (this.playerChoice.enemy === character) {
+          this.playerChoice.status = false;
+          this.playerChoice.enemy = null;
+          thang = true;
+        }
+        thang
+          ? this.battleLogs.push(
+              `${character.name} died, please pick a different enemy!`
+            )
+          : this.battleLogs.push(`${character.name} died lol`);
         this.aliveOpponentTeam = this.aliveOpponentTeam.filter(
           (enemy) => enemy !== character
         );
