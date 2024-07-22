@@ -1,355 +1,388 @@
 {
   "questions": [
     {
-    
-      "id": 1,
+      "id": "1",
       "text": "Welcome traveller to the land of akoland!",
       "answers": [
         {
-          "id": 1,
+          "id": "1",
           "selection": "A",
           "text": "Who are you? Where am I?",
           "outcome": {
-            "nextQuestionId": 2
-            
+            "nextQuestionId": "1.11"
           }
         },
         {
-          "id": 2,
+          "id": "2",
           "selection": "B",
           "text": "Thank you for the warm welcome?",
           "outcome": {
-            "nextQuestionId": 4
+            "nextQuestionId": "1.12"
           }
         },
         {
-          "id": 3,
+          "id": "3",
           "selection": "C",
           "text": "Fuck off!",
           "outcome": {
-            "nextQuestionId": 3
+            "nextQuestionId": "1.21"
           }
         },
         {
-          "id": 4,
+          "id": "4",
           "selection": "D",
           "text": "Take your time, do not answer.",
           "outcome": {
-           "nextQuestionId": 5
+            "nextQuestionId": "1.31"
           }
         }
       ],
       "imageUrl": "https://cdn.discordapp.com/attachments/984382901716148234/1128719300484669650/output.png"
     },
     {
-    
-      "id": 2,
-      "text": "I am your guide. You're in the land of akoverse. ",
-      "answers": 
-      
-      [{
-          "id": 1,
-        "selection": "A",
+      "id": "1.11",
+      "text": "I am your guide. You're in the land of akoverse.",
+      "answers": [
+        {
+          "id": "1",
+          "selection": "A",
           "text": "Are you real? well I probably am just dreaming.",
           "outcome": {
-            "nextQuestionId": 3
+            "nextQuestionId": "1.32"
           }
         },
         {
-          "id": 2,
+          "id": "2",
           "selection": "B",
           "text": "Is this some joke stunt?",
           "outcome": {
-            "nextQuestionId": 3
+            "nextQuestionId": "1.32"
           }
         },
         {
-          "id": 3,
+          "id": "3",
           "selection": "C",
           "text": "Take your time, do not answer.",
           "outcome": {
-            "nextQuestionId": 5
+            "nextQuestionId": "1.32"
           }
         },
         {
-          "id": 4,
+          "id": "4",
           "selection": "D",
           "text": "Go away, I dont want a Paimon IRL.",
           "outcome": {
-           "nextQuestionId": 3
+            "nextQuestionId": "1.21"
           }
         }
       ]
-
-      
     },
-    
     {
-      
-      "id": 3,
-      "text": "Quite rude arent you?",
-      "imageUrl": "https://cdn.discordapp.com/attachments/984382901716148234/1128749270657417317/main-qimg-1e20142d1e62db8f22456d7b049b1782-lq.png",
-      "answers":
-      
-      [{
-          "id": 1,
-        "selection": "A",
+      "id": "1.21",
+      "text": "Quite rude arent you? I'm tryna teach you something here.",
+      "imageUrl": "https://cdn.discordapp.com/attachments/984382901716148234/1128749270657417317/main-qimg-1e2.142d1e62db8f22456d7b049b1782-lq.png",
+      "answers": [
+        {
+          "id": "1",
+          "selection": "A",
           "text": "idk bruv, am I?",
           "outcome": {
-           "nextQuestionId": 4
+            "nextQuestionId": "1.22"
           }
         },
         {
-          "id": 2,
+          "id": "2",
           "selection": "B",
           "text": "You're quick to catch on",
           "outcome": {
-           "nextQuestionId": 4
+            "nextQuestionId": "1.22"
           }
         },
         {
-          "id": 3,
-          "selection": "D",
+          "id": "3",
+          "selection": "C",
           "text": "and so?",
           "outcome": {
-           "nextQuestionId": 2
+            "nextQuestionId": "1.22"
           }
         },
         {
-          "id": 2,
+          "id": "4",
           "selection": "D",
           "text": "Sorry, I didnt want to sound off rude. I am just very confused.",
           "outcome": {
-            "nextQuestionId": 4
+            "nextQuestionId": "1.12"
           }
         }
       ]
- 
     },
     {
-    
-      "id": 4,
-      "text": "Okay, You must be curious about who I am and where are you right? I am your guide and you're in the land of akoverse. ",
-      "answers": 
-      
-      [{
-          "id": 1,
-        "selection": "A",
+      "id": "1.12",
+      "text": "Okay, You must be curious about who I am and where are you right? I am your guide and you're in the land of akoverse.",
+      "answers": [
+        {
+          "id": "1",
+          "selection": "A",
           "text": "Are you real? well I probably am just dreaming.",
           "outcome": {
-            "nextQuestionId": 6
+            "nextQuestionId": "1.32"
           }
         },
         {
-          "id": 2,
+          "id": "2",
           "selection": "B",
           "text": "Is this some joke stunt?",
           "outcome": {
-            "nextQuestionId": 6
+            "nextQuestionId": "1.32"
           }
         },
         {
-          "id": 3,
+          "id": "3",
           "selection": "C",
           "text": "Take your time, do not answer.",
           "outcome": {
-           "nextQuestionId": 5
+            "nextQuestionId": "1.32"
           }
         },
         {
-          "id": 4,
+          "id": "4",
           "selection": "D",
           "text": "Go away, I dont want a Paimon IRL.",
           "outcome": {
-            "nextQuestionId": 6
+            "nextQuestionId": "1.32"
           }
         }
       ]
-
-      
     },
     {
-      
-      "id": 5,
+      "id": "1.31",
       "text": "Oh, a silent observer? How amusing.",
-      "imageUrl": "https://cdn.discordapp.com/attachments/984382901716148234/1128749270657417317/main-qimg-1e20142d1e62db8f22456d7b049b1782-lq.png",
+      "imageUrl": "https://cdn.discordapp.com/attachments/984382901716148234/1128749270657417317/main-qimg-1e2.142d1e62db8f22456d7b049b1782-lq.png",
       "answers": [
         {
-          "id": 1,
-        "selection": "A",
+          "id": "1",
+          "selection": "A",
           "text": "Stay silent, dont make any moves.",
           "outcome": {
-           "nextQuestionId": 6
+            "nextQuestionId": "1.41"
           }
         },
         {
-          "id": 2,
+          "id": "2",
           "selection": "B",
           "text": "You're quick to catch on",
           "outcome": {
-            "nextQuestionId": 6
+            "nextQuestionId": "1.41"
           }
         },
         {
-          "id": 3,
-          "selection": "D",
+          "id": "3",
+          "selection": "C",
           "text": "Stay silent but, show a surprised expression.",
           "outcome": {
-            "nextQuestionId": 6
+            "nextQuestionId": "1.41"
           }
         },
         {
-          "id": 4,
+          "id": "4",
           "selection": "D",
           "text": "Being calculative is in my bones.",
           "outcome": {
-           "nextQuestionId": 6
+            "nextQuestionId": "1.41"
           }
         }
       ]
- 
     },
     {
-      
-      "id": 6,
-      "text": "You can get a list of commands by typing a!help. Furthermore, Please pick what you want to learn about.**",
-      "imageUrl": "https://cdn.discordapp.com/attachments/984382901716148234/1128749270657417317/main-qimg-1e20142d1e62db8f22456d7b049b1782-lq.png",
-      "answers":
-      
-      [{
-          "id": 1,
-        "selection": "A",
-          "text": "I want to Learn about the basics, I am new to the bot.",
-          "outcome": {
-            "id": 1,
-            "nextQuestionId": 2.11
-            
-          }
-        },
-        {
-          "id": 2,
-          "selection": "B",
-          "text": "I'm not really a newbie nor a veteran. Is there something for me?",
-          "outcome": {
-            "id": 1,
-            "text": "Quite full of yourself arent you? Try to take a decision on selecting your race. Use a!tutorial again to start where you left off."
-            
-          }
-        },
-        {
-          "id": 3,
-          "selection": "D",
-          "text": "I'm a veteran, I know almost everything about the bot, entertain me.",
-          "outcome": {
-            "id": 1,
-            "text": "Take off your pants."
-            
-          }
-        },
-        {
-          "id": 4,
-          "selection": "D",
-          "text": "I'm an expert, show me how to get rich quickly.",
-          "outcome": {
-            "id": 1,
-           "text": "KYS, (Keep yourself safe!) This world is harsh."
-          }
-        }
-      ]
- 
-    },
-
-
-
-
-    {
-      
-      "id": 2.1,
-      "text": "Type a!selectrace to select a race. Selecting anything right now is temporary and you can freely change you race as many times you want until you hit lvl 10. ",
-      "imageUrl": "https://cdn.discordapp.com/attachments/984382901716148234/1128749270657417317/main-qimg-1e20142d1e62db8f22456d7b049b1782-lq.png",
-      "answers":
-      
-      [{
-          "id": 1,
-        "selection": "A",
-          "text": "Click to proceed with selecting a race.",
-          "outcome": {
-            "id": 1,
-            "text": "You can restart tutorial right where you left off using a!tutorial again so dont worry, go for it!"
-            
-          }
-        },
-        {
-          "id": 2,
-          "selection": "B",
-          "text": "I'm not really a newbie nor a veteran. Is there something for me?",
-          "outcome": {
-            "id": 1,
-            "text": "Quite full of yourself arent you? Try to take a decision on selecting your race. Use a!tutorial again to start where you left off."
-            
-          }
-        },
-        {
-          "id": 3,
-          "selection": "D",
-          "text": "I'm a veteran, I know almost everything about the bot, entertain me.",
-          "outcome": {
-            "id": 1,
-            "text": "Take off your pants."
-            
-          }
-        },
-        {
-          "id": 4,
-          "selection": "D",
-          "text": "I'm an expert, show me how to get rich quickly.",
-          "outcome": {
-            "id": 1,
-           "text": "KYS, (Keep yourself safe!) This world is harsh."
-          }
-        }
-      ]
- 
-    }
-
-  ],
-  "outcomes": [
-    {
-      "id": 1,
-      "text": "Welcome back to the tutorial! after selecting your race, use the command a!sc (select class) to select a class, and then use a!tutorial again to start where you left off.",
+      "id": "1.32",
+      "text": "Okay, lets break the silence, I am your guide and you're in the land of akoverse.",
       "answers": [
         {
-          "id": 1,
+          "id": "1",
+          "selection": "A",
+          "text": "What do we do now?.",
+          "outcome": {
+            "nextQuestionId": "1.41"
+          }
+        },
+        {
+          "id": "2",
+          "selection": "B",
+          "text": "Take your time, do not answer.",
+          "outcome": {
+            "nextQuestionId": "1.41"
+          }
+        },
+        {
+          "id": "3",
+          "selection": "C",
+          "text": "Please tell me more about this place.",
+          "outcome": {
+            "nextQuestionId": "1.41"
+          }
+        }
+      ]
+    },
+    {
+      "id": "1.41",
+      "text": "You can get a list of commands by typing a!help. Furthermore, Please pick what you want to learn about.",
+      "imageUrl": "https://cdn.discordapp.com/attachments/984382901716148234/1128749270657417317/main-qimg-1e2.142d1e62db8f22456d7b049b1782-lq.png",
+      "answers": [
+        {
+          "id": "1",
+          "selection": "A",
+          "text": "I want to learn about the basics, I am new to the bot.",
+          "outcome": {
+           "id": 1
+          }
+        },
+        {
+          "id": "2",
+          "selection": "B",
+          "text": "I'm not really a newbie nor a veteran. Is there something for me?",
+          "outcome": {
+            "text": "Quite full of yourself aren't you? Try to take a decision on selecting your race. Use a!tutorial again to start where you left off."
+          }
+        },
+        {
+          "id": "3",
+          "selection": "C",
+          "text": "I'm a veteran, I know almost everything about the bot, entertain me.",
+          "outcome": {
+            "text": "Take off your pants. (You can use a!tutorial again to start where you left off.)"
+          }
+        },
+        {
+          "id": "4",
+          "selection": "D",
+          "text": "I'm an expert, show me how to get rich quickly.",
+          "outcome": {
+            "text": "KYS, (Keep yourself safe!) This world is harsh. (You can use a!tutorial again to start where you left off.)"
+          }
+        }
+      ]
+    },
+    {
+      
+      "id": "2.12",
+      "text": "Now, lets pull 2 familiars using the gacha system. Type, a!gacha and pull 2 normal familiars.",
+      "imageUrl": "https://cdn.discordapp.com/attachments/984382901716148234/1128749270657417317/main-qimg-1e2.142d1e62db8f22456d7b049b1782-lq.png",
+      "answers":
+      
+      [{
+          "id": "1",
+        "selection": "A",
+          "text": "Click to simply proceed with the gacha",
+         "outcome": {
+            "id": "2",
+            "activation": "gacha",
+           "text": "Alright, tutorial progress saved! You can use a!tutorial again to start where you left off anytime or continue after pulling 2 familiars."
+         }
+        },
+        {
+          "id": "2",
+          "selection": "B",
+          "text": "I'm not really a newbie nor a veteran. Is there something for me?",
+          "outcome": {
+            "id": "1",
+            "text": "Quite full of yourself arent you? Try to take a decision on selecting your race. Use a!tutorial again to start where you left off."
+            
+          }
+        },
+        {
+          "id": "3",
+          "selection": "D",
+          "text": "I'm a veteran, I know almost everything about the bot, entertain me.",
+          "outcome": {
+            "id": "1",
+            "text": "Take off your pants."
+            
+          }
+        },
+        {
+          "id": "4",
+          "selection": "D",
+          "text": "I'm an expert, show me how to get rich quickly.",
+          "outcome": {
+            "id": "1",
+           "text": "KYS, (Keep yourself safe!) This world is harsh."
+          }
+        }
+      ]
+ 
+    },
+    {
+      "id": "2.11",
+      "text": "Now, after selecting your race, use the command a!sc (select class) to select a class, and then use a!tutorial again to start where you left off.",
+      "answers": [
+        {
+          "id": "1",
         "selection": "A",
           "text": "Click to proceed with selecting a class.",
           "outcome": {
-            "id": 1,
+            "id": "1",
             "activation": "selectclass",
            "text": "Alright, tutorial progress saved! You can use a!tutorial again to start where you left off anytime or continue after selecting a class."
           }
         },
         {
-          "id": 2,
+          "id": "2",
           "selection": "B",
-          "text": "Click to continue tutorial.",
+          "text": "Click to proceed with the gacha system.",
           "outcome": {
-            "nextQuestionId": 2.11
+            "nextQuestionId": "2.11"
           }
         },
         {
-          "id": 3,
+          "id": "3",
           "selection": "C",
           "text": "Click to skip selection tutorial.",
           "outcome": {
-            "nextQuestionId": 2.2
+            "nextQuestionId": "2.21"
+          }
+        }
+      ]
+    }
+
+  ],
+  "outcomes": [
+    {
+      "id": "1",
+      "text": "Welcome back to the tutorial! assuming you've selecting your race (a!sr), use the command a!sc (select class) to select a class. Use a!tutorial again to start where you left off.",
+      "answers": [
+        {
+          "id": "1",
+        "selection": "A",
+          "text": "Click to proceed with selecting a race.",
+          "outcome": {
+            "idS": "1",
+            "activation": "selectrace",
+           "text": "Alright, tutorial progress saved! Press do it to pop up the race select menu.",
+           "nextQuestionId": "2.11"
+          }
+        },
+        {
+          "id": "2",
+          "selection": "B",
+          "text": "Click to continue tutorial.",
+          "outcome": {
+            "nextQuestionId": "2.11"
+          }
+        },
+        {
+          "id": "3",
+          "selection": "C",
+          "text": "Click to skip selection tutorial.",
+          "outcome": {
+            "nextQuestionId": "2.2"
           }
         }
       ]
     },
     {
-      "id": 2,
-      "text": "Outcome 420",
-      "nextQuestionId": 2
+      "id": "2",
+      "text": "Outcome 42.",
+      "nextQuestionId": "2"
     }
   ]
 }
