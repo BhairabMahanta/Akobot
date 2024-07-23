@@ -13,8 +13,10 @@ const abilities = require("../../../data/abilities.js");
 const {
   calculateDamage,
 } = require("../../../my_rust_library/my_rust_library.node");
+let that2;
 class Ability {
   constructor(that) {
+    that2 = that;
     this.battleLogs = that.battleLogs;
     this.enemyToHit = that.enemyToHit;
     this.cooldowns = that.cooldowns;
@@ -22,6 +24,7 @@ class Ability {
     this.buffDebuffLogic = new BuffDebuffLogic(that);
   }
   async cooldownFinder(ability) {
+    console.log("that2:", that2.currentTurn);
     const abilityCooldown = abilities[ability].cooldown;
     return abilityCooldown;
   }

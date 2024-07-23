@@ -439,7 +439,7 @@ class Duel {
     const target =
       this.currentTurnId === this.player._id
         ? this.playerChoice.enemy
-        : this.opponeneChoice.enemy;
+        : this.opponentChoice.enemy;
 
     const dodgeEffect = await this.handleDodge(attacker, target);
 
