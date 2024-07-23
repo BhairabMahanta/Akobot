@@ -38,8 +38,10 @@ const debuffs = {
     effect: "stun", // Indicates it's a status effect rather than an attribute change
   },
 };
+let that2;
 class BuffDebuffLogic {
   constructor(that) {
+    that2 = that;
     this.battleLogs = that.battleLogs;
     // Initialize any necessary properties
   }
@@ -155,7 +157,11 @@ class BuffDebuffLogic {
           user.stats.attack,
           targeta.stats.defense
         );
-        targeta.stats.hp -= damage * (1.2 / specialContext.length);
+        that2.handleStatusEffects(
+          targeta,
+          (damage * 1.2) / specialContext.length,
+          user
+        );
         damageArray.push(damage * (1.2 / specialContext.length));
         enemyNameArray.push(targeta.name);
       })

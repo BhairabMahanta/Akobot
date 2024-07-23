@@ -441,14 +441,6 @@ class Duel {
         ? this.playerChoice.enemy
         : this.opponentChoice.enemy;
 
-    const dodgeEffect = await this.handleDodge(attacker, target);
-
-    if (dodgeEffect) {
-      await handleTurnEffects(attacker);
-      this.dodge = { option: null, id: null };
-      return;
-    }
-
     const damage = await this.calculatePFDamage(attacker, target);
     await this.handleStatusEffects(target, damage, attacker);
   }
@@ -512,6 +504,16 @@ class Duel {
   }
 
   async handleStatusEffects(target, damage, attacker) {
+    const dodgeEffect = await this.handleDodge(attacker, target);
+
+    if (dodgeEffect) {
+      await handleTurnEffects(attacker);
+      this.dodge = { option: null, id: null };
+      return;
+    }
+    if (target.isNPC === true) {
+      return;
+    }
     const statusEffectsOnDamage = {
       invincible: {
         apply: () => {
@@ -545,6 +547,7 @@ class Duel {
       },
       // Add more status effects as needed
     };
+
     let statuses = target.statuses.buffs || {};
     console.log("statuses:", statuses);
     if (!statuses || statuses.length === 0) {
@@ -788,7 +791,7 @@ class Duel {
       }
       if (this.battleLogs.length > 0) {
         this.battleEmbed.setDescription(
-          `**Battle Logs:**\n\`\`\`diff\n+ ${this.battleLogs.join("\n")}\`\`\``
+          `**Battle Logs:**\n\`\`\`diff\n${this.battleLogs.join("\n")}\`\`\``
         );
       } else {
         this.battleEmbed.addFields({
@@ -1160,6 +1163,13 @@ class Duel {
       attacker.stats.attack,
       target.stats.defense
     );
+  }
+  async critOrNotHandler(critRate, critDamage, attack, defense) {
+    const damage = await critOrNot(critRate, critDamage, attack, defense);
+    const attacker = this.getCurrentAttacker();
+    const target =
+      this.currentTurn.name === this.player.name ? this.opponent : this.player;
+    await this.handleStatusEffects(target, damage, attacker);
   }
 
   getReducedDamage(damage) {

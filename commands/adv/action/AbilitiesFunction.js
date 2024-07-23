@@ -31,13 +31,13 @@ class Ability {
 
   //PLAYER ABILOITIES AKAI THIS WORKS BLUD
   async shieldBash(user, target) {
-    const damage = await critOrNot(
+    const damage = await that2.critOrNotHandler(
       user.stats.critRate,
       user.stats.critDamage,
       user.stats.attack,
       target.stats.defense
     );
-    target.stats.hp -= damage;
+    // target.stats.hp -= damage;
     const debuffType = "decrease_speed";
     const debuffDetails = {
       name: "Shield Bash",
@@ -48,10 +48,6 @@ class Ability {
       turnLimit: 2, // Lasts for 2 turns
       flat: true,
     };
-
-    console.log(
-      `${user} uses Shield Bash on ${target}dealing ${damage} damage.`
-    );
     this.buffDebuffManager.applyDebuff(user, target, debuffDetails);
     await this.buffDebuffLogic.decreaseWhat(target, debuffDetails);
 
@@ -101,13 +97,13 @@ class Ability {
   }
 
   async ragingStrike(user, target) {
-    const damage = await critOrNot(
+    const damage = await that2.critOrNotHandler(
       user.stats.critRate + 50,
       user.stats.critDamage,
       user.stats.attack,
       target.stats.defense
     );
-    target.stats.hp -= damage;
+
     this.battleLogs.push(
       `${user.name} unleashes a wild Raging Strike on ${target.name}. It deals ${damage} damage!`
     );
@@ -161,13 +157,12 @@ class Ability {
   }
 
   async precisionStrike(user, target) {
-    const criticalDamage = critOrNot(
+    const criticalDamage = that2.critOrNotHandler(
       100, //in place of crit rate
       user.stats.critDamage + 15,
       user.stats.attack * 1.2,
       target.stats.defense
     );
-    target.stats.hp -= criticalDamage;
     this.battleLogs.push(
       `${user.name} executes a precise Precision Strike on ${target.name}. It's a critical hit!`
     );
@@ -197,14 +192,12 @@ class Ability {
 
   async fireball(user, target, specialContext) {
     // Calculate initial damage
-    const damage = critOrNot(
+    const damage = that2.critOrNotHandler(
       user.stats.critRate,
       user.stats.critDamage,
       user.stats.attack,
       target.stats.defense
     );
-    target.stats.hp -= damage;
-
     // Apply DoT debuff
     const debuffDetails = {
       name: "Fireball",
@@ -320,13 +313,13 @@ class Ability {
   }
 
   async drainLife(user, target) {
-    const drainAmount = critOrNot(
+    const drainAmount = that2.critOrNotHandler(
       user.stats.critRate,
       user.stats.critDamage,
       user.stats.attack,
       target.stats.defense
     ); // Example: Drain Life heals for 25 HP
-    target.stats.hp -= drainAmount;
+
     user.stats.hp += drainAmount * 0.4;
     this.battleLogs.push(
       `${user.name} deals ${drainAmount} damage draining ${
@@ -396,13 +389,13 @@ class Ability {
   }
 
   async backstab(user, target) {
-    const damage = await critOrNot(
+    const damage = await that2.critOrNotHandler(
       user.stats.critRate,
       user.stats.critDamage,
       user.stats.attack,
       target.stats.defense * 0.75
     );
-    target.stats.hp -= damage;
+
     this.battleLogs.push(
       `${user.name} strikes ${target.name} from behind. It's a backstab! It deals ${damage} damage.`
     );
@@ -413,13 +406,13 @@ class Ability {
   }
 
   async shadowStep(user, target) {
-    const damage = critOrNot(
+    const damage = that2.critOrNotHandler(
       user.stats.critRate + 10,
       user.stats.critDamage,
       user.stats.attack,
       target.stats.defense
     );
-    target.stats.hp -= damage;
+
     const buffType = "increase_critRate";
     const buffDetails = {
       name: "Shadow Step",
