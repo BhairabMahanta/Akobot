@@ -892,15 +892,6 @@ class Duel {
       embeds: [this.initialMessage],
       components: await this.getDuelActionRow(),
     });
-
-    if (this.enemyFirst) {
-      this.printBattleResult();
-      const updatedEmbed = await this.sendInitialEmbed(message);
-      await this.initialMessage.edit({
-        embeds: [updatedEmbed],
-        components: await this.getDuelActionRow(),
-      });
-    }
     const filter = (i) =>
       i.user.id === message.author.id ||
       (i.user.id === this.opponent._id && i.customId.startsWith("action_")) ||
