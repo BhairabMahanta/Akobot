@@ -521,7 +521,7 @@ class Duel {
             `- ${target.name}'s invincibility nullifies the attack.`
           );
           damage = 0;
-          return true; // Damage is null
+          return true;
         },
       },
       reflect: {

@@ -700,6 +700,31 @@ class Ability {
 
   // FAMILIAR ABILITIES MAFAKA
   async flameStrike(user, target) {
+    const damage = await that2.critOrNotHandler(
+      user.stats.critRate,
+      user.stats.critDamage,
+      user.stats.attack,
+      target.stats.defense
+    );
+    // target.stats.hp -= damage;
+    const debuffType = "decrease_speed";
+    const debuffDetails = {
+      name: "Shield Bash",
+      debuffType: debuffType,
+      unique: true,
+      value_amount: { speed: 20 }, // Decrease speed by 20
+      targets: target,
+      turnLimit: 2, // Lasts for 2 turns
+      flat: true,
+    };
+    this.buffDebuffManager.applyDebuff(user, target, debuffDetails);
+    await this.buffDebuffLogic.decreaseWhat(target, debuffDetails);
+
+    this.cooldowns.push({
+      name: "Shield Bash",
+      cooldown: this.cooldownFinder("Shield Bash"),
+    });
+
     const power = 20;
     const damage = calculateAbilityDamage(power);
     target.stats.hp -= damage;
