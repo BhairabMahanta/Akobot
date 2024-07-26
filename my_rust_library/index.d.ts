@@ -5,4 +5,5 @@
 
 export function calculateDamage(authorAtk: number, opponentDefense: number): number
 export function calculateCritDamage(authorAtk: number, authorCritDamage: number, opponentDefense: number): number
+export function calculateAbilityDamage(authorAtk: number, authorCritDamage: number, opponentDefense: number, authorAbilityPower: number): number
 export function add(left: number, right: number): number
