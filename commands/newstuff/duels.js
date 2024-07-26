@@ -26,6 +26,7 @@ const {
   toCamelCase,
   generateAttackBarEmoji,
   generateHPBarEmoji,
+  calculateAbilityDamage,
 } = require("../util/glogic.js");
 const classes = require("../../data/classes/allclasses.js");
 const abilities = require("../../data/abilities.js");
@@ -85,6 +86,8 @@ class Duel {
   async initialiseStuff() {
     console.log("initialised");
     try {
+      this.player.name = this.player.name.toUpperCase();
+      this.opponent.name = this.opponent.name.toUpperCase();
       try {
         if (this.player.selectedFamiliars) {
           this.playerFamiliar = this.player.selectedFamiliars.name;
@@ -103,7 +106,6 @@ class Duel {
       try {
         if (this.opponent.selectedFamiliars) {
           this.opponentFamiliar = this.opponent.selectedFamiliars.name;
-          console.log("Opponent familiars:", this.opponentFamiliar);
         } else {
           console.log("No selected Familiars for opponent!");
           this.opponentFamiliar = [{ name: "Fire Dragon" }]; // Adjusted to match the object structure
@@ -124,10 +126,6 @@ class Duel {
 
           const familiarDataFromAllFamiliars =
             this.famsSource[`Tier${familiar.tier}`]?.[familiarName];
-          console.log(
-            "familiarDataFromAllFamiliars:",
-            familiarDataFromAllFamiliars
-          );
 
           if (familiarDataFromAllFamiliars) {
             // Create a deep copy of the familiar object before pushing it into allies
@@ -503,7 +501,7 @@ class Duel {
     return false;
   }
 
-  async handleStatusEffects(target, damage, attacker) {
+  async handleStatusEffects(target, damage, attacker, name) {
     const dodgeEffect = await this.handleDodge(attacker, target);
 
     if (dodgeEffect) {
@@ -547,14 +545,15 @@ class Duel {
       },
       // Add more status effects as needed
     };
-
     let statuses = target.statuses.buffs || {};
     console.log("statuses:", statuses);
     if (!statuses || statuses.length === 0) {
       await handleTurnEffects(attacker);
       target.stats.hp -= damage;
       this.battleLogs.push(
-        `+ ${this.currentTurn.name} attacks ${target.name} for ${damage} damage using an attack`
+        `+ ${this.currentTurn.name} attacks ${
+          target.name
+        } for ${damage} damage using ${name !== undefined ? name : "an attack"}`
       );
       return false; // No status effects to handle
     }
@@ -808,7 +807,6 @@ class Duel {
       let playerAndFamiliarsInfo = ""; // Initialize an empty string to store the info
 
       for (const familiar of this.allyFamiliars) {
-        console.log("fam id:", familiar._id);
         playerAndFamiliarsInfo += `[2;37m ${familiar.name}: ⚔️${
           familiar.stats.attack
         } 🛡️${familiar.stats.defense} 💨${familiar.stats.speed}\n[2;32m ${
@@ -842,7 +840,6 @@ class Duel {
       let opponentAndFamiliarsInfo = ""; // Initialize an empty string to store the info
 
       for (const familiar of this.enemyFamiliars) {
-        console.log("fam id:", familiar._id);
         opponentAndFamiliarsInfo += `[2;37m ${familiar.name}: ⚔️${
           familiar.stats.attack
         } 🛡️${familiar.stats.defense} 💨${familiar.stats.speed}\n[2;32m ${
@@ -1061,9 +1058,7 @@ class Duel {
           } else if (selectedClassValue.startsWith("fam-")) {
             try {
               const abilityName = selectedClassValue.replace("fam-", "");
-              console.log("abilityName:a", abilityName);
               const abilityNameCamel = await toCamelCase(abilityName);
-              console.log("abilityName:a", abilityNameCamel);
               if (typeof this.ability[abilityNameCamel] === "function") {
                 // Execute the ability by calling it using square brackets
                 if (
@@ -1155,12 +1150,24 @@ class Duel {
       target.stats.defense
     );
   }
-  async critOrNotHandler(critRate, critDamage, attack, defense) {
-    const damage = await critOrNot(critRate, critDamage, attack, defense);
+  async critOrNotHandler(
+    critRate,
+    critDamage,
+    attack,
+    defense,
+    target,
+    ability,
+    name
+  ) {
+    const damage = await critOrNot(
+      critRate,
+      critDamage,
+      attack,
+      defense,
+      ability
+    );
     const attacker = this.getCurrentAttacker();
-    const target =
-      this.currentTurn.name === this.player.name ? this.opponent : this.player;
-    await this.handleStatusEffects(target, damage, attacker);
+    await this.handleStatusEffects(target, damage, attacker, name);
   }
 
   getReducedDamage(damage) {

@@ -21,6 +21,7 @@ const DeactivatedElement = require("../../../data/mongo/elementSchema.js");
 const {
   calculateDamage,
   calculateCritDamage,
+  calculateAbilityDamage,
 } = require("../../../my_rust_library/my_rust_library.node");
 
 class GameImage {
@@ -534,18 +535,29 @@ async function critOrNot(
   attackerCritRate,
   critDamage,
   authorAttack,
-  enemyDefense
+  enemyDefense,
+  familiarPower
 ) {
+  const fomiliarPower = await familiarPower;
   const critChance = Math.random() * 100;
-  if (attackerCritRate === undefined) {
+  if (attackerCritRate === undefined && fomiliarPower === undefined) {
     console.log("normal damage");
     return calculateDamage(authorAttack, enemyDefense);
   } else if (critChance <= attackerCritRate) {
     console.log("crit damage");
-    return calculateCritDamage(authorAttack, critDamage, enemyDefense);
+    return fomiliarPower === undefined
+      ? calculateCritDamage(authorAttack, critDamage, enemyDefense)
+      : calculateAbilityDamage(
+          authorAttack,
+          critDamage,
+          enemyDefense,
+          fomiliarPower
+        );
   } else {
     console.log("normal damage");
-    return calculateDamage(authorAttack, enemyDefense);
+    return fomiliarPower === undefined
+      ? calculateDamage(authorAttack, enemyDefense)
+      : (calculateDamage(authorAttack, enemyDefense) * fomiliarPower) / 100;
   }
 }
 

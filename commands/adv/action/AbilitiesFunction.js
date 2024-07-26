@@ -10,10 +10,13 @@ const { critOrNot } = require("../adventure/sumfunctions.js");
 const { BuffDebuffManager } = require("./BuffDebuffManager.js");
 const { BuffDebuffLogic } = require("./buffdebufflogic.js");
 const abilities = require("../../../data/abilities.js");
+const { allFamiliars } = require("../information/allfamilliars.js");
 const {
   calculateDamage,
 } = require("../../../my_rust_library/my_rust_library.node");
+const { some } = require("../../../data/locations.js");
 let that2;
+
 class Ability {
   constructor(that) {
     that2 = that;
@@ -24,7 +27,6 @@ class Ability {
     this.buffDebuffLogic = new BuffDebuffLogic(that);
   }
   async cooldownFinder(ability) {
-    console.log("that2:", that2.currentTurn);
     const abilityCooldown = abilities[ability].cooldown;
     return abilityCooldown;
   }
@@ -698,39 +700,46 @@ class Ability {
     // Implement gadget creation and usage logic here
   }
 
+  async someMethod(familiar, functionName) {
+    const tier = `Tier${familiar.stats.tier}`;
+    const moves = allFamiliars[tier][familiar.name].moves;
+    const move = moves.find((move) => move.name === functionName);
+    console.log(move.power);
+    return move.power;
+  }
+
   // FAMILIAR ABILITIES MAFAKA
   async flameStrike(user, target) {
-    const damage = await that2.critOrNotHandler(
-      user.stats.critRate,
-      user.stats.critDamage,
-      user.stats.attack,
-      target.stats.defense
-    );
-    // target.stats.hp -= damage;
-    const debuffType = "decrease_speed";
+    const debuffType = "apply_burn";
     const debuffDetails = {
-      name: "Shield Bash",
+      name: "Flame Strike",
       debuffType: debuffType,
       unique: true,
-      value_amount: { speed: 20 }, // Decrease speed by 20
+      value_amount: {
+        burn: {
+          state: true,
+        },
+      },
       targets: target,
       turnLimit: 2, // Lasts for 2 turns
       flat: true,
     };
+    await that2.critOrNotHandler(
+      user.stats.critRate,
+      user.stats.critDamage,
+      user.stats.attack,
+      target.stats.defense,
+      target,
+      this.someMethod(user, debuffDetails.name),
+      debuffDetails.name
+    );
     this.buffDebuffManager.applyDebuff(user, target, debuffDetails);
-    await this.buffDebuffLogic.decreaseWhat(target, debuffDetails);
+    await this.buffDebuffLogic.applyWhat(target, debuffDetails);
 
     this.cooldowns.push({
-      name: "Shield Bash",
-      cooldown: this.cooldownFinder("Shield Bash"),
+      name: debuffDetails.name,
+      cooldown: this.cooldownFinder(debuffDetails.name),
     });
-
-    const power = 20;
-    const damage = calculateAbilityDamage(power);
-    target.stats.hp -= damage;
-    this.battleLogs.push(
-      `+ ${user.name} uses Flame Strike on ${target.name} dealing ${damage}.`
-    );
     this.cooldowns.push({
       name: "Flame Strike",
       cooldown: this.cooldownFinder("Flame Strike"),
