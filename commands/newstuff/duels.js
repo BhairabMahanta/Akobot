@@ -82,6 +82,7 @@ class Duel {
     this.buffDebuffManager = new BuffDebuffManager(this);
     this.buffDebuffLogic = new BuffDebuffLogic(this);
     this.dodge = { option: null, id: null };
+    this.taunted = false;
   }
   async initialiseStuff() {
     console.log("initialised");
@@ -469,8 +470,20 @@ class Duel {
           return true; // Turn is skipped
         },
       },
+      burn: {
+        apply: (target) => {
+          target.stats.hp -= Math.floor(target.stats.hp * 0.05);
+          console.log("beep");
+          this.battleLogs.push(
+            `- ${target.name} is burning and lost 5% of HP.`
+          );
+          return false; // Turn is skipped
+        },
+      },
       taunt: {
         apply: (target) => {
+          this.taunted = true;
+          const targetted = target.statuses.debuffs["taunt"].target;
           this.battleLogs.push(
             `- ${target.name} is taunted and must target the taunter.`
           );

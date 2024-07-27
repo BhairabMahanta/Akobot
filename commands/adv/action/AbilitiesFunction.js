@@ -37,7 +37,10 @@ class Ability {
       user.stats.critRate,
       user.stats.critDamage,
       user.stats.attack,
-      target.stats.defense
+      target.stats.defense,
+      target,
+      150,
+      "Shield Bash"
     );
     // target.stats.hp -= damage;
     const debuffType = "decrease_speed";
@@ -142,6 +145,7 @@ class Ability {
       value_amount: {
         taunt: {
           state: true,
+          target: user,
         },
       },
       turnLimit: 3, // Lasts for 3 turns

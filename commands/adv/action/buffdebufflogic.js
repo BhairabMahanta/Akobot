@@ -169,10 +169,6 @@ class BuffDebuffLogic {
 
     return { damageArray, enemyNameArray };
   }
-  async burn(target, turnLimit) {
-    //it just needs to keep damage over time 5% of hp, then 4.5% and so on. if the turn limit ends, it'll automatically turn off without having to do target.statuses.debuffs.push.
-  }
-
   //invincible invisible stun freeze, immunity, DOT, unskillable, taunt, provoke, sleep, oblivion, silence, block beneficial effects, block harmful effects, block healing, block revive, reflect damage, counter, endure,
 
   async increaseCritRate(target, amount, flat) {
