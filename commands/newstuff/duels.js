@@ -7,6 +7,7 @@ const {
   deactivateElement,
   deactivatedElements,
   critOrNot,
+  capitalizeFirstLetter,
 } = require("../adv/adventure/sumfunctions.js");
 const { bosses } = require("../adv/monsterInfo/bosses.js");
 const { mobs } = require("../adv/monsterInfo/mobs.js");
@@ -87,8 +88,8 @@ class Duel {
   async initialiseStuff() {
     console.log("initialised");
     try {
-      this.player.name = this.player.name.toUpperCase();
-      this.opponent.name = this.opponent.name.toUpperCase();
+      this.player.name = capitalizeFirstLetter(this.player.name);
+      this.opponent.name = capitalizeFirstLetter(this.opponent.name);
       try {
         if (this.player.selectedFamiliars) {
           this.playerFamiliar = this.player.selectedFamiliars.name;
@@ -242,7 +243,7 @@ class Duel {
     this.battleEmbed = new EmbedBuilder()
       .setTitle("DUEL INVITATION!")
       .setDescription(
-        `**${this.opponent.name}!!${this.player.name}** has challenged you to a duel! Will you **accept** the challenge?`
+        `**${this.opponent.name}!! ${this.player.name}** has challenged you to a duel! Will you **accept** the challenge?`
       );
     // Display options for quests, bosses, mobs, and adventures
     const optionSelectMenu = new StringSelectMenuBuilder()
@@ -729,6 +730,8 @@ class Duel {
 
   async getNextTurn() {
     let nextTurn = null;
+    console.log("oppshITTTT:", this.opponent.statuses.debuffs.flat());
+    console.log("oppshITTTT:", this.opponent.statuses.buffs.flat());
     const charactersWith100AtkBar = await this.fillAtkBars();
 
     if (charactersWith100AtkBar.length === 1) {
@@ -1041,7 +1044,8 @@ class Duel {
                   this.ability[abilityNameCamel](
                     this.player,
                     this.playerChoice.enemy,
-                    this.aliveOpponentTeam
+                    this.aliveOpponentTeam,
+                    this.alivePlayerTeam
                   );
                 } else if (
                   this.teamTurn === this.opponent.name &&
@@ -1050,13 +1054,13 @@ class Duel {
                   this.ability[abilityNameCamel](
                     this.opponent,
                     this.opponentChoice.enemy,
+                    this.aliveOpponentTeam,
                     this.alivePlayerTeam
                   );
                 }
                 await cycleCooldowns(this.cooldowns);
                 await this.getNextTurn();
-                console.log("oppshITTTT:", this.player.statuses.debuffs.flat());
-                console.log("oppshITTTT:", this.player.statuses.buffs.flat());
+
                 this.printBattleResult();
                 const updatedEmbed = await this.sendInitialEmbed(message);
               } else {

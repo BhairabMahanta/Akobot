@@ -21,7 +21,6 @@ class BuffDebuffManager {
         type: debuffDetails.debuffType,
         name: debuffDetails.name,
         remainingTurns: debuffDetails.turnLimit,
-        value_amount: debuffDetails.value_amount,
         targets: debuffDetails.targets,
         flat: debuffDetails.flat || false,
       };
@@ -45,7 +44,8 @@ class BuffDebuffManager {
           ...debuffDetails.value_amount[debuffDetails.value_name], // Existing properties of invincible
           ...specialDebuff, // New properties from specialBuff
         };
-        debuffDetails.targets.statuses.debuffs.push(specialDebuff.value_amount);
+
+        debuffDetails.targets.statuses.debuffs.push(debuffDetails.value_amount);
       }
     } else {
       // Normal case: debuff application

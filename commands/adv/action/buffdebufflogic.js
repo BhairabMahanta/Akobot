@@ -145,24 +145,22 @@ class BuffDebuffLogic {
       target.atkBar -= target.atkBar * (amount / 100);
     }
   }
-  async aoeDamage(user, target, specialContext) {
+  async aoeDamage(user, target, specialContext, thang) {
     let damageArray = [];
     let enemyNameArray = [];
 
     await Promise.all(
       specialContext.map(async (targeta) => {
-        const damage = await critOrNot(
+        const damage = await await that2.critOrNotHandler(
           user.stats.critRate,
           user.stats.critDamage,
           user.stats.attack,
-          targeta.stats.defense
-        );
-        that2.handleStatusEffects(
+          targeta.stats.defense,
           targeta,
-          (damage * 1.2) / specialContext.length,
-          user
+          thang.power,
+          thang.name
         );
-        damageArray.push(damage * (1.2 / specialContext.length));
+        damageArray.push(damage / specialContext.length);
         enemyNameArray.push(targeta.name);
       })
     );
@@ -206,9 +204,6 @@ class BuffDebuffLogic {
             break;
           case "apply_freeze":
             await this.freeze(unit, debuffDetails.turnLimit);
-            break;
-          case "apply_burn":
-            await this.burn(unit, debuffDetails.turnLimit);
             break;
           case "apply_invisibility":
             await this.invisibility(unit, debuffDetails.turnLimit);

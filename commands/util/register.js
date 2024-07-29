@@ -10,6 +10,7 @@ const fs = require("fs");
 const players = require("../../data/players.json");
 const locations = require("../../data/locations");
 const { cards } = require("../adv/information/cards.js");
+const { capitalizeFirstLetter } = require("../adv/adventure/sumfunctions.js");
 let startedTutorial = [537619455409127442];
 let deniedTutorial = [];
 const { allFamiliars } = require("../adv/information/allfamilliars.js");
@@ -39,7 +40,7 @@ module.exports = {
         return message.channel.send({ embeds: [registerErrorEmbed] });
       }
     }
-    const characterName = args[0];
+    const characterName = capitalizeFirstLetter(args[0]);
     // Check if the character name already exists
     const existingCharacter = Object.values(players).find(
       (player) => player.name.toLowerCase() === characterName.toLowerCase()

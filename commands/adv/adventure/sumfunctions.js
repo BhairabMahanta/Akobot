@@ -560,6 +560,10 @@ async function critOrNot(
       : (calculateDamage(authorAttack, enemyDefense) * fomiliarPower) / 100;
   }
 }
+function capitalizeFirstLetter(string) {
+  if (string.length === 0) return string;
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
 
 module.exports = {
   GameImage,
@@ -569,4 +573,5 @@ module.exports = {
   pullGacha,
   GACHA_TYPES,
   critOrNot,
+  capitalizeFirstLetter,
 };

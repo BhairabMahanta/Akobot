@@ -32,6 +32,9 @@ class Ability {
   }
 
   //PLAYER ABILOITIES AKAI THIS WORKS BLUD
+
+  //  @params singleUser, singleTarget, multipleEnmies, multipleTeammates
+
   async shieldBash(user, target) {
     const damage = await that2.critOrNotHandler(
       user.stats.critRate,
@@ -42,15 +45,15 @@ class Ability {
       150,
       "Shield Bash"
     );
-    // target.stats.hp -= damage;
+
     const debuffType = "decrease_speed";
     const debuffDetails = {
       name: "Shield Bash",
       debuffType: debuffType,
       unique: true,
-      value_amount: { speed: 20 }, // Decrease speed by 20
+      value_amount: { speed: 20 },
       targets: target,
-      turnLimit: 2, // Lasts for 2 turns
+      turnLimit: 2,
       flat: true,
     };
     this.buffDebuffManager.applyDebuff(user, target, debuffDetails);
@@ -68,7 +71,7 @@ class Ability {
       name: "Defend",
       buffType: buffType,
       unique: true,
-      value_amount: { defense: 30 }, // Increase defense by 30
+      value_amount: { defense: 110 }, //
       targets: user,
       turnLimit: 2, // Lasts for 2 turns
       flat: true,
@@ -88,7 +91,7 @@ class Ability {
       name: "Bloodlust",
       buffType: buffType,
       unique: true,
-      value_amount: { attack: 15, speed: 20 },
+      value_amount: { attack: 110, speed: 20 },
       targets: target,
       turnLimit: 1,
       flat: true,
@@ -102,15 +105,14 @@ class Ability {
   }
 
   async ragingStrike(user, target) {
-    const damage = await that2.critOrNotHandler(
-      user.stats.critRate + 50,
+    await that2.critOrNotHandler(
+      user.stats.critRate,
       user.stats.critDamage,
       user.stats.attack,
-      target.stats.defense
-    );
-
-    this.battleLogs.push(
-      `${user.name} unleashes a wild Raging Strike on ${target.name}. It deals ${damage} damage!`
+      target.stats.defense,
+      target,
+      200,
+      "Raging Strike"
     );
     this.cooldowns.push({
       name: "Raging Strike",
@@ -119,8 +121,9 @@ class Ability {
   }
 
   async arenaSpin(user, target, specialContext) {
+    const thang = { name: "Arena Spin", power: 200 };
     const { damageArray, enemyNameArray } =
-      await this.buffDebuffLogic.aoeDamage(user, target, specialContext);
+      await this.buffDebuffLogic.aoeDamage(user, target, specialContext, thang);
 
     this.battleLogs.push(
       `+ ${user.name} performs an Arena Spin, hitting ${enemyNameArray.join(
@@ -148,8 +151,17 @@ class Ability {
           target: user,
         },
       },
-      turnLimit: 3, // Lasts for 3 turns
+      turnLimit: 2, // Lasts for 3 turns
     };
+    const damage = that2.critOrNotHandler(
+      user.stats.critRate,
+      user.stats.critDamage,
+      user.stats.attack,
+      target.stats.defense,
+      target,
+      100,
+      "Crowd Control"
+    );
 
     console.log(
       `${user} taunts ${target}. ${target} is now focused on ${user}.`
@@ -163,14 +175,14 @@ class Ability {
   }
 
   async precisionStrike(user, target) {
-    const criticalDamage = that2.critOrNotHandler(
-      100, //in place of crit rate
-      user.stats.critDamage + 15,
+    await that2.critOrNotHandler(
+      100,
+      user.stats.critDamage + 25,
       user.stats.attack * 1.2,
-      target.stats.defense
-    );
-    this.battleLogs.push(
-      `${user.name} executes a precise Precision Strike on ${target.name}. It's a critical hit!`
+      target.stats.defense,
+      target,
+      200,
+      "Precision Strike"
     );
     this.cooldowns.push({
       name: "Precision Strike",
@@ -198,12 +210,6 @@ class Ability {
 
   async fireball(user, target, specialContext) {
     // Calculate initial damage
-    const damage = that2.critOrNotHandler(
-      user.stats.critRate,
-      user.stats.critDamage,
-      user.stats.attack,
-      target.stats.defense
-    );
     // Apply DoT debuff
     const debuffDetails = {
       name: "Fireball",
@@ -213,17 +219,22 @@ class Ability {
       value_amount: {
         burn: {
           state: true,
+          percentage: 4,
         },
       },
       targets: target,
-      turnLimit: 3, // Lasts for 3 turns
+      turnLimit: 2, // Lasts for 3 turns
     };
-
-    await this.buffDebuffLogic.applyWhat(user, target, debuffDetails);
-    await this.buffDebuffManager.applyDebuff(user, target, debuffDetails);
-    this.battleLogs.push(
-      `${user.name} hurls a Fireball at ${target.name}, dealing ${damage} damage and causing burn damage over time.`
+    await that2.critOrNotHandler(
+      user.stats.critRate,
+      user.stats.critDamage,
+      user.stats.attack,
+      target.stats.defense,
+      target,
+      160,
+      debuffDetails.name
     );
+    await this.buffDebuffManager.applyDebuff(user, target, debuffDetails);
 
     this.cooldowns.push({
       name: "Fireball",
@@ -319,11 +330,14 @@ class Ability {
   }
 
   async drainLife(user, target) {
-    const drainAmount = that2.critOrNotHandler(
+    const drainAmount = await that2.critOrNotHandler(
       user.stats.critRate,
       user.stats.critDamage,
       user.stats.attack,
-      target.stats.defense
+      target.stats.defense,
+      target,
+      180,
+      "Drain Life"
     ); // Example: Drain Life heals for 25 HP
 
     user.stats.hp += drainAmount * 0.4;
@@ -395,15 +409,14 @@ class Ability {
   }
 
   async backstab(user, target) {
-    const damage = await that2.critOrNotHandler(
+    await that2.critOrNotHandler(
       user.stats.critRate,
       user.stats.critDamage,
       user.stats.attack,
-      target.stats.defense * 0.75
-    );
-
-    this.battleLogs.push(
-      `${user.name} strikes ${target.name} from behind. It's a backstab! It deals ${damage} damage.`
+      target.stats.defense,
+      target,
+      210,
+      "Backstab"
     );
     this.cooldowns.push({
       name: "Backstab",
@@ -412,25 +425,25 @@ class Ability {
   }
 
   async shadowStep(user, target) {
-    const damage = that2.critOrNotHandler(
-      user.stats.critRate + 10,
-      user.stats.critDamage,
-      user.stats.attack,
-      target.stats.defense
-    );
-
     const buffType = "increase_critRate";
     const buffDetails = {
       name: "Shadow Step",
       buffType: buffType,
       unique: true,
-      value_amount: { critRate: 10 }, // Example crit rate increase
+      value_amount: { critRate: 15 }, // Example crit rate increase
       targets: user,
       turnLimit: 2, // Lasts for 2 turns
     };
-    this.battleLogs.push(
-      `+ ${user.name} teleports behind ${target.name}, dealing ${damage} damage and increasing crit rate by 10% for 2 turns.`
+    const damage = await that2.critOrNotHandler(
+      user.stats.critRate + 10,
+      user.stats.critDamage,
+      user.stats.attack,
+      target.stats.defense,
+      target,
+      200,
+      "Shadow Step"
     );
+
     this.buffDebuffManager.applyBuff(user, user, buffDetails);
     await this.buffDebuffLogic.increaseWhat(user, buffDetails);
 
@@ -719,9 +732,11 @@ class Ability {
       name: "Flame Strike",
       debuffType: debuffType,
       unique: true,
+      value_name: "burn",
       value_amount: {
         burn: {
           state: true,
+          percentage: 4, // Deals 4% of target's max HP as burn damage
         },
       },
       targets: target,
@@ -738,12 +753,7 @@ class Ability {
       debuffDetails.name
     );
     this.buffDebuffManager.applyDebuff(user, target, debuffDetails);
-    await this.buffDebuffLogic.applyWhat(target, debuffDetails);
 
-    this.cooldowns.push({
-      name: debuffDetails.name,
-      cooldown: this.cooldownFinder(debuffDetails.name),
-    });
     this.cooldowns.push({
       name: "Flame Strike",
       cooldown: this.cooldownFinder("Flame Strike"),
