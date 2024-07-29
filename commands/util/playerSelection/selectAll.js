@@ -45,10 +45,12 @@ module.exports = {
     const filter = { _id: message.author.id };
     playerData = await collection.findOne(filter);
 
-    classOptions = Object.keys(classesData).map((className) => ({
-      label: className,
-      value: `class-${className}`,
-    }));
+    const classOptions = Object.keys(classesData)
+      .filter((className) => classesData[className].state !== "locked")
+      .map((className) => ({
+        label: className,
+        value: `class-${className}`,
+      }));
 
     const classSelectMenu = new StringSelectMenuBuilder()
       .setCustomId("class_select")

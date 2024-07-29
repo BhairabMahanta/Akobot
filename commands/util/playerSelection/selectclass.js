@@ -51,10 +51,12 @@ module.exports = {
       console.log("working");
 
       // Create options for classes
-      const classOptions = Object.keys(classesData).map((className) => ({
-        label: className,
-        value: `class-${className}`,
-      }));
+      const classOptions = Object.keys(classesData)
+        .filter((className) => classesData[className].state !== "locked")
+        .map((className) => ({
+          label: className,
+          value: `class-${className}`,
+        }));
 
       const optionsPerPage = 5;
       let classPageIndex = 0;
