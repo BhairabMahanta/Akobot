@@ -6,6 +6,7 @@ const {
   cycleCooldowns,
   deactivateElement,
   deactivatedElements,
+  critOrNot,
 } = require("../adventure/sumfunctions.js");
 const { bosses } = require("../monsterInfo/bosses.js");
 const { mobs } = require("../monsterInfo/mobs.js");
@@ -21,6 +22,9 @@ const {
   checkResults,
   getCardStats,
   getCardMoves,
+  toCamelCase,
+  generateAttackBarEmoji,
+  generateHPBarEmoji,
   getPlayerMoves,
   handleTurnEffects,
 } = require("../../util/glogic.js");
@@ -110,7 +114,7 @@ class Battle {
     this.ability = new Ability(this);
     this.buffDebuffManager = new BuffDebuffManager(this);
     this.buffDebuffLogic = new BuffDebuffLogic(this);
-    this.dodge = { option: null };
+    this.dodge = { option: null, id: null };
   }
 
   async initialiseStuff() {
@@ -316,7 +320,7 @@ class Battle {
       }
       this.battleEmbed.addFields({
         name: "Current Turn",
-        value: `\`\`\`${this.currentTurn}\`\`\``,
+        value: `\`\`\`${this.currentTurn.name}\`\`\``,
         inline: false,
       });
       if (this.enemyDetails.type === "boss") {
@@ -350,13 +354,13 @@ class Battle {
             mob.stats.hp
           } ♥️ \n[2;36m [2;34m${mob.attackBarEmoji} ${Math.floor(
             mob.atkBar
-          )} [2;34mb&d [${buffIcons}${debuffIcons}}\n\n`;
+          )} [2;34mstts [${buffIcons}${debuffIcons}]\n\n`;
         }
 
         this.battleEmbed.addFields({
           name: "Enemies Info:",
           value: `\`\`\`ansi\n${mobInfo}\`\`\``,
-          inline: false,
+          inline: true,
         });
       }
       if (this.player) {
@@ -407,7 +411,7 @@ class Battle {
         this.battleEmbed.addFields({
           name: "Your Team Info:",
           value: `\`\`\`ansi\n${playerAndFamiliarsInfo}\`\`\``,
-          inline: false,
+          inline: true,
         });
       }
 
@@ -419,28 +423,11 @@ class Battle {
     // Implement code to send an initial embed with battle information
   }
 
-  async toCamelCase(str) {
-    const words = str.split(" ");
-    if (words.length === 1) {
-      return words[0].toLowerCase();
-    }
-    if (words.length === 2) {
-      return words[0].toLowerCase() + words[1];
-    }
-    return str
-      .replace(/\s(.)/g, function (match, group1) {
-        console.log("group1:", group1);
-        console.log("match:", match);
-        return group1.toUpperCase();
-      })
-      .replace(/\s/g, ""); // Remove any remaining spaces
-  }
-
   async startBattle(message) {
     console.log("startBattle");
 
     await this.getNextTurn();
-    console.log("currentTurn:", this.currentTurn);
+    console.log("currentTurn:", this.currentTurn.name);
     this.initialMessage = await this.sendInitialEmbed(message);
     console.log("initialMessage:", this.initialMessage);
     this.initialMessage = await message.channel.send({
@@ -482,7 +469,7 @@ class Battle {
             await cycleCooldowns(this.cooldowns);
             await this.getNextTurn();
             await this.performEnemyTurn(message);
-            console.log("currentTurn:", this.currentTurn);
+            console.log("currentTurn:", this.currentTurn.name);
             this.printBattleResult();
           } else {
             i.followUp({
@@ -536,7 +523,7 @@ class Battle {
                 ""
               );
 
-              const abilityNameCamel = await this.toCamelCase(abilityName);
+              const abilityNameCamel = await toCamelCase(abilityName);
 
               // Check if the abilityName exists as a method in the Ability class
               if (typeof this.ability[abilityNameCamel] === "function") {
@@ -570,7 +557,7 @@ class Battle {
                 await cycleCooldowns(this.cooldowns);
                 await this.getNextTurn();
                 await this.performEnemyTurn(message);
-                console.log("currentTurn:", this.currentTurn);
+
                 this.printBattleResult();
                 const updatedEmbed = await this.sendInitialEmbed(message);
               } else {
@@ -586,17 +573,17 @@ class Battle {
             try {
               const abilityName = selectedClassValue.replace("fam-", "");
               console.log("abilityName:a", abilityName);
-              const abilityNameCamel = await this.toCamelCase(abilityName);
+              const abilityNameCamel = await toCamelCase(abilityName);
               console.log("abilityName:a", abilityNameCamel);
               if (typeof this.ability[abilityNameCamel] === "function") {
                 // Execute the ability by calling it using square brackets
                 for (const familiar of this.familiarInfo) {
-                  if (familiar.name === this.currentTurn) {
+                  if (familiar.name === this.currentTurn.name) {
                     this.ability[abilityNameCamel](familiar, this.enemyToHit);
                     await cycleCooldowns(this.cooldowns);
                     await this.getNextTurn();
                     await this.performEnemyTurn(message);
-                    console.log("currentTurn:", this.currentTurn);
+
                     this.printBattleResult();
                     break;
                   }
@@ -631,7 +618,7 @@ class Battle {
         await cycleCooldowns(this.cooldowns);
         await this.getNextTurn();
         await this.performEnemyTurn(message);
-        console.log("currentTurn:", this.currentTurn);
+
         this.printBattleResult();
       }
     });
@@ -642,11 +629,11 @@ class Battle {
     //    console.log('thiscurenttyrn:', this.playerFamiliar)
     if (this.playerFamiliar.includes(this.currentTurn)) {
       let familiarArray = [];
-      familiarArray.push(this.currentTurn);
+      familiarArray.push(this.currentTurn.name);
       const moveFinder = familiarArray.map((cardName) =>
         getCardMoves(cardName)
       );
-
+      console.log("wellNOTHERE");
       try {
         this.abilityOptions = moveFinder[0]
           .map((ability) => {
@@ -686,9 +673,9 @@ class Battle {
       } catch (error) {
         console.log("moveOptionsError:", error);
       }
-    } else if (this.currentTurn === this.player.name) {
+    } else if (this.currentTurn.name === this.player.name) {
       const playerAbility = classes[this.player.class].abilities;
-      // console.log('stuffimportant:', playerAbility)
+      console.log("stuffimportant:", playerAbility);
       try {
         const moveFinder = playerAbility.map((cardName) =>
           getPlayerMoves(cardName)
@@ -722,7 +709,8 @@ class Battle {
           description: cooldownDescriptions,
           value: "cooldowns",
         });
-        // If there are no abilities available, add a failsafe option
+        // If there are no abilities available, add a failsafe option);
+
         if (this.abilityOptions.length === 1) {
           this.abilityOptions.push({
             label: "Cooldown",
@@ -736,7 +724,7 @@ class Battle {
       }
     }
     for (const enemy of this.allEnemies) {
-      if (enemy.name === this.currentTurn) {
+      if (enemy.name === this.currentTurn.name) {
         this.enemyFirst = true;
         this.abilityOptions = [
           {
@@ -778,96 +766,92 @@ class Battle {
     return rows;
   }
 
-  async calculateOverallSpeed(character) {
-    try {
-      if (character === this.player) {
-        return this.player.stats.speed;
-      } else if (this.playerFamiliar.includes(character.name)) {
-        // Find the familiar's speed by matching it with this.familiarInfo
-        const familiarInfo = this.familiarInfo.find(
-          (fam) => fam.name === character.name
-        );
-        const familiarSpeed = familiarInfo ? familiarInfo.stats.speed : 1; // Default to 0 if not found
-
-        return familiarSpeed;
-      } else if (character === this.boss) {
-        return this.boss.stats.speed;
-      } else if (this.mobs.includes(character.name)) {
-        // Find the familiar's speed by matching it with this.familiarInfo
-        const familiarInfo = this.mobInfo.find(
-          (fam) => fam.name === character.name
-        );
-        const familiarSpeed = familiarInfo ? familiarInfo.stats.speed : 0; // Default to 0 if not found
-
-        return familiarSpeed;
-      } else {
-        console.log("Calculating speed for unknown character type: 0");
-        return 0; // Default to 0 for unknown character types
-      }
-    } catch (error) {
-      console.log("speedcalculator:", error);
-    }
-  }
-
   async calculateOverallHp(character) {
     // console.log('character:', character)
     try {
-      if (character === this.player) {
-        return this.player.stats.hp;
-      } else if (this.playerFamiliar.includes(character.name)) {
-        // Find the familiar's speed by matching it with this.familiarInfo
-        const familiarInfo = this.familiarInfo.find(
-          (fam) => fam.name === character.name
-        );
-        const familiarHp = familiarInfo ? familiarInfo.stats.hp : 0; // Default to 0 if not found
-
-        return familiarHp;
-      } else if (character === this.boss) {
-        return this.boss.stats.hp;
-      } else if (this.mobs.includes(character.name)) {
-        // Find the familiar's speed by matching it with this.familiarInfo
-        const familiarInfo = this.mobInfo.find(
-          (fam) => fam.name === character.name
-        );
-        const familiarHp = familiarInfo ? familiarInfo.stats.hp : 0; // Default to 0 if not found
-
-        return familiarHp;
-      } else {
-        console.log("Calculating speed for unknown character type: 0");
-        return 0; // Default to 0 for unknown character types
-      }
+      return character.stats.hp;
     } catch (error) {
       console.log("speedcalculator:", error);
     }
   }
 
   async fillAtkBars() {
+    let charactersWith100AtkBar = [];
     try {
+      console.log("Starting fillAtkBars...");
+      // Sort characters by speed in descending order
       this.characters.sort((a, b) => b.stats.speed - a.stats.speed);
-      for (const character of this.characters) {
-        const speed = await this.calculateOverallSpeed(character);
 
-        const speedMultiplier = character.speedBuff ? 1.3 : 1; // Apply Speed Buff if active
-        character.atkBar += speed * 0.05 * speedMultiplier;
-        character.attackBarEmoji = await this.generateAttackBarEmoji(
+      // Check if any character already has atkBar >= 100
+      for (const character of this.characters) {
+        console.log(
+          "Checking atkBar for:",
+          character.name,
+          "atkBar:",
           character.atkBar
         );
+        if (character.atkBar >= 100) {
+          charactersWith100AtkBar.push(character);
+          return charactersWith100AtkBar; // Exit early if any character has atkBar >= 100
+        }
+      }
 
-        // character.hpBarEmoji = await this.generateHPBarEmoji(
-        //   character.stats.hp,
-        //   character.stats.hp
-        // );
+      // Calculate the smallestFactor for all characters
+      let smallestFactor = Infinity;
+      for (const character of this.characters) {
+        const speedMultiplier = character.speedBuff ? 1.3 : 1;
+        const factor =
+          (100 - character.atkBar) /
+          (character.stats.speed * 0.05 * speedMultiplier);
+        if (factor < smallestFactor) {
+          smallestFactor = factor;
+        }
+      }
+      console.log("Calculated smallestFactor:", smallestFactor);
+
+      // Update atkBar for all characters using smallestFactor
+      for (const character of this.characters) {
+        const speedMultiplier = character.speedBuff ? 1.3 : 1;
+        character.atkBar +=
+          smallestFactor * (character.stats.speed * 0.05 * speedMultiplier);
+        console.log(
+          "Updated atkBar for:",
+          character.name,
+          "speed:",
+          character.stats.speed,
+          "new atkBar:",
+          character.atkBar
+        );
+        if (character.atkBar >= 100) {
+          charactersWith100AtkBar.push(character);
+        }
+      }
+
+      // Generate attack bar emoji for each character
+      for (const character of this.characters) {
+        character.attackBarEmoji = await generateAttackBarEmoji(
+          character.atkBar
+        );
+      }
+
+      if (charactersWith100AtkBar.length > 0) {
+        // Process characters with 100 attack bar further (sorting, additional actions)
+        console.log(
+          "Processing characters with 100 atkBar:",
+          charactersWith100AtkBar
+        );
       }
     } catch (error) {
       console.log("fillBarError:", error);
     }
+    return charactersWith100AtkBar;
   }
 
   async fillHpBars() {
     try {
       for (const character of this.characters) {
         const hp = await this.calculateOverallHp(character);
-        character.hpBarEmoji = await this.generateHPBarEmoji(
+        character.hpBarEmoji = await generateHPBarEmoji(
           character.stats.hp,
           character.maxHp
         );
@@ -877,291 +861,309 @@ class Battle {
     }
   }
 
-  async generateAttackBarEmoji(atkBar) {
-    try {
-      const emoji = "■";
-      let emptyBars = 0;
-      if (atkBar >= 100) {
-        console.log("atkBar:", atkBar);
-        atkBar = 100;
-      }
-      const filledBars = Math.floor(atkBar / 10);
-      emptyBars = Math.floor(10 - filledBars);
-
-      // if (atkBar > 100) {
-      //   emptyBars = Math.floor(12 - filledBars);
-      // }
-      const attackBarString = `${emoji.repeat(filledBars)}${" ".repeat(
-        emptyBars
-      )}`;
-      return `[${attackBarString}]`;
-    } catch (error) {
-      console.log("errorHere:", error);
-    }
-  }
-
-  async generateHPBarEmoji(currentHP, maxHP) {
-    const emoji = "■";
-    let filledBars;
-    filledBars = Math.floor((currentHP / maxHP) * 17);
-    if (currentHP < 0) {
-      filledBars = 0;
-    }
-    const emptyBars = Math.floor(17 - filledBars);
-
-    let hpBarString = emoji.repeat(filledBars);
-    if (emptyBars > 0) {
-      hpBarString += " ".repeat(emptyBars);
-    }
-
-    return `[${hpBarString}]`;
-  }
-
   async getNextTurn() {
     let nextTurn = null;
-    console.log("ho raha hai");
-    while (true) {
-      await this.fillAtkBars();
+    const charactersWith100AtkBar = await this.fillAtkBars();
+    console.log("it did reach here");
+    if (charactersWith100AtkBar.length === 1) {
+      const characterWith100AtkBar = charactersWith100AtkBar[0];
 
-      // Get all characters that have reached 100 attack bar
-      const charactersWith100AtkBar = this.characters.filter(
-        (character) => character.atkBar >= 100
+      this.currentTurn = characterWith100AtkBar;
+      this.currentTurnId = characterWith100AtkBar._id;
+
+      characterWith100AtkBar.atkBar -= 100;
+      characterWith100AtkBar.attackBarEmoji = await generateAttackBarEmoji(
+        characterWith100AtkBar.atkBar
       );
-      // console.log('charactersWITHQ100ATKBAR:', charactersWith100AtkBar.length)
-      if (charactersWith100AtkBar.length === 1) {
-        const characterWith100AtkBar = charactersWith100AtkBar[0];
-        console.log(
-          `${characterWith100AtkBar.name} has reached 100 attack bar.`
-        );
-        this.currentTurn = characterWith100AtkBar.name;
-        characterWith100AtkBar.attackBarEmoji =
-          await this.generateAttackBarEmoji(characterWith100AtkBar.atkBar);
-        characterWith100AtkBar.atkBar = 0;
-        console.log(
-          `${characterWith100AtkBar.name} - ${characterWith100AtkBar.attackBarEmoji}`
-        );
-        break; // Exit the loop
-      } else if (charactersWith100AtkBar.length > 1) {
-        // If multiple characters have reached 100 attack bar, determine the next turn based on speed
-        let fastestCharacter = charactersWith100AtkBar[0];
-        for (const character of charactersWith100AtkBar) {
-          if (character.atkBar > fastestCharacter.atkBar) {
-            fastestCharacter = character;
-          }
-        }
-        console.log(
-          `${fastestCharacter.name} has the highest atkBar and will take the next turn.`
-        );
-        this.currentTurn = fastestCharacter.name;
-        fastestCharacter.attackBarEmoji = await this.generateAttackBarEmoji(
-          fastestCharacter.atkBar
-        );
+    } else if (charactersWith100AtkBar.length > 1) {
+      // If multiple characters have reached 100 attack bar, determine the next turn based on speed
+      charactersWith100AtkBar.sort((a, b) => b.atkBar - a.atkBar);
+      let fastestCharacter = charactersWith100AtkBar[0];
+      this.currentTurn = fastestCharacter;
+      this.currentTurnId = fastestCharacter._id;
 
-        console.log(
-          `${fastestCharacter.name} - ${fastestCharacter.atkBar} - ${fastestCharacter.attackBarEmoji}`
-        );
-        fastestCharacter.atkBar -= 100;
-        break; // Exit the loop
-      }
+      fastestCharacter.atkBar -= 100;
+      fastestCharacter.attackBarEmoji = await generateAttackBarEmoji(
+        fastestCharacter.atkBar
+      );
     }
+
     await this.fillHpBars();
+
+    // const currentAttacker = this.getCurrentAttacker();
+    // const debuffs = "debuffs";
+    // if (await this.handlePreTurnEffects(currentAttacker, debuffs)) {
+    //   // If the current attacker is affected by a debuff that skips the turn, find the next turn
+    //   return this.getNextTurn(); // Recursively call to get the next valid turn
+    // }
+
     return nextTurn;
-  }
+  } //
 
   async performTurn() {
-    // const attacker = this.currentTurn;
-    // this.getNextTurn()
-    console.log("currentTurn:", this.currentTurn);
-    // If the current turn is the player, let the player choose a move
-    if (this.currentTurn === this.playerName) {
-      // const move = attacker.chooseMove(); // Implement this method for the player
+    const attacker = this.getCurrentAttacker(); // Determine if the attacker is a player, familiar, or boss
+    const damage = await this.calculatePFDamage(attacker, this.enemyToHit);
 
-      const target = this.enemyToHit.name;
-      const damage = await calculateDamage(
-        this.player.stats.attack,
-        this.enemyToHit.stats.defense
-      );
-
-      // Update HP and battle logs
-      this.enemyToHit.stats.hp -= damage;
-      this.battleLogs.push(
-        `+ ${this.currentTurn} attacks ${target} for ${damage} damage using gayness`
-      );
-      console.log("loglength:", this.battleLogs.length);
-      console.log(
-        `${this.currentTurn} attacks ${target} for ${damage} damage using gayness`
-      );
-      await handleTurnEffects(this.player);
-      // this.getNextTurn()
-      // console.log('currentTurn:', this.currentTurn);
-    } else if (this.playerFamiliar.includes(this.currentTurn)) {
-      const target = this.enemyToHit.name; // Implement target selection logic
-      let damage = 0;
-
-      // Loop through the familiars to find the attacking familiar
-      for (const familiar of this.familiarInfo) {
-        if (familiar.name === this.currentTurn) {
-          // Calculate damage for the attacking familiar
-          damage = await calculateDamage(
-            familiar.stats.attack,
-            this.enemyToHit.stats.defense
-          );
-
-          // Update HP and battle logs
-          this.enemyToHit.stats.hp -= damage;
-          this.battleLogs.push(
-            `+ ${this.currentTurn} attacks ${target} for ${damage} damage using an attack`
-          );
-          console.log(
-            `${this.currentTurn} attacks ${target} for ${damage} damage using an attack`
-          );
-          await handleTurnEffects(familiar);
-          break; // Exit the loop once the attacking familiar is found
-        }
-      }
-
-      // Set the current turn to the boss's name
-    }
-    // this.currentTurn = this.currentTurn === this.player ? this.boss.name : this.playerName;
+    // Handle dodge mechanics
+    await this.handleStatusEffects(this.enemyToHit, damage, attacker);
+    await this.getNextTurn();
   }
-
   async performEnemyTurn() {
-    for (const enemies of this.allEnemies) {
-      // console.log('enemyname:', enemies.name);
-      if (
-        enemies.name === this.currentTurn &&
-        !this.deadEnemies.includes(enemies.name) &&
-        this.currentTurn != this.boss.name
-      ) {
-        console.log("enemy:", enemies);
-        let damage;
-        let isTargetingPlayer;
-        // If the current turn is the environment, let it make a move
-        // const move = this.environment.makeMove();
-        isTargetingPlayer = Math.random() < 0.3; // 30% chance to target the player
+    // Ensure the current turn belongs to an enemy
+    const currentEnemy = this.allEnemies.find(
+      (enemy) =>
+        enemy.name === this.currentTurn.name &&
+        !this.deadEnemies.includes(enemy.name)
+    );
 
-        const aliveFamiliars = this.familiarInfo.filter(
-          (familiar) => familiar.stats.hp > 0
-        );
-
-        if (aliveFamiliars.length < 1) {
-          isTargetingPlayer = true;
-        }
-        const targetInfo = isTargetingPlayer
-          ? this.player
-          : aliveFamiliars[Math.floor(Math.random() * aliveFamiliars.length)];
-
-        const target = targetInfo.name;
-        console.log("TARGETNAME:", target);
-        if (this.dodge.option === "dodge_and_increase_attack_bar") {
-          damage = 0;
-          await this.getNextTurn();
-          target.atkBar += 20;
-          this.battleLogs.push(
-            `- ${target} swiftly dodges the attack increasing 20 attack bar!!\n ============================================`
-          );
-        } else if (this.dodge.option === "dodge") {
-          damage = 0;
-          await this.getNextTurn();
-          this.battleLogs.push(
-            `- ${target} barely dodges the attack!\n ============================================`
-          );
-        } else if (this.dodge.option === "reduce_damage") {
-          damage = await this.mobAIClass.move(enemies, targetInfo);
-          // const damage = calculateDamage(this.boss.stats.attack, targetInfo.stats.defense);
-          const damageReductionPercentage = Math.random() * (40 - 15) + 15;
-          const reducedDamage = Math.floor(
-            damage * (1 - damageReductionPercentage / 100)
-          );
-          targetInfo.stats.hp -= reducedDamage;
-
-          this.battleLogs.push(
-            `- ${
-              this.currentTurn
-            } attacks ${target} for ${reducedDamage}. Reduced ${
-              damage - reducedDamage
-            } damage!!\n ============================================`
-          );
-        } else if (this.dodge.option === "take_hit") {
-          damage = await this.mobAIClass.move(enemies, targetInfo);
-          // const damage = calculateDamage(this.boss.stats.attack, targetInfo.stats.defense);
-          if (isNaN(damage)) {
-            damage = 0;
-            var noLogs = true;
-          }
-          // Update HP and battle logs
-          targetInfo.stats.hp -= damage;
-          if (!noLogs) {
-            this.battleLogs.push(
-              `- ${this.currentTurn} attacks ${target} for ${damage} damage using basic attack!\n ============================================`
-            );
-          }
-        } else if (this.dodge.option === "take_1.5x_damage") {
-          damage = await this.mobAIClass.move(enemies, targetInfo);
-          const damageReductionPercentage = Math.random() * (40 - 15) + 15;
-          const increasedDamage = Math.floor(
-            damage * (1 - damageReductionPercentage / 100)
-          );
-          targetInfo.stats.hp -= increasedDamage + damage;
-        }
-
-        await this.getNextTurn();
-        //  const updatedEmbed = await this.sendInitialEmbed(message);
-        // this.initialMessage.edit({ embeds: [updatedEmbed], components: await this.getDuelActionRow() });
-
-        // console.log('currentTurn:', this.currentTurn);
-      }
-      await handleTurnEffects(enemies);
-    }
-    if (this.currentTurn != this.boss.name) {
-      console.log("notmy turn bitches");
+    if (!currentEnemy) {
+      console.log("No valid enemy found for this turn.");
       return;
-    } else if (this.currentTurn === this.boss.name) {
-      let isTargetingPlayer;
-      // If the current turn is the environment, let it make a move
-      // const move = this.environment.makeMove();
-      isTargetingPlayer = Math.random() < 0.3; // 30% chance to target the player
+    }
 
-      const aliveFamiliars = this.familiarInfo.filter(
-        (familiar) => familiar.stats.hp > 0
-      );
-      console.log(
-        "length LMAOAWDOJAIHFIAJFOIAJDFFASIF: ",
-        aliveFamiliars.length
-      );
-      if (aliveFamiliars.length < 1) {
-        isTargetingPlayer = true;
-      }
-      const targetInfo = isTargetingPlayer
+    // Determine the target (30% chance to target player, otherwise target a random alive familiar)
+    const isTargetingPlayer = Math.random() < 0.3;
+    const aliveFamiliars = this.familiarInfo.filter(
+      (familiar) => familiar.stats.hp > 0
+    );
+    const targetInfo =
+      isTargetingPlayer || aliveFamiliars.length === 0
         ? this.player
         : aliveFamiliars[Math.floor(Math.random() * aliveFamiliars.length)];
 
-      const target = targetInfo.name;
-      console.log("TARGETNAME:", target);
-      const damage = await calculateDamage(
-        this.boss.stats.attack,
-        targetInfo.stats.defense
-      );
+    const damage = await this.mobAIClass.move(currentEnemy, targetInfo);
 
-      // Update HP and battle logs
-      targetInfo.stats.hp -= damage;
-      console.log("My turn now bitches");
-      this.battleLogs.push(
-        `- ${this.currentTurn} attacks ${target} for ${damage} damage using cum!\n ============================================`
-      );
-      // message.channel.send(`\`\`\`${logsString}\`\`\``);
-      console.log("loglength:", this.battleLogs.length);
-      console.log(
-        `${this.currentTurn} attacks ${target} for ${damage} damage using cum!`
-      );
-      await this.getNextTurn();
-      console.log("currentTurnForDragonafter;", this.currentTurn);
-      await handleTurnEffects(this.boss);
-      //  const updatedEmbed = await this.sendInitialEmbed(message);
-      // this.initialMessage.edit({ embeds: [updatedEmbed], components: await this.getDuelActionRow() });
+    await this.handleStatusEffects(targetInfo, damage, currentEnemy);
 
-      // console.log('currentTurn:', this.currentTurn);
+    await this.getNextTurn();
+  }
+
+  async handleDodge(attacker, target) {
+    if (this.dodge.id !== target._id && this.dodge.id !== target.id)
+      return false;
+
+    const dodgeOptions = {
+      dodge_and_increase_attack_bar: () => {
+        target.atkBar += 20;
+        this.battleLogs.push(
+          `- ${target.name} swiftly dodges the attack increasing 20 attack bar!!`
+        );
+      },
+      dodge: () => {
+        this.battleLogs.push(`- ${target.name} barely dodges the attack!`);
+      },
+      reduce_damage: async () => {
+        const damage = await this.calculatePFDamage(attacker, target);
+        const reducedDamage = this.getReducedDamage(damage);
+        target.stats.hp -= reducedDamage;
+        this.battleLogs.push(
+          `- ${attacker.name} attacks ${
+            target.name
+          } for ${reducedDamage} damage. Reduced ${
+            damage - reducedDamage
+          } damage!!`
+        );
+      },
+      take_hit: async () => {
+        const damage = await this.calculatePFDamage(attacker, target);
+        target.stats.hp -= damage;
+        this.battleLogs.push(
+          `+ ${attacker.name} attacks ${target.name} for ${damage} damage. Failed to dodge!`
+        );
+      },
+      take_15x_damage: async () => {
+        const damage = await this.calculatePFDamage(attacker, target);
+        const increasedDamage = this.getIncreasedDamage(damage);
+        target.stats.hp -= increasedDamage + damage;
+        this.battleLogs.push(
+          `+ ${attacker.name} attacks ${target.name} for ${damage} damage and ${increasedDamage}. ${target.name} slipped and fell while trying to dodge!`
+        );
+      },
+    };
+
+    const dodgeOption = this.dodge.option;
+    if (dodgeOptions[dodgeOption]) {
+      await dodgeOptions[dodgeOption]();
+      return true;
     }
+
+    return false;
+  }
+  async handlePreTurnEffects(target, type) {
+    const statusEffects = {
+      freeze: {
+        apply: (target) => {
+          this.battleLogs.push(
+            `- ${target.name} is frozen and cannot act this turn.`
+          );
+          console.log("frozen haha");
+          return true; // Turn is skipped
+        },
+      },
+      stun: {
+        apply: (target) => {
+          this.battleLogs.push(
+            `- ${target.name} is stunned and cannot act this turn.`
+          );
+          return true; // Turn is skipped
+        },
+      },
+      sleep: {
+        apply: (target) => {
+          this.battleLogs.push(
+            `- ${target.name} is asleep and cannot act this turn.`
+          );
+          return true; // Turn is skipped
+        },
+      },
+      burn: {
+        apply: (target) => {
+          target.stats.hp -= Math.floor(target.stats.hp * 0.05);
+          console.log("beep");
+          this.battleLogs.push(
+            `- ${target.name} is burning and lost 5% of HP.`
+          );
+          return false; // Turn is skipped
+        },
+      },
+      taunt: {
+        apply: (target) => {
+          this.taunted = true;
+          const targetted = target.statuses.debuffs["taunt"].target;
+          this.battleLogs.push(
+            `- ${target.name} is taunted and must target the taunter.`
+          );
+          return false; // Turn is not skipped, but actions are restricted
+        },
+      },
+      // Add other status effects here
+    };
+
+    let statuses;
+    if (type === "debuffs") {
+      statuses = target.statuses.debuffs || {};
+    } else if (type === "buffs") {
+      statuses = target.statuses.buffs || {};
+    }
+    if (!statuses || statuses.length === 0) {
+      return false; // No status effects to handle
+    }
+    for (const status of statuses) {
+      for (const [effect, { apply }] of Object.entries(statusEffects)) {
+        console.log("status:", status, "effect:", effect);
+        if (status[effect] && apply(target)) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+  async handleStatusEffects(target, damage, attacker, name) {
+    const dodgeEffect = await this.handleDodge(attacker, target);
+
+    if (dodgeEffect) {
+      await handleTurnEffects(attacker);
+      this.dodge = { option: null, id: null };
+      return;
+    }
+    if (target.isNPC === true) {
+      return;
+    }
+    const statusEffectsOnDamage = {
+      invincible: {
+        apply: () => {
+          this.battleLogs.push(
+            `- ${target.name}'s invincibility nullifies the attack.`
+          );
+          damage = 0;
+          return true;
+        },
+      },
+      reflect: {
+        apply: () => {
+          const reflectDamage = Math.floor(damage * 0.4);
+          this.getCurrentAttacker().stats.hp -= reflectDamage;
+          this.battleLogs.push(
+            `- ${target.name} reflects ${reflectDamage} damage back to the attacker.`
+          );
+          return true;
+        },
+      },
+      endure: {
+        apply: () => {
+          if (target.stats.hp - damage <= 0) {
+            target.stats.hp = 1;
+            this.battleLogs.push(
+              `- ${target.name} endures the hit and stays at 1 HP.`
+            );
+            return true; // Damage is nullified
+          }
+        },
+      },
+      // Add more status effects as needed
+    };
+    let statuses = target.statuses.buffs || {};
+    console.log("statuses:", statuses);
+    if (!statuses || statuses.length === 0) {
+      await handleTurnEffects(attacker);
+      target.stats.hp -= damage;
+      this.battleLogs.push(
+        `+ ${this.currentTurn.name} attacks ${
+          target.name
+        } for ${damage} damage using ${name !== undefined ? name : "an attack"}`
+      );
+      return false; // No status effects to handle
+    }
+    let isTrue = false;
+    for (const status of statuses) {
+      for (const [effect, { apply }] of Object.entries(statusEffectsOnDamage)) {
+        console.log("status:", status, "effect:", effect);
+        if (status[effect] && apply(target)) {
+          console.log("happu");
+          isTrue = true;
+        }
+      }
+    }
+    if (isTrue) {
+      await handleTurnEffects(attacker);
+      return true;
+    } else {
+      target.stats.hp -= damage;
+      this.battleLogs.push(
+        `+ ${this.currentTurn.name} attacks ${target.name} for ${damage} damage using an attack`
+      );
+
+      await handleTurnEffects(attacker);
+      return false;
+    }
+  }
+
+  getCurrentAttacker() {
+    return this.currentTurn;
+  }
+
+  getEnemyTarget(attacker) {
+    const isTargetingPlayer = Math.random() < 0.3;
+    const aliveFamiliars = this.familiarInfo.filter(
+      (familiar) => familiar.stats.hp > 0
+    );
+    return isTargetingPlayer || aliveFamiliars.length < 1
+      ? this.player
+      : aliveFamiliars[Math.floor(Math.random() * aliveFamiliars.length)];
+  }
+
+  getAttackName(attacker) {
+    // You can extend this method to return the actual attack name
+    return "an attack";
+  }
+  async calculatePFDamage(attacker, target) {
+    return critOrNot(
+      attacker.stats.critRate,
+      attacker.stats.critDamage,
+      attacker.stats.attack,
+      target.stats.defense
+    );
   }
 
   async printBattleResult() {

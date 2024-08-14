@@ -695,7 +695,6 @@ class Duel {
       }
 
       if (charactersWith100AtkBar.length > 0) {
-        console.log();
         // Process characters with 100 attack bar further (sorting, additional actions)
         // Do something with charactersWith100AtkBar
       }

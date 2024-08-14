@@ -86,11 +86,10 @@ class GameImage {
       if (!this.generatedRandomElements2) {
         // Add elements to the image
         this.generatedRandomElements2 = true;
-        console.log("one");
+
         // await this.deactivatedElements();
-        console.log("two");
+
         for (const element of this.elements) {
-          console.log("element:", element);
           const elementName = element.name;
           name = `commands/adv/npcimg/${elementName}.png`;
 
@@ -204,7 +203,7 @@ class GameImage {
       if (this.distanceToMonster <= attackRadius) {
         nearbyElements.push(element);
         this.whichMon = element.name;
-        console.log(`Nearby element: ${element.name}, Type: ${element.type}`);
+
         // Check if the element is already in elementArray
         if (!this.elementArray.includes(element)) {
           this.elementArray.push(element);
@@ -233,7 +232,6 @@ class GameImage {
 
       // Determine which row to display based on nearby elements
       if (nearbyElements.length > 0) {
-        console.log("Nearby elements:", nearbyElements);
         if (isMobNearby && isNpcNearby) {
           nowBattling.setFooter({
             text: "You are near both a monster and an NPC. Choose an action.",
