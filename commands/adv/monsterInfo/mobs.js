@@ -3,7 +3,7 @@ const mobs = {
     name: "monsterA",
     stats: {
       hp: 1000,
-      attack: 50,
+      attack: 100,
       defense: 40,
       speed: 95,
       magic: 200,

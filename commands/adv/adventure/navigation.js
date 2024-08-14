@@ -290,14 +290,14 @@ async function handleNavigation(
   });
 
   // // Handle collector end
-  if (!dontGoThrough) {
-    collector.on("end", (collected) => {
-      initialMessage.edit({
-        content: "Button interaction ended.",
-        components: [],
-      });
-    });
-  }
+  // if (!dontGoThrough) {
+  //   collector.on("end", (collected) => {
+  //     initialMessage.edit({
+  //       content: "Button interaction ended.",
+  //       components: [],
+  //     });
+  //   });
+  // }
 }
 
 module.exports = {

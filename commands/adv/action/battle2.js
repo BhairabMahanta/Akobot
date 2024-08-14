@@ -782,30 +782,28 @@ class Battle {
       console.log("Starting fillAtkBars...");
       // Sort characters by speed in descending order
       this.characters.sort((a, b) => b.stats.speed - a.stats.speed);
-
+      let hehetrue = false;
       // Check if any character already has atkBar >= 100
       for (const character of this.characters) {
-        console.log(
-          "Checking atkBar for:",
-          character.name,
-          "atkBar:",
-          character.atkBar
-        );
         if (character.atkBar >= 100) {
+          console.log("found atkBar >= 100 for:", character.name);
           charactersWith100AtkBar.push(character);
+          hehetrue = true;
           return charactersWith100AtkBar; // Exit early if any character has atkBar >= 100
         }
+        console.log("broke bruh");
       }
+      console.log("broken further");
 
       // Calculate the smallestFactor for all characters
       let smallestFactor = Infinity;
       for (const character of this.characters) {
         const speedMultiplier = character.speedBuff ? 1.3 : 1;
         const toMinus = character.atkBar;
+
         const factor =
           (100 - toMinus) / (character.stats.speed * 0.05 * speedMultiplier);
         console.log("factor:", factor);
-        console.log("character.atkBar:", character.atkBar);
         if (factor < smallestFactor) {
           smallestFactor = factor;
         }
@@ -817,14 +815,7 @@ class Battle {
         const speedMultiplier = character.speedBuff ? 1.3 : 1;
         character.atkBar +=
           smallestFactor * (character.stats.speed * 0.05 * speedMultiplier);
-        console.log(
-          "Updated atkBar for:",
-          character.name,
-          "speed:",
-          character.stats.speed,
-          "new atkBar:",
-          character.atkBar
-        );
+
         if (character.atkBar >= 100) {
           charactersWith100AtkBar.push(character);
         }
@@ -852,6 +843,7 @@ class Battle {
 
   async fillHpBars() {
     try {
+      console.log("Starting fillHpBars...");
       for (const character of this.characters) {
         const hp = await this.calculateOverallHp(character);
         character.hpBarEmoji = await generateHPBarEmoji(
@@ -873,8 +865,9 @@ class Battle {
 
       this.currentTurn = characterWith100AtkBar;
       this.currentTurnId = characterWith100AtkBar._id;
-
+      console.log("characterWith100AtkBar:", characterWith100AtkBar.atkBar);
       characterWith100AtkBar.atkBar -= 100;
+      console.log("characterWith100AtkBar2:", characterWith100AtkBar.atkBar);
       characterWith100AtkBar.attackBarEmoji = await generateAttackBarEmoji(
         characterWith100AtkBar.atkBar
       );
@@ -884,15 +877,15 @@ class Battle {
       let fastestCharacter = charactersWith100AtkBar[0];
       this.currentTurn = fastestCharacter;
       this.currentTurnId = fastestCharacter._id;
-
+      console.log("fastestCharacter:", fastestCharacter.name);
       fastestCharacter.atkBar -= 100;
       fastestCharacter.attackBarEmoji = await generateAttackBarEmoji(
         fastestCharacter.atkBar
       );
     }
-
+    console.log("hieee");
     await this.fillHpBars();
-
+    console.log("sussy");
     // const currentAttacker = this.getCurrentAttacker();
     // const debuffs = "debuffs";
     // if (await this.handlePreTurnEffects(currentAttacker, debuffs)) {
@@ -905,11 +898,11 @@ class Battle {
 
   async performTurn() {
     const attacker = this.getCurrentAttacker(); // Determine if the attacker is a player, familiar, or boss
+    console.log("attacker:", attacker, "attacking", this.enemyToHit);
     const damage = await this.calculatePFDamage(attacker, this.enemyToHit);
 
     // Handle dodge mechanics
     await this.handleStatusEffects(this.enemyToHit, damage, attacker);
-    await this.getNextTurn();
   }
   async performEnemyTurn() {
     // Ensure the current turn belongs to an enemy
@@ -923,6 +916,7 @@ class Battle {
       console.log("No valid enemy found for this turn.");
       return;
     }
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // Determine the target (30% chance to target player, otherwise target a random alive familiar)
     const isTargetingPlayer = Math.random() < 0.3;
@@ -937,7 +931,7 @@ class Battle {
     const damage = await this.mobAIClass.move(currentEnemy, targetInfo);
 
     await this.handleStatusEffects(targetInfo, damage, currentEnemy);
-
+    console.log("gogogogo");
     await this.getNextTurn();
   }
 
@@ -1112,9 +1106,9 @@ class Battle {
       await handleTurnEffects(attacker);
       target.stats.hp -= damage;
       this.battleLogs.push(
-        `+ ${this.currentTurn.name} attacks ${
-          target.name
-        } for ${damage} damage using ${name !== undefined ? name : "an attack"}`
+        `+ ${attacker.name} attacks ${target.name} for ${damage} damage using ${
+          name !== undefined ? name : "an attack"
+        }`
       );
       return false; // No status effects to handle
     }
@@ -1136,6 +1130,7 @@ class Battle {
       this.battleLogs.push(
         `+ ${this.currentTurn.name} attacks ${target.name} for ${damage} damage using an attack`
       );
+      console.log("attackerAttacking:", attacker);
 
       await handleTurnEffects(attacker);
       return false;
