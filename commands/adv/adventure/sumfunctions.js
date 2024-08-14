@@ -17,7 +17,7 @@ const db = mongoClient.db("Akaimnky");
 const collection = db.collection("akaillection");
 const { cards } = require("../information/cards.js"); // Import the cards data from 'cards.js'
 const abilities = require("../../../data/abilities.js");
-const DeactivatedElement = require("../../../data/mongo/elementSchema.js");
+const { DeactivatedElement } = require("../../../data/mongo/elementSchema.js");
 const {
   calculateDamage,
   calculateCritDamage,
@@ -27,7 +27,7 @@ const {
 class GameImage {
   constructor(imgH, imgW, player, message) {
     this.filter = { _id: player._id };
-    this.playerData = collection.findOne(this.filter);
+    this.playerData = player;
     this.message = message;
     this.imgH = imgH;
     this.imgW = imgW;
@@ -52,7 +52,6 @@ class GameImage {
   }
   async generateTutorialEntities() {
     firstArea.entities.Entity.forEach((entity) => {
-      console.log(entity);
       this.elements.push({
         name: entity.customFields.name,
         x: entity.x,
@@ -67,21 +66,22 @@ class GameImage {
 
     // Accessing teleport
     console.log("Teleports:");
-    firstArea.entities.Teleport.forEach((teleport) => {
-      console.log(teleport);
-    });
+    // firstArea.entities.Teleport.forEach((teleport) => {
+    //   console.log(teleport);
+    // });
 
     // Accessing npc
     console.log("NPCs:");
-    firstArea.entities.Npc.forEach((npc) => {
-      console.log(npc);
-    });
+    // firstArea.entities.Npc.forEach((npc) => {
+    //   console.log(npc);
+    // });
   }
 
   async forLoop() {
     const attackRadius = 40; // Adjust the radius as needed
 
-    for (const element of this.monsterArray) {
+    for (const element of this.elements) {
+      console.log("happens");
       this.distanceToMonster = Math.sqrt(
         Math.pow(this.playerpos.x - element.x, 2) +
           Math.pow(this.playerpos.y - element.y, 2)
@@ -121,7 +121,9 @@ class GameImage {
       if (!this.generatedRandomElements2) {
         // Add elements to the image
         this.generatedRandomElements2 = true;
-        await this.deactivatedElements();
+        console.log("one");
+        // await this.deactivatedElements();
+        console.log("two");
         for (const element of this.elements) {
           console.log("element:", element);
           const elementName = element.name;
@@ -169,6 +171,7 @@ class GameImage {
         ])
         .png()
         .toBuffer();
+      console.log("doneupdatedMAP");
 
       return new AttachmentBuilder(this.gaeImage, { name: "updatedMap.png" });
     } catch (error) {
@@ -219,109 +222,88 @@ class GameImage {
     const attackRadius = 40; // Adjust the radius as needed
     console.log("NearElement");
 
-    // while (restartForLoop) {
-    for (const element of this.monsterArray) {
-      await this.forLoop();
+    let isMobNearby = false;
+    let isNpcNearby = false;
+    let nearbyElements = [];
 
+    for (const element of this.elements) {
       this.distanceToMonster = Math.sqrt(
         Math.pow(this.playerpos.x - element.x, 2) +
           Math.pow(this.playerpos.y - element.y, 2)
       );
-      console.log("elementname:", element.name);
-      console.log("Distance to monster:", this.distanceToMonster);
 
-      if (
-        this.distanceToMonster <= attackRadius &&
-        element.name.startsWith("monster") &&
-        !hasAttackButton
-      ) {
+      console.log("elementname:", element.name);
+
+      if (this.distanceToMonster <= attackRadius) {
+        nearbyElements.push(element);
+        console.log(`Nearby element: ${element.name}, Type: ${element.type}`);
+
+        if (element.type === "mob") {
+          isMobNearby = true;
+          console.log("isMobNearby:", isMobNearby);
+        } else if (element.type === "npc") {
+          isNpcNearby = true;
+        }
+      }
+    }
+
+    // Determine which row to display based on nearby elements
+    if (nearbyElements.length > 0) {
+      console.log("Nearby elements:", nearbyElements);
+      if (isMobNearby && isNpcNearby) {
+        nowBattling.setFooter({
+          text: "You are near both a monster and an NPC. Choose an action.",
+        });
+        initialMessage.edit({
+          embeds: [nowBattling],
+          components: [...bothButton],
+        });
+      } else if (isMobNearby) {
         nowBattling.setFooter({
           text: "You are in the monster field radius, click the attack button to attack.",
         });
-        this.whichMon = element.name;
-        console.log("whichMon:", this.whichMon);
         initialMessage.edit({
           embeds: [nowBattling],
           components: [...attackRow],
         });
-        console.log("should break");
-
-        break;
-      } else if (
-        this.distanceToMonster >= attackRadius &&
-        element.name === this.whichMon &&
-        hasAttackButton &&
-        this.isTrue
-      ) {
-        console.log("whichMon2:", this.whichMon);
-        console.log("element:", element.name);
-        nowBattling.setFooter({ text: "You moved out of attack range." });
-        initialMessage.edit({
-          embeds: [nowBattling],
-          components: [...navigationRow],
-        });
-
-        break;
-      }
-    }
-
-    //}
-
-    for (const element of this.npcArray) {
-      this.distanceToNpc = Math.sqrt(
-        Math.pow(this.playerpos.x - element.x, 2) +
-          Math.pow(this.playerpos.y - element.y, 2)
-      );
-      //  console.log('elementname:', element.name);
-      //       console.log('Distance to monster:', this.distanceToNpc);
-
-      if (
-        this.distanceToNpc <= attackRadius &&
-        element.name.startsWith("npc") &&
-        !hasTalkButton
-      ) {
+        console.log("editing attackRow");
+      } else if (isNpcNearby) {
         nowBattling.setFooter({
-          text: "You see an NPC, click the 'Talk' button to interact.",
+          text: "You are near an NPC, click the talk button to interact.",
         });
-        this.whichMon = element.name;
-        console.log("whichMonNpcOne:", this.whichMon);
         initialMessage.edit({
           embeds: [nowBattling],
           components: [...talktRow],
         });
-        break;
-      } else if (
-        this.distanceToNpc >= attackRadius &&
-        element.name === this.whichMon &&
-        hasTalkButton
-      ) {
-        nowBattling.setFooter({ text: "You moved out of NPC's range." });
-        initialMessage.edit({
-          embeds: [nowBattling],
-          components: [...navigationRow],
-        });
-        break;
       }
     }
-    if (
-      this.distanceToMonster <= attackRadius &&
-      this.distanceToNpc <= attackRadius &&
-      !hasAttackButton &&
-      !hasTalkButton
-    ) {
-      message.channel.send(
-        "You see an 'NPC' and a 'Monster', click the buttons to interact."
-      );
-      initialMessage.edit({
-        components: [interactRow],
-      });
-    }
+
+    // If player moves out of range of an element
+    // for (const element of nearbyElements) {
+    //   if (
+    //     this.distanceToMonster >= attackRadius &&
+    //     element.name === this.whichMon &&
+    //     hasAttackButton
+    //   ) {
+    //     console.log("whichMon2:", this.whichMon);
+    //     console.log("element:", element.name);
+    //     nowBattling.setFooter({ text: "You moved out of attack range." });
+    //     initialMessage.edit({
+    //       embeds: [nowBattling],
+    //       components: [...navigationRow],
+    //     });
+    //     break;
+    //   }
+    // }
+
+    //}
   }
 
   // Method to filter out deactivated elements
   async deactivatedElements() {
+    console.log("playterDATA:", this.playerData);
     const result = await deactivatedElements(
-      this.playerId,
+      this.playerData._id,
       this.elements,
       this.monsterArray,
       this.npcArray
@@ -446,9 +428,18 @@ async function deactivateElement(
 }
 async function deactivatedElements(playerId, elements, monsterArray, npcArray) {
   // Fetch deactivated elements from the database
+  console.log("playerId:", playerId);
   const deactivatedData = await DeactivatedElement.findOne({
     playerId: playerId,
-  });
+  }).maxTimeMS(2000);
+
+  if (!deactivatedData) {
+    console.log("No deactivated data found for this player.");
+    // Handle the case where no data is found
+  } else {
+    console.log("Deactivated data found:", deactivatedData);
+  }
+
   const currentDate = new Date();
 
   if (deactivatedData) {

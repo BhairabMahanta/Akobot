@@ -93,6 +93,7 @@ module.exports = {
 
     const randomCardStats = randomCardData.card.stats;
     const randomCardExperience = randomCardData.card.experience;
+    const randomCardMoves = randomCardData.card.moves;
     const playerId = message.author.id;
 
     const playerData2 = new Player({
@@ -138,6 +139,7 @@ module.exports = {
           serialId: `${collectionCounter + 1}`,
           globalId: `${Math.floor(Math.random() * 1000000)}`,
           name: randomCard,
+          element: randomCardData.card.element,
           stats: {
             level: randomCardExperience.level,
             xp: randomCardExperience.current,
@@ -152,6 +154,7 @@ module.exports = {
             magic: randomCardStats.magic || 0,
             magicDefense: randomCardStats.magicDefense || 0,
           },
+          moves: randomCardMoves,
         },
       ],
       deck: [

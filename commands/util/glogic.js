@@ -196,7 +196,7 @@ async function generateAttackBarEmoji(atkBar) {
     console.log("errorHere:", error);
   }
 }
-
+const emhoje = "<:hbmf:1269047084049240064> 💚";
 async function generateHPBarEmoji(currentHP, maxHP) {
   const emoji = "■";
   let filledBars;

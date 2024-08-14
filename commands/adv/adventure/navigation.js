@@ -9,7 +9,7 @@ const {
 } = require("../information/loc.js");
 const { GameImage, Player, cycleCooldowns } = require("./sumfunctions.js");
 const players = require("../../../data/players.json");
-const { Battle, BossMonster, Environment } = require("../action/battle.js");
+const { Battle, BossMonster, Environment } = require("../action/battle2.js");
 const { mongoClient } = require("../../../data/mongo/mongo.js");
 const { NPC } = require("../quest/npc.js");
 let updatedImageBuffer = null;
@@ -134,8 +134,6 @@ async function handleNavigation(
   const gameImage = new GameImage(600, 600, player, message);
   const newNpc = new NPC(playerData2, "npc1", message);
   const playerpos = gameImage.playerpos;
-  // const player = new Player('PlayerName', 100); // Replace with actual player name and health
-  // const element = new Element('Monster', 200, 300); // Replace with actual element details
 
   // Call methods on the instances
   // await gameImage.generateAreaElements("Forest Clearing");
@@ -174,7 +172,7 @@ async function handleNavigation(
     filter,
     time: 600000,
   });
-
+  console.log("click1test1 :", playerpos);
   await gameImage.nearElement(
     hasAttackButton,
     message,
@@ -188,7 +186,7 @@ async function handleNavigation(
     interactRow
   );
   // initialMessage.edit({ files: [updatedImageBuffer] });
-  console.log("click1test :", playerpos);
+  console.log("click1test2 :", playerpos);
 
   // Handle button interactions
   collector.on("collect", async (i) => {
@@ -259,7 +257,7 @@ async function handleNavigation(
       newNpc.initiateTalk();
       initialMessage.edit({ components: [] });
     }
-
+    console.log("click1test3 :", playerpos);
     gameImage.nearElement(
       hasAttackButton,
       message,

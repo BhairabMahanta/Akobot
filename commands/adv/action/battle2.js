@@ -55,8 +55,9 @@ class Battle {
   constructor(player, enemy, message) {
     this.mobSource = JSON.parse(JSON.stringify(mobs));
     this.bossSource = JSON.parse(JSON.stringify(bosses));
-    this.famsSource = JSON.parse(JSON.stringify(allFamiliars));
+    // this.famsSource = JSON.parse(JSON.stringify(allFamiliars));
     this.enemyDetails = enemy;
+    console.log("enemyDetails:", this.enemyDetails);
     this.message = message;
     this.continue = true;
     this.player = player;
@@ -115,13 +116,16 @@ class Battle {
   async initialiseStuff() {
     console.log("initialised");
     try {
-      for (const familiarName of this.playerFamiliar) {
-        // console.log('familiarName:', this.playerFamiliar);
-        const familiarData = this.famSource[familiarName];
-        if (familiarData) {
-          this.familiarInfo.push(familiarData);
+      for (const familiar of [...this.frontRow, ...this.backRow]) {
+        if (
+          (familiar.name && familiar.name !== "empty") ||
+          familiar.name !== null ||
+          familiar.name !== this.player.name
+        ) {
+          this.familiarInfo.push(familiar);
         }
       }
+
       if (this.enemyDetails.type === "boss") {
         this.boss = this.bossSource[this.enemyDetails.name];
         this.bossAIClass = new BossAI(this, this.enemyDetails.name);
@@ -156,13 +160,6 @@ class Battle {
         console.log("preTtygay;");
         this.characters = [this.player, ...this.familiarInfo, this.boss];
       } else {
-        // console.log(
-        //   "charGAY:",
-        //   this.player,
-        //   ...this.familiarInfo,
-        //   ...this.mobInfo
-        // );
-
         this.characters = [this.player, ...this.familiarInfo, ...this.mobInfo];
       }
       console.log("characters:", this.characters);

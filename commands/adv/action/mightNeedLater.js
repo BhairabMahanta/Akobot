@@ -189,3 +189,54 @@
       this.teamTurn = isOpponentTurn ? this.opponent.name : this.player.name;
 
   */
+
+/* for (const element of this.npcArray) {
+      this.distanceToNpc = Math.sqrt(
+        Math.pow(this.playerpos.x - element.x, 2) +
+          Math.pow(this.playerpos.y - element.y, 2)
+      );
+      //  console.log('elementname:', element.name);
+      //       console.log('Distance to monster:', this.distanceToNpc);
+
+      if (
+        this.distanceToNpc <= attackRadius &&
+        element.name.startsWith("npc") &&
+        !hasTalkButton
+      ) {
+        nowBattling.setFooter({
+          text: "You see an NPC, click the 'Talk' button to interact.",
+        });
+        this.whichMon = element.name;
+        console.log("whichMonNpcOne:", this.whichMon);
+        initialMessage.edit({
+          embeds: [nowBattling],
+          components: [...talktRow],
+        });
+        break;
+      } else if (
+        this.distanceToNpc >= attackRadius &&
+        element.name === this.whichMon &&
+        hasTalkButton
+      ) {
+        nowBattling.setFooter({ text: "You moved out of NPC's range." });
+        initialMessage.edit({
+          embeds: [nowBattling],
+          components: [...navigationRow],
+        });
+        break;
+      }
+    }
+    if (
+      this.distanceToMonster <= attackRadius &&
+      this.distanceToNpc <= attackRadius &&
+      !hasAttackButton &&
+      !hasTalkButton
+    ) {
+      message.channel.send(
+        "You see an 'NPC' and a 'Monster', click the buttons to interact."
+      );
+      initialMessage.edit({
+        components: [interactRow],
+      });
+    }
+      */

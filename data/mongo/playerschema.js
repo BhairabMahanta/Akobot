@@ -59,6 +59,7 @@ const playerSchema = new Schema(
         serialId: String,
         globalId: String,
         name: String,
+        element: String,
         stats: {
           level: Number,
           xp: Number,
@@ -74,6 +75,7 @@ const playerSchema = new Schema(
           magicDefense: Number,
           // Add other relevant stats here
         },
+        moves: Array,
       },
     ],
     deck: [{ slot: Number, serialId: String, globalId: String, name: String }],
