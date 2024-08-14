@@ -147,16 +147,7 @@ async function handleNavigation(
   );
   nowBattling.setImage(`attachment://updatedMap.png`);
   // Now you can use initialMessage to edit it or perform other actions
-  try {
-    initialMessage.edit({
-      // content: `You are at: ${selectedLocation.name}\nDescription: ${selectedLocation.description}`,
-      embeds: [nowBattling],
-      components: [...navigationRow],
-      files: [updatedImageBuffer],
-    });
-  } catch (error) {
-    console.error("error hoogaya:", error);
-  }
+
   // Collect button interactions
   const filter = (i) =>
     i.user.id === message.user.id &&
@@ -173,7 +164,8 @@ async function handleNavigation(
     time: 600000,
   });
   console.log("click1test1 :", playerpos);
-  await gameImage.nearElement(
+  // initialMessage.edit({ files: [updatedImageBuffer] });
+  const hahaTrueOrFalse = await gameImage.nearElement(
     hasAttackButton,
     message,
     initialMessage,
@@ -183,9 +175,22 @@ async function handleNavigation(
     bothButton,
     hasTalkButton,
     nowBattling,
-    interactRow
+    interactRow,
+    updatedImageBuffer
   );
-  // initialMessage.edit({ files: [updatedImageBuffer] });
+  if (!hahaTrueOrFalse) {
+    try {
+      initialMessage.edit({
+        // content: `You are at: ${selectedLocation.name}\nDescription: ${selectedLocation.description}`,
+        embeds: [nowBattling],
+        components: [...navigationRow],
+        files: [updatedImageBuffer],
+      });
+    } catch (error) {
+      console.error("error hoogaya:", error);
+    }
+  }
+
   console.log("click1test2 :", playerpos);
 
   // Handle button interactions
@@ -258,6 +263,7 @@ async function handleNavigation(
       initialMessage.edit({ components: [] });
     }
     console.log("click1test3 :", playerpos);
+    const phals = false;
     gameImage.nearElement(
       hasAttackButton,
       message,
@@ -268,7 +274,8 @@ async function handleNavigation(
       bothButton,
       hasTalkButton,
       nowBattling,
-      interactRow
+      interactRow,
+      phals
     );
   });
 

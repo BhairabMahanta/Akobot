@@ -77,41 +77,6 @@ class GameImage {
     // });
   }
 
-  async forLoop() {
-    const attackRadius = 40; // Adjust the radius as needed
-
-    for (const element of this.elements) {
-      console.log("happens");
-      this.distanceToMonster = Math.sqrt(
-        Math.pow(this.playerpos.x - element.x, 2) +
-          Math.pow(this.playerpos.y - element.y, 2)
-      );
-      if (this.distanceToMonster <= attackRadius) {
-        this.isTrue = true;
-        console.log("it orked");
-        this.whichMon = element.name;
-        if (!this.elementArray.includes(element)) {
-          this.elementArray.push(element);
-          // Sort the elementArray by shortest distanceToMonster
-          this.elementArray.sort((a, b) => {
-            const distA = Math.sqrt(
-              Math.pow(this.playerpos.x - a.x, 2) +
-                Math.pow(this.playerpos.y - a.y, 2)
-            );
-            const distB = Math.sqrt(
-              Math.pow(this.playerpos.x - b.x, 2) +
-                Math.pow(this.playerpos.y - b.y, 2)
-            );
-            return distA - distB;
-          });
-        }
-
-        break;
-      }
-    }
-    return this.isTrue;
-  }
-
   async generateUpdatedImage(areaImage, playerpos) {
     let name;
     let inputImagePath;
@@ -217,8 +182,10 @@ class GameImage {
     bothButton,
     hasTalkButton,
     nowBattling,
-    interactRow
+    interactRow,
+    updatedImageBuffer
   ) {
+    let hahaTrueOrFalse = false;
     const attackRadius = 40; // Adjust the radius as needed
     console.log("NearElement");
 
@@ -236,8 +203,12 @@ class GameImage {
 
       if (this.distanceToMonster <= attackRadius) {
         nearbyElements.push(element);
+        this.whichMon = element.name;
         console.log(`Nearby element: ${element.name}, Type: ${element.type}`);
-
+        // Check if the element is already in elementArray
+        if (!this.elementArray.includes(element)) {
+          this.elementArray.push(element);
+        }
         if (element.type === "mob") {
           isMobNearby = true;
           console.log("isMobNearby:", isMobNearby);
@@ -245,58 +216,105 @@ class GameImage {
           isNpcNearby = true;
         }
       }
-    }
-
-    // Determine which row to display based on nearby elements
-    if (nearbyElements.length > 0) {
-      console.log("Nearby elements:", nearbyElements);
-      if (isMobNearby && isNpcNearby) {
-        nowBattling.setFooter({
-          text: "You are near both a monster and an NPC. Choose an action.",
-        });
-        initialMessage.edit({
-          embeds: [nowBattling],
-          components: [...bothButton],
-        });
-      } else if (isMobNearby) {
-        nowBattling.setFooter({
-          text: "You are in the monster field radius, click the attack button to attack.",
-        });
-        initialMessage.edit({
-          embeds: [nowBattling],
-          components: [...attackRow],
-        });
-        console.log("editing attackRow");
-      } else if (isNpcNearby) {
-        nowBattling.setFooter({
-          text: "You are near an NPC, click the talk button to interact.",
-        });
-        initialMessage.edit({
-          embeds: [nowBattling],
-          components: [...talktRow],
+      if (this.elementArray.length > 1) {
+        // Sort elementArray by distance to player
+        this.elementArray.sort((a, b) => {
+          const distA = Math.sqrt(
+            Math.pow(this.playerpos.x - a.x, 2) +
+              Math.pow(this.playerpos.y - a.y, 2)
+          );
+          const distB = Math.sqrt(
+            Math.pow(this.playerpos.x - b.x, 2) +
+              Math.pow(this.playerpos.y - b.y, 2)
+          );
+          return distA - distB;
         });
       }
+
+      // Determine which row to display based on nearby elements
+      if (nearbyElements.length > 0) {
+        console.log("Nearby elements:", nearbyElements);
+        if (isMobNearby && isNpcNearby) {
+          nowBattling.setFooter({
+            text: "You are near both a monster and an NPC. Choose an action.",
+          });
+
+          updatedImageBuffer
+            ? initialMessage.edit({
+                embeds: [nowBattling],
+                components: [...bothButton],
+                files: [updatedImageBuffer],
+              })
+            : initialMessage.edit({
+                embeds: [nowBattling],
+                components: [...bothButton],
+              });
+          hahaTrueOrFalse = true;
+        } else if (isMobNearby) {
+          nowBattling.setFooter({
+            text: "You are in the monster field radius, click the attack button to attack.",
+          });
+          updatedImageBuffer
+            ? initialMessage.edit({
+                embeds: [nowBattling],
+                components: [...attackRow],
+                files: [updatedImageBuffer],
+              })
+            : initialMessage.edit({
+                embeds: [nowBattling],
+                components: [...attackRow],
+              });
+          hahaTrueOrFalse = true;
+          console.log("editing attackRow");
+        } else if (isNpcNearby) {
+          nowBattling.setFooter({
+            text: "You are near an NPC, click the talk button to interact.",
+          });
+          updatedImageBuffer
+            ? initialMessage.edit({
+                embeds: [nowBattling],
+                components: [...talktRow],
+                files: [updatedImageBuffer],
+              })
+            : initialMessage.edit({
+                embeds: [nowBattling],
+                components: [...talktRow],
+              });
+          hahaTrueOrFalse = true;
+        }
+      }
+
+      // If player moves out of range of an element
+      for (const element of this.elementArray) {
+        const distanceToElement = Math.sqrt(
+          Math.pow(this.playerpos.x - element.x, 2) +
+            Math.pow(this.playerpos.y - element.y, 2)
+        );
+
+        if (distanceToElement > attackRadius) {
+          if (element.type === "mob" && hasAttackButton) {
+            nowBattling.setFooter({
+              text: "You moved out of attack range.",
+            });
+            initialMessage.edit({
+              embeds: [nowBattling],
+              components: [...navigationRow],
+            });
+            hasAttackButton = false;
+          } else if (element.type === "npc" && hasAttackButton) {
+            nowBattling.setFooter({
+              text: "You moved out of interaction range with the NPC.",
+            });
+            initialMessage.edit({
+              embeds: [nowBattling],
+              components: [...navigationRow],
+            });
+            hasAttackButton = false;
+          }
+        }
+      }
     }
-
-    // If player moves out of range of an element
-    // for (const element of nearbyElements) {
-    //   if (
-    //     this.distanceToMonster >= attackRadius &&
-    //     element.name === this.whichMon &&
-    //     hasAttackButton
-    //   ) {
-    //     console.log("whichMon2:", this.whichMon);
-    //     console.log("element:", element.name);
-    //     nowBattling.setFooter({ text: "You moved out of attack range." });
-    //     initialMessage.edit({
-    //       embeds: [nowBattling],
-    //       components: [...navigationRow],
-    //     });
-    //     break;
-    //   }
-    // }
-
-    //}
+    return hahaTrueOrFalse;
   }
 
   // Method to filter out deactivated elements

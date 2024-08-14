@@ -240,3 +240,39 @@
       });
     }
       */
+
+/* async forLoop() {
+    const attackRadius = 40; // Adjust the radius as needed
+
+    for (const element of this.elements) {
+      console.log("happens");
+      this.distanceToMonster = Math.sqrt(
+        Math.pow(this.playerpos.x - element.x, 2) +
+          Math.pow(this.playerpos.y - element.y, 2)
+      );
+      if (this.distanceToMonster <= attackRadius) {
+        this.isTrue = true;
+        console.log("it orked");
+        this.whichMon = element.name;
+        if (!this.elementArray.includes(element)) {
+          this.elementArray.push(element);
+          // Sort the elementArray by shortest distanceToMonster
+          this.elementArray.sort((a, b) => {
+            const distA = Math.sqrt(
+              Math.pow(this.playerpos.x - a.x, 2) +
+                Math.pow(this.playerpos.y - a.y, 2)
+            );
+            const distB = Math.sqrt(
+              Math.pow(this.playerpos.x - b.x, 2) +
+                Math.pow(this.playerpos.y - b.y, 2)
+            );
+            return distA - distB;
+          });
+        }
+
+        break;
+      }
+    }
+    return this.isTrue;
+  }
+    */
