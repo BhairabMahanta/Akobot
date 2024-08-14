@@ -30,7 +30,7 @@ module.exports = {
     const empty2 = { name: "empty" };
     const updatedDescription = playerData.deck
       .map(
-        (item, index) =>
+        (item) =>
           `${
             item
               ? `\`\`${item.name.toString().padStart(14, " ")}\`\``
@@ -38,12 +38,26 @@ module.exports = {
           }`
       )
       .join("\n");
+    const serialIdsDescription = playerData.deck
+      .map((item) => (item && item.serialId ? item.serialId : "e"))
+      .join(" ");
+    console.log("serialIdsDescription", serialIdsDescription);
+    const serialIdsTopRow = serialIdsDescription
+      .split(" ")
+      .slice(0, 3)
+      .join("                 ");
+    const serialIdsBottomRow = serialIdsDescription
+      .split(" ")
+      .slice(3, 6)
+      .join("                 ");
     const formattedDescription = updatedDescription.split("\n");
     const topRow = formattedDescription.slice(0, 3).join("   ");
     const bottomRow = formattedDescription.slice(3, 6).join("   ");
     const embed = new EmbedBuilder()
       .setTitle("Deck Configuration")
-      .setDescription(`**__FR__**: ${topRow}\n\n__**BR**__: ${bottomRow}\n\n`)
+      .setDescription(
+        `SL ids: \` ${serialIdsTopRow} \`\n**__FR__**: ${topRow}\n\nSL ids: \` ${serialIdsBottomRow}\` \n__**BR**__: ${bottomRow}\n\n`
+      )
       .setColor(0x00ae86)
       .setFooter({
         text: `FrontRow elements are hit more often and BackRow are hit less often/reduced dmg`,
@@ -94,7 +108,7 @@ module.exports = {
           {
             label: "Select Deck Fast",
             description:
-              "Input 6 responses, with 'e' for empty and numbers as serial IDs",
+              "Input 6 responses, with 'e' for empty, 'p' for player and numbers as serial IDs.",
             value: "select_deck_fast",
           },
           {
@@ -234,7 +248,31 @@ module.exports = {
             const foundItem = extraPlayerDataNonUpdating.collectionInv.find(
               (item) => item.serialId === input
             );
-            playerData.deck.push(foundItem || empty);
+            if (foundItem) {
+              const existingFamiliar = playerData.deck.find(
+                (item) => item && item.name === foundItem.name
+              );
+
+              if (existingFamiliar) {
+                await interaction.reply({
+                  content: `You can't add two of the same familiars (${foundItem.name}) to your deck.`,
+                  ephemeral: true,
+                });
+                return;
+              }
+              const filledSlotsCount = playerData.deck.filter(
+                (item) => item && item.name !== "empty"
+              ).length;
+
+              if (filledSlotsCount >= 4) {
+                await interaction.reply({
+                  content: `You can only have 4 familiars in your deck. Please ensure 2 slots remain empty. Taking player slot or not is up to you.`,
+                  ephemeral: true,
+                });
+                return;
+              }
+            }
+            playerData.deck.push(foundItem || empty2);
           }
         }
       } else {
@@ -242,24 +280,59 @@ module.exports = {
         const input = interaction.fields.getTextInputValue(
           `input-${slotNumber}`
         );
+        console.log("ithinknormalbuttons");
         let updateText = input;
         // Ensure extraPlayerDataNonUpdating is defined
         const extraPlayerDataNonUpdating = await collection.findOne(filter);
 
-        if (input.toLowerCase() === "player") {
+        if (input.toLowerCase() === "p" || input.toLowerCase() === "player") {
           updateText = {
             serialId: "player",
             globalId: message.author.id,
             name: message.author.username,
             stats: {},
           };
+        } else if (
+          input.toLowerCase() === "e" ||
+          input.toLowerCase() === "empty"
+        ) {
+          updateText = empty2;
         } else {
           const foundItem = extraPlayerDataNonUpdating.collectionInv.find(
             (item) => item.serialId === input
           );
+          console.log("foundItem", foundItem);
           let theElement;
           if (foundItem) {
+            const existingFamiliar = playerData.deck.find(
+              (item) => item && item.name === foundItem.name
+            );
+
+            if (existingFamiliar) {
+              await interaction.reply({
+                content: `You can't add two of the same familiars (${updateText.name}) to your deck.`,
+                ephemeral: true,
+              });
+              return;
+            }
+            const filledSlotsCount = playerData.deck.filter(
+              (item) => item && item.name !== "empty"
+            ).length;
+
+            if (filledSlotsCount >= 4) {
+              await interaction.reply({
+                content: `You can only have 4 familiars in your deck. Please ensure 2 slots remain empty. Taking player slot or not is up to you.`,
+                ephemeral: true,
+              });
+              return;
+            }
             theElement = foundItem;
+          } else {
+            await interaction.reply({
+              content: `The familiar ID (${input}) doesn't exist.`,
+              ephemeral: true,
+            });
+            return;
           }
 
           updateText = {
@@ -273,11 +346,35 @@ module.exports = {
         playerData.deck = playerData.deck || [];
         playerData.deck[slotNumber - 1] = updateText;
       }
-
+      console.log("updating?");
       const updatedDescription = playerData.deck
-        .map((item, index) => `${index + 1}) ${item ? item.name : "empty"}`)
+        .map(
+          (item) =>
+            `${
+              item
+                ? `\`\`${item.name.toString().padStart(14, " ")}\`\``
+                : `\`\`${empty.toString().padStart(7, " ")}\`\``
+            }`
+        )
         .join("\n");
-      embed.setDescription(updatedDescription);
+      const serialIdsDescription = playerData.deck
+        .map((item) => (item && item.serialId ? item.serialId : "e"))
+        .join("     ");
+
+      const serialIdsTopRow = serialIdsDescription
+        .split(" ")
+        .slice(0, 3)
+        .join("                 ");
+      const serialIdsBottomRow = serialIdsDescription
+        .split(" ")
+        .slice(3, 6)
+        .join("                 ");
+      const formattedDescription = updatedDescription.split("\n");
+      const topRow = formattedDescription.slice(0, 3).join("   ");
+      const bottomRow = formattedDescription.slice(3, 6).join("   ");
+      embed.setDescription(
+        `SL ids: \` ${serialIdsTopRow} \`\n**__FR__**: ${topRow}\n\nSL ids: \` ${serialIdsBottomRow}\` \n__**BR**__: ${bottomRow}\n\n`
+      );
 
       await collection.updateOne(filter, { $set: { deck: playerData.deck } });
 

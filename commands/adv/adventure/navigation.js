@@ -12,9 +12,11 @@ const players = require("../../../data/players.json");
 const { Battle, BossMonster, Environment } = require("../action/battle2.js");
 const { mongoClient } = require("../../../data/mongo/mongo.js");
 const { NPC } = require("../quest/npc.js");
+const { set } = require("mongoose");
 let updatedImageBuffer = null;
 let hasAttackButton = false;
 let hasTalkButton = false;
+let dontGoThrough = false;
 
 // Create a button-based navigation interface
 const navigationRowUp = new ActionRowBuilder().addComponents(
@@ -249,13 +251,17 @@ async function handleNavigation(
       i.customId === "attack_monster" &&
       i.user.id === message.user.id
     ) {
+      dontGoThrough = true;
       initialMessage.edit({ components: [] });
       const thatArray = gameImage.elementArray[0];
-      // console.log('THAT ARA ARAA:', thatArray)
-      // Handle the attack logic here
-      const battle = new Battle(playerData2, thatArray, message);
-      console.log("worked Here beta");
-      await battle.startEmbed();
+      setTimeout(async () => {
+        const battle = new Battle(playerData2, thatArray, message);
+        console.log("worked Here beta");
+        await battle.startEmbed();
+      }, 1000);
+      setTimeout(async () => {
+        initialMessage.delete();
+      }, 1000);
     } else if (i.customId === "talk_npc" && i.user.id === message.user.id) {
       // Handle the attack logic here
       // message.channel.send('You are talking with \`\`NpcName\`\`!');
@@ -264,28 +270,34 @@ async function handleNavigation(
     }
     console.log("click1test3 :", playerpos);
     const phals = false;
-    gameImage.nearElement(
-      hasAttackButton,
-      message,
-      initialMessage,
-      navigationRow,
-      attackRow,
-      talktRow,
-      bothButton,
-      hasTalkButton,
-      nowBattling,
-      interactRow,
-      phals
-    );
+
+    if (dontGoThrough === false) {
+      console.log("click1test4 :", playerpos);
+      gameImage.nearElement(
+        hasAttackButton,
+        message,
+        initialMessage,
+        navigationRow,
+        attackRow,
+        talktRow,
+        bothButton,
+        hasTalkButton,
+        nowBattling,
+        interactRow,
+        phals
+      );
+    }
   });
 
-  // Handle collector end
-  collector.on("end", (collected) => {
-    initialMessage.edit({
-      content: "Button interaction ended.",
-      components: [],
+  // // Handle collector end
+  if (!dontGoThrough) {
+    collector.on("end", (collected) => {
+      initialMessage.edit({
+        content: "Button interaction ended.",
+        components: [],
+      });
     });
-  });
+  }
 }
 
 module.exports = {

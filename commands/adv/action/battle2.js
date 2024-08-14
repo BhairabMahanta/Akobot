@@ -59,7 +59,6 @@ class Battle {
   constructor(player, enemy, message) {
     this.mobSource = JSON.parse(JSON.stringify(mobs));
     this.bossSource = JSON.parse(JSON.stringify(bosses));
-    // this.famsSource = JSON.parse(JSON.stringify(allFamiliars));
     this.enemyDetails = enemy;
     console.log("enemyDetails:", this.enemyDetails);
     this.message = message;
@@ -122,10 +121,12 @@ class Battle {
     try {
       for (const familiar of [...this.frontRow, ...this.backRow]) {
         if (
-          (familiar.name && familiar.name !== "empty") ||
-          familiar.name !== null ||
+          familiar.name &&
+          familiar.name !== "empty" &&
+          familiar.name !== null &&
           familiar.name !== this.player.name
         ) {
+          console.log("familiar:", familiar.name);
           this.familiarInfo.push(familiar);
         }
       }
@@ -800,9 +801,11 @@ class Battle {
       let smallestFactor = Infinity;
       for (const character of this.characters) {
         const speedMultiplier = character.speedBuff ? 1.3 : 1;
+        const toMinus = character.atkBar;
         const factor =
-          (100 - character.atkBar) /
-          (character.stats.speed * 0.05 * speedMultiplier);
+          (100 - toMinus) / (character.stats.speed * 0.05 * speedMultiplier);
+        console.log("factor:", factor);
+        console.log("character.atkBar:", character.atkBar);
         if (factor < smallestFactor) {
           smallestFactor = factor;
         }
