@@ -550,6 +550,7 @@ class Battle {
                 } else {
                   console.log(`Method ${abilityNameCamel} does not exist.`);
                 }
+                //bye byuee
                 this.ability[abilityNameCamel](
                   this.player,
                   this.enemyToHit,
