@@ -2,6 +2,7 @@ const { mongoClient } = require("../../data/mongo/mongo.js");
 const db = mongoClient.db("Akaimnky");
 const collection = db.collection("akaillection");
 const { quests } = require("../adv/quest/quests.js");
+//apply the new logic used in battle here tomorrow
 const {
   cycleCooldowns,
   deactivateElement,
