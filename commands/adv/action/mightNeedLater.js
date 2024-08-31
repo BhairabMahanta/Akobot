@@ -276,3 +276,59 @@
     return this.isTrue;
   }
     */
+
+// OLD COMMAND HANDLERRRR
+/*
+  const Discord = require("discord.js");
+const { loadCommands } = require("./handler");
+
+// Create a new collection to store the commands
+client.commands = new Collection();
+
+// Load all the commands
+loadCommands(client);
+
+const BOT_PREFIX = "a!";
+
+client.on("messageCreate", async (message) => {
+  try {
+    if (message.content.toLowerCase().startsWith(`${BOT_PREFIX}`)) {
+      const args = message.content.slice(2).trim().split(/ +/);
+      const commandName = args.shift().toLowerCase();
+      console.log(`Received command: ${commandName}`);
+      // console.log('commandAlias:', client.commands)
+
+      const command =
+        client.commands.get(commandName) ||
+        client.commands.find(
+          (c) => c.aliases && c.aliases.includes(commandName.toLowerCase())
+        );
+
+      if (!command) return;
+
+      const player = await collection.findOne({ _id: message.author.id });
+
+      // If player is not found, return null
+      if (!player && command.name !== "register") {
+        return message.channel.send(
+          "Player not found. Please use the `a!register yourname` command to register."
+        );
+      }
+
+      if (command.guildOnly && message.channel.type === "dm") {
+        return message.reply("I can't execute that command inside DMs!");
+      }
+
+      try {
+        console.log("Executing command:", command.name);
+        command.execute(client, message, args);
+      } catch (error) {
+        console.error(error);
+        message.reply("An error occurred while executing the command.");
+      }
+    }
+  } catch (error) {
+    console.log("what the fuck:", error);
+  }
+});
+*/

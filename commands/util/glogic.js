@@ -214,7 +214,94 @@ async function generateHPBarEmoji(currentHP, maxHP) {
   return `[${hpBarString}]`;
 }
 
+const { mongoClient } = require("../../data/mongo/mongo.js");
+const db = mongoClient.db("Akaimnky");
+const collection = db.collection("akaillection");
+// Define a function to periodically check quest completion
+async function checkQuestCompletion() {
+  const currentTime = Math.floor(Date.now() / 1000);
+  const playersDb = await collection.find({}).toArray();
+
+  // Iterate through players
+  playersDb.forEach(async (player) => {
+    const playerQuests = player.activeQuests;
+    let questSuccess = false;
+    let questFailure = false;
+
+    // Iterate through active quests of the player
+    for (const questId in playerQuests) {
+      const quest = playerQuests[questId];
+      const questList = player.quests;
+      const timeLimit = quest.timeLimit.daysLeft;
+
+      // Check if time limit is exceeded
+      if (currentTime > timeLimit) {
+        // Quest has failed
+        questFailure = true;
+        quest.questStatus = "timeout";
+        player.completedQuests[questId] = quest;
+        console.log(`Quest '${questId}' has failed for ${player.name}`);
+        // Optionally, update the quest's result and other details
+        delete playerQuests[questId];
+        // Remove the completed quest from quests
+        const questIndex = questList.indexOf(questId);
+        if (questIndex !== -1) {
+          questList.splice(questIndex, 1);
+        }
+      } else {
+        // Quest is still active
+        const objectives = quest.objectives;
+
+        // Check if all objectives are met
+        const allObjectivesMet = objectives.every((objective) => {
+          return Number(objective.current) >= Number(objective.required);
+        });
+
+        if (allObjectivesMet) {
+          // Quest is completed successfully
+          questSuccess = true;
+          quest.questStatus = "completed";
+          player.completedQuests[questId] = quest;
+          console.log(
+            `Quest '${questId}' has been completed successfully for ${player.name}`
+          );
+          // Remove the completed quest from activeQuests
+          delete playerQuests[questId];
+          // Remove the completed quest from quests
+          const questIndex = questList.indexOf(questId);
+          if (questIndex !== -1) {
+            questList.splice(questIndex, 1);
+          }
+        }
+      }
+    }
+    if (questSuccess || questFailure) {
+      // Update the player's data in the database
+      console.log("player.activeQuests:", player.activeQuests);
+      console.log("player.activeQuests:", player);
+      await updatePlayer(player);
+    }
+  });
+}
+async function updatePlayer(player) {
+  try {
+    const filter = { _id: player._id };
+    const update = {
+      $set: {
+        quests: player.quests,
+        activeQuests: player.activeQuests,
+        completedQuests: player.completedQuests,
+      },
+    };
+    await collection.updateOne(filter, update);
+    console.log(`Player data updated for ${player.name}`);
+  } catch (error) {
+    console.error("Error updating player data:", error);
+  }
+}
+
 module.exports = {
+  checkQuestCompletion,
   getMax,
   checkResults,
   updateMovesOnCd,

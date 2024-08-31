@@ -2,22 +2,19 @@ const config = require("./config.json");
 const {
   Client,
   IntentsBitField,
-  EmbedBuilder,
-  ButtonBuilder,
-  ActionRowBuilder,
-  SlashCommandBuilder,
+  ActivityType,
+  ChannelType,
   Events,
   GatewayIntentBits,
-  ModalBuilder,
   Collection,
   Partials,
 } = require("discord.js");
-const path = require("path");
-const fs = require("fs");
+const { checkQuestCompletion } = require("./commands/util/glogic.js");
 const { connectToDB } = require("./data/mongo/mongo.js");
-const { AuditLogEvent } = require("discord.js");
-
+const CommandHandler = require("./events/handlers/commandHandler");
+const { loadCommands } = require("./handler.js");
 const client = new Client({
+  shards: "auto",
   intents: [
     IntentsBitField.Flags.Guilds,
     IntentsBitField.Flags.GuildMessages,
@@ -28,19 +25,22 @@ const client = new Client({
   ],
   partials: [Partials.Message, Partials.Channel, Partials.Reaction],
 });
+const { mongoClient } = require("./data/mongo/mongo.js");
+const db = mongoClient.db("Akaimnky");
+const collection = db.collection("akaillection");
+const path = require("path");
+const fs = require("fs");
 
 client.db = null;
 
 const Discord = require("discord.js");
-const { loadCommands } = require("./handler");
-
-// Create a new collection to store the commands
-client.commands = new Collection();
-
-// Load all the commands
-loadCommands(client);
-
 const BOT_PREFIX = "a!";
+const commandHandler = new CommandHandler(client);
+commandHandler.loadCommands();
+
+// Interaction handler
+const interactionHandler = require("./events/handlers/interactionHandler");
+client.on(Events.InteractionCreate, interactionHandler);
 
 client.on("messageCreate", async (message) => {
   try {
@@ -48,153 +48,87 @@ client.on("messageCreate", async (message) => {
       const args = message.content.slice(2).trim().split(/ +/);
       const commandName = args.shift().toLowerCase();
       console.log(`Received command: ${commandName}`);
-      // console.log('commandAlias:', client.commands)
 
-      const command =
-        client.commands.get(commandName) ||
-        client.commands.find(
-          (c) => c.aliases && c.aliases.includes(commandName.toLowerCase())
-        );
-
-      if (!command) return;
-
-      const player = await collection.findOne({ _id: message.author.id });
-
-      // If player is not found, return null
-      if (!player && command.name !== "register") {
-        return message.channel.send(
-          "Player not found. Please use the `a!register yourname` command to register."
-        );
-      }
-
-      if (command.guildOnly && message.channel.type === "dm") {
-        return message.reply("I can't execute that command inside DMs!");
-      }
-
-      try {
-        console.log("Executing command:", command.name);
-        command.execute(client, message, args);
-      } catch (error) {
-        console.error(error);
-        message.reply("An error occurred while executing the command.");
-      }
+      commandHandler.handleCommand(message);
     }
   } catch (error) {
-    console.log("what the fuck:", error);
+    console.log("meh:", error);
   }
 });
+// Load events
+const eventsPath = path.join(__dirname, "events");
+const eventFiles = fs
+  .readdirSync(eventsPath)
+  .filter((file) => file.endsWith(".js", ".ts"));
 
-// client.on('interactionCreate', async (interaction) => {
-//   if (!interaction.isButton()) return;
-//   if (interaction.customId === 'selectclass') {
-//     const selectClassCommand = require('./commands/util/selectclass.js');
-//     await selectClassCommand.execute(client, interaction.message, [], interaction);
-//   }
-// });
+for (const file of eventFiles) {
+  const event = require(path.join(eventsPath, file));
+  const eventMethod = event.once ? "once" : "on";
+  client[eventMethod](event.name, (...args) => event.execute(...args, client));
+}
 
 client.on("ready", async () => {
   console.log(`${client.user.tag} is ready!🚀`);
   const db = await connectToDB(); // Connect to MongoDB when the bot is ready
 
   client.db = db;
-
-  client.user.setPresence({
-    activities: [{ name: "Watching myself being coded!" }],
-    status: "idle",
-  });
 }); //tells that bot is hot and on
 
-const { mongoClient } = require("./data/mongo/mongo.js");
-const db = mongoClient.db("Akaimnky");
-const collection = db.collection("akaillection");
-// Define a function to periodically check quest completion
-async function checkQuestCompletion() {
-  const currentTime = Math.floor(Date.now() / 1000);
-  const playersDb = await collection.find({}).toArray();
+setInterval(checkQuestCompletion, 1000 * 60);
 
-  // Iterate through players
-  playersDb.forEach(async (player) => {
-    const playerQuests = player.activeQuests;
-    let questSuccess = false;
-    let questFailure = false;
+async function updateStatus(message) {
+  if (!client.user) {
+    console.log("Client user is not available");
+    return;
+  }
 
-    // Iterate through active quests of the player
-    for (const questId in playerQuests) {
-      const quest = playerQuests[questId];
-      const questList = player.quests;
-      const timeLimit = quest.timeLimit.daysLeft;
+  const guildCount = client.guilds.cache.size;
+  const statusMessage = ` ${guildCount} server ${guildCount !== 1 ? "s" : ""} `;
 
-      // Check if time limit is exceeded
-      if (currentTime > timeLimit) {
-        // Quest has failed
-        questFailure = true;
-        quest.questStatus = "timeout";
-        player.completedQuests[questId] = quest;
-        console.log(`Quest '${questId}' has failed for ${player.name}`);
-        // Optionally, update the quest's result and other details
-        delete playerQuests[questId];
-        // Remove the completed quest from quests
-        const questIndex = questList.indexOf(questId);
-        if (questIndex !== -1) {
-          questList.splice(questIndex, 1);
-        }
-      } else {
-        // Quest is still active
-        const objectives = quest.objectives;
+  // console.log(`Attempting to update status: ${statusMessage}`);
 
-        // Check if all objectives are met
-        const allObjectivesMet = objectives.every((objective) => {
-          return Number(objective.current) >= Number(objective.required);
-        });
-
-        if (allObjectivesMet) {
-          // Quest is completed successfully
-          questSuccess = true;
-          quest.questStatus = "completed";
-          player.completedQuests[questId] = quest;
-          console.log(
-            `Quest '${questId}' has been completed successfully for ${player.name}`
-          );
-          // Remove the completed quest from activeQuests
-          delete playerQuests[questId];
-          // Remove the completed quest from quests
-          const questIndex = questList.indexOf(questId);
-          if (questIndex !== -1) {
-            questList.splice(questIndex, 1);
-          }
-        }
-      }
-    }
-    if (questSuccess || questFailure) {
-      // Update the player's data in the database
-      console.log("player.activeQuests:", player.activeQuests);
-      console.log("player.activeQuests:", player);
-      await updatePlayer(player);
-    }
-  });
-}
-
-// Periodically call the function (adjust the interval as needed)
-setInterval(checkQuestCompletion, 1000 * 60); // Check every minute
-
-// Update the player's data in the database
-async function updatePlayer(player) {
   try {
-    const filter = { _id: player._id };
-    const update = {
-      $set: {
-        quests: player.quests,
-        activeQuests: player.activeQuests,
-        completedQuests: player.completedQuests,
-      },
-    };
-    await collection.updateOne(filter, update);
-    console.log(`Player data updated for ${player.name}`);
+    client.user.setPresence({
+      activities: [
+        {
+          name: `Watching myself being coded in ${statusMessage}`,
+          type: ActivityType.Watching,
+        },
+      ],
+      status: "online",
+    });
+    // console.log('Presence updated to:', statusMessage);
+
+    // Send status update to the specified channel if it's in the correct server
+    const channel = await client.channels.fetch(config.statusChannelID);
+    if (
+      channel &&
+      channel.type === ChannelType.GuildText &&
+      channel.guild.id === config.serverID
+    ) {
+      channel.send(message);
+    }
   } catch (error) {
-    console.error("Error updating player data:", error);
+    console.error("Error updating status:", error);
   }
 }
+process.on("SIGINT", () => {
+  updateStatus("Bot is restarting...")
+    .then(() => process.exit())
+    .catch((err) => {
+      console.error("Error sending status update on restart:", err);
+      process.exit();
+    });
+});
 
+process.on("uncaughtException", (err) => {
+  updateStatus(`Bot encountered an error and is shutting down: ${err.message}`)
+    .then(() => process.exit(1))
+    .catch(() => process.exit(1));
+});
+
+client.on(Events.GuildCreate, () => updateStatus("Bot joined a new server."));
+client.on(Events.GuildDelete, () => updateStatus("Bot left a server."));
 client.login(config.token);
 
 module.exports = { client };
